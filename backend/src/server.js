@@ -47,6 +47,7 @@ const main = async () => {
 	await controller.initialize(config, app)
 
 
+    // catch CTRL+C interuption
     process.on('SIGINT', async () => {
         console.log('Stopping Comaint backend...')
 	    await model.terminate()
@@ -55,12 +56,20 @@ const main = async () => {
 
 
     const port = config.server.port
-    app.listen(
-        port, 
-        () => { // success
-            console.log(`Comaint backend listening on ${port}...`)
-        }
-    )
+    
+    // use a Promise to transmit connection error to the main caller
+    const expressServer = await new Promise( (resolve, reject) => {
+        const server = app.listen(
+            port, 
+            () => { // success
+                console.log(`Comaint backend listening on ${port}...`)
+                resolve(server)
+            }
+        )
+        server.on('error', (error) => {
+            reject(error)
+        })
+    })
 
 }
 
