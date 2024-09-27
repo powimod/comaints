@@ -3,8 +3,13 @@
 class View {
     #config = null
 
-    async initialize(config) {
+    initialize(config) {
         this.#config = config
+    }
+
+    json(response, jsonContent) {
+        // use «response.send()» instead of «response.json()» to add a CR at the end
+        response.send(JSON.stringify(jsonContent) + '\n')
     }
 
 }

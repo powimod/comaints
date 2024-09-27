@@ -1,7 +1,9 @@
 'use strict'
 const VERSION = '0.0.1';
 
+import express from 'express'
 import dotenv from 'dotenv'
+
 import ModelSingleton from './model.js'
 import ViewSingleton from './view.js'
 import ControllerSingleton from './controller.js'
@@ -9,6 +11,10 @@ import ControllerSingleton from './controller.js'
 dotenv.config()
 
 const main = async () => {
+
+    const app = express()
+    app.use(express.json())
+    app.use(express.urlencoded({extended: true}))
 
     // configuration is defined in «.env» file
     const DB_PASSWORD = process.env.DB_PASSWORD
@@ -31,10 +37,27 @@ const main = async () => {
 
 	let model  = ModelSingleton.getInstance()
 	await model.initialize(config)
+
+	let view = ViewSingleton.getInstance()
+	await view.initialize(config)
+
+	let controller = ControllerSingleton.getInstance()
+	await controller.initialize(config, app)
+
+    const port = config.server.port
+    app.listen(
+        port, 
+        () => { // success
+            console.log(`Comaint backend listening on ${port}...`)
+        }
+    )
+
 }
 
 
 main().
 catch (error => {
-    console.error(`ERROR : Can not start Comaint backend : ${error.message}`)
+	const message = erreur.message ? erreur.message : erreur
+    console.error(`ERROR : Can not start Comaint backend : ${message}`)
+	process.exit(1)
 })

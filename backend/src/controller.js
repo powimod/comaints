@@ -1,10 +1,22 @@
 'use strict'
 
-class Controller {
-    #config = null
+import ViewSingleton from './view.js'
 
-    async initialize(config) {
-        this.#config = config
+const API_VERSION = 'v1'
+
+class Controller {
+
+    async initialize(config, expressApp) {
+	    const view = ViewSingleton.getInstance()
+
+        expressApp.get(`/api/api-version`, (request, response) => {
+            view.json(response, { version: API_VERSION })
+        })
+
+        expressApp.get(`/api/${API_VERSION}/version`, (request, response) => {
+            view.json(response, { version: config.version})
+        })
+
     }
 
 }
