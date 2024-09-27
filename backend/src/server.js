@@ -44,6 +44,14 @@ const main = async () => {
 	let controller = ControllerSingleton.getInstance()
 	await controller.initialize(config, app)
 
+
+    process.on('SIGINT', async () => {
+        console.log('Stopping Comaint backend...')
+	    await model.terminate()
+        process.exit(0)
+    })
+
+
     const port = config.server.port
     app.listen(
         port, 

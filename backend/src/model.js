@@ -25,6 +25,12 @@ class Model {
         this.#config = config
     }
 
+    async terminate() {
+        if (! this.#dbConnection)
+            return
+        await this.#dbConnection.end()
+        this.#dbConnection = null
+    }
 }
 
 class ModelSingleton {
