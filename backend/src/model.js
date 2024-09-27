@@ -1,19 +1,27 @@
 'use strict'
 
+import mysql from 'promise-mysql'
+
 class Model {
     #config = null
+    #dbConnection = null
 
     async initialize(config) {
 
-        if (config.database === undefined)
+        const dbConfig = config.database
+        if (dbConfig === undefined)
             throw new Error(`Config «database» section not defined`)
 
-        const parameterNames = [ 'name', 'host', 'port', 'account', 'password' ]
-        for (const parameterName of parameterNames) {
-            if (config.database[parameterName] === undefined)
+        for (const parameterName of [ 'name', 'host', 'port', 'user', 'password' ]) {
+            if (dbConfig[parameterName] === undefined)
                 throw new Error(`Parameter «${parameterName}» not defined`)
         }
 
+
+        // TODO add a retry loop
+        const dbConnection = await mysql.createConnection(dbConfig)
+
+        this.#dbConnection = dbConnection
         this.#config = config
     }
 

@@ -30,7 +30,7 @@ const main = async () => {
             name: process.env.DB_NAME || 'bdd_woodstock',
             host: process.env.DB_HOST || 'localhost',
             port: process.env.DB_PORT || 3306, // MySQL default port
-            account: process.env.DB_ACCOUNT || 'admin',
+            user: process.env.DB_USER || 'admin',
             password: DB_PASSWORD
         }
     }
@@ -57,7 +57,7 @@ const main = async () => {
 
 main().
 catch (error => {
-	const message = erreur.message ? erreur.message : erreur
+	const message = error.message ? error.message : error
     console.error(`ERROR : Can not start Comaint backend : ${message}`)
 	process.exit(1)
 })
