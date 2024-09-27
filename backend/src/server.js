@@ -37,13 +37,13 @@ const main = async () => {
         }
     }
 
-	let model  = ModelSingleton.getInstance()
+	const model = ModelSingleton.getInstance()
 	await model.initialize(config)
 
-	let view = ViewSingleton.getInstance()
+	const view = ViewSingleton.getInstance()
 	await view.initialize(config)
 
-	let controller = ControllerSingleton.getInstance()
+	const controller = ControllerSingleton.getInstance()
 	await controller.initialize(config, app)
 
 

@@ -2,7 +2,7 @@
 
 import { expect } from 'chai';
 
-import { loadConfig, jsonGet } from './util.js'
+import { loadConfig, jsonGet, jsonPost } from './util.js'
 
 describe('Check API version', () => {
 
@@ -28,6 +28,19 @@ describe('Check API version', () => {
 				.and.match(/^\d+\.\d+\.\d+$/)
 		})
 
+
+        const DATABASE_CHECK_VERSION = '/api/v1/check-database'
+		it(`Control route ${DATABASE_CHECK_VERSION }`, async () => {
+			let json = await jsonPost(DATABASE_CHECK_VERSION )
+			expect(json).to.have.property('message')
+			expect(json.message).to.be.a('string').and.equal('Success')
+			expect(json).to.have.property('success')
+			expect(json.success).to.be.a('boolean').and.equal(true)
+		})
+
 	})
+
+
+
 })
 

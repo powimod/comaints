@@ -58,6 +58,18 @@ class Model {
         await this.#dbConnection.end()
         this.#dbConnection = null
     }
+
+    async checkAccess() {
+        const rows = await this.#dbConnection.query('SELECT 1');
+        // [ RowDataPacket { '1': 1 } ]
+        if (! (rows instanceof Array))
+            throw new Error('Invalid result')
+        if (rows.length !== 1)
+            throw new Error('Invalid result')
+        const res = rows[0]
+        if (! (rows instanceof Object))
+            throw new Error('Invalid result')
+    }
 }
 
 class ModelSingleton {

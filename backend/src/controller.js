@@ -1,12 +1,14 @@
 'use strict'
 
 import ViewSingleton from './view.js'
+import ModelSingleton from './model.js'
 
 const API_VERSION = 'v1'
 
 class Controller {
 
     async initialize(config, expressApp) {
+	    const model  = ModelSingleton.getInstance()
 	    const view = ViewSingleton.getInstance()
 
         expressApp.get(`/api/version`, (request, response) => {
@@ -15,6 +17,20 @@ class Controller {
 
         expressApp.get(`/api/${API_VERSION}/backend-version`, (request, response) => {
             view.json(response, { version: config.version})
+        })
+
+        expressApp.post(`/api/${API_VERSION}/check-database`, async (request, response) => {
+            let success = false
+            let message = null
+            try {
+                await model.checkAccess()
+                success = true
+                message = 'Success'
+            }
+            catch (error) {
+                message = error.message
+            }
+            view.json(response, { success, message })
         })
 
     }
