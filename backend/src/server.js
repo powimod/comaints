@@ -27,10 +27,12 @@ const main = async () => {
             port: process.env.PORT || 9101
         },
         database: {
-            name: process.env.DB_NAME || 'bdd_woodstock',
+            name: process.env.DB_NAME || 'comaint',
             host: process.env.DB_HOST || 'localhost',
             port: process.env.DB_PORT || 3306, // MySQL default port
             user: process.env.DB_USER || 'admin',
+            retry_interval: process.env.DB_RETRY_INTERVAL || 10, // seconds
+            max_retries: process.env.DB_MAX_RETRIES || -1, // in seconds (-1:infinity)
             password: DB_PASSWORD
         }
     }
@@ -63,8 +65,9 @@ const main = async () => {
 }
 
 
-main().
-catch (error => {
+main()
+// TODO reactivate this
+. catch (error => {
 	const message = error.message ? error.message : error
     console.error(`ERROR : Can not start Comaint backend : ${message}`)
 	process.exit(1)
