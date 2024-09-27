@@ -9,11 +9,11 @@ class Controller {
     async initialize(config, expressApp) {
 	    const view = ViewSingleton.getInstance()
 
-        expressApp.get(`/api/api-version`, (request, response) => {
+        expressApp.get(`/api/version`, (request, response) => {
             view.json(response, { version: API_VERSION })
         })
 
-        expressApp.get(`/api/${API_VERSION}/version`, (request, response) => {
+        expressApp.get(`/api/${API_VERSION}/backend-version`, (request, response) => {
             view.json(response, { version: config.version})
         })
 

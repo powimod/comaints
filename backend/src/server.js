@@ -1,5 +1,5 @@
 'use strict'
-const VERSION = '0.0.1';
+const BACKEND_VERSION = '0.0.1'
 
 import express from 'express'
 import dotenv from 'dotenv'
@@ -22,7 +22,7 @@ const main = async () => {
         throw new Error('DB_PASSWORD not defined')
 
     let config = {
-        version: VERSION,
+        version: BACKEND_VERSION,
         server: {
             port: process.env.PORT || 9101
         },
