@@ -75,9 +75,10 @@ const main = async () => {
 
 
 main()
-// TODO reactivate this
+/* TODO reactivate this
 . catch (error => {
 	const message = error.message ? error.message : error
     console.error(`ERROR : Can not start Comaint backend : ${message}`)
 	process.exit(1)
 })
+*/

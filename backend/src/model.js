@@ -3,11 +3,12 @@
 import mysql from 'promise-mysql'
 
 import { sleep } from './util.js'
+import CompanyModel, {buildCompanyModel} from './models/CompanyModel.js'
 
 class Model {
     #config = null
     #dbConnection = null
-
+    #companyModel = null
 
     async initialize(config) {
 
@@ -47,10 +48,10 @@ class Model {
         if (dbConnection === null)
             throw new Error(`Can not connect database`)
 
+        this.#companyModel = buildCompanyModel(dbConnection)
         this.#dbConnection = dbConnection
         this.#config = config
     }
-
 
     async terminate() {
         if (! this.#dbConnection)
@@ -69,6 +70,10 @@ class Model {
         const res = rows[0]
         if (! (rows instanceof Object))
             throw new Error('Invalid result')
+    }
+
+    getCompanyModel() {
+        return this.#companyModel
     }
 }
 

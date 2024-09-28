@@ -3,9 +3,13 @@
 import ViewSingleton from './view.js'
 import ModelSingleton from './model.js'
 
+import {buildCompanyRoutes} from './routes/CompanyRoutes.js'
+
 const API_VERSION = 'v1'
 
 class Controller {
+
+	#companyRoutes = null;
 
     async initialize(config, expressApp) {
 	    const model  = ModelSingleton.getInstance()
@@ -33,6 +37,7 @@ class Controller {
             view.json(response, { success, message })
         })
 
+        this.#companyRoutes = buildCompanyRoutes(config, expressApp)
     }
 
 }
