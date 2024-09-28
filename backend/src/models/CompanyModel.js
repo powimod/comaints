@@ -1,19 +1,20 @@
 'use strict'
 
 class CompanyModel {
-    static #db = null
+    #db = null
 
-    static initialize = (db) => {
-        CompanyModel.#db = db
+    initialize (db) {
+        this.#db = db
     }
 
-    static async findCompanyList() {
+    async findCompanyList() {
         return []
     }
 
 }
 
 
+/* TODO cleanup
 const buildCompanyModel = (db) => {
     CompanyModel.initialize(db)
     return CompanyModel
@@ -21,3 +22,21 @@ const buildCompanyModel = (db) => {
 
 export {buildCompanyModel }
 export default CompanyModel
+*/
+
+class CompanyModelSingleton {
+
+    static #instance = null
+
+	constructor() {
+		throw new Error('Can not instanciate CompanyModelSingleton!')
+	}
+
+	static getInstance() {
+		if (! CompanyModelSingleton.#instance)
+			CompanyModelSingleton.#instance = new CompanyModel()
+		return CompanyModelSingleton.#instance
+	}
+}
+
+export default CompanyModelSingleton 

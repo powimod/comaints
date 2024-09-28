@@ -6,7 +6,7 @@ import ControllerSingleton from '../controller.js'
 
 class CompanyRoutes {
 
-    static initialize = (config, expressApp) => {
+    initialize(config, expressApp) {
         const controller = ControllerSingleton.getInstance()
 	    const view = ViewSingleton.getInstance()
 	    const model  = ModelSingleton.getInstance()
@@ -23,10 +23,19 @@ class CompanyRoutes {
 
 }
 
-const buildCompanyRoutes = (config, expressApp) => {
-    CompanyRoutes.initialize(config, expressApp)
-    return CompanyRoutes
+class CompanyRoutesSingleton {
+
+    static #instance = null
+
+	constructor() {
+		throw new Error('Can not instanciate CompanyRoutesSingleton!')
+	}
+
+	static getInstance() {
+		if (! CompanyRoutesSingleton.#instance)
+			CompanyRoutesSingleton.#instance = new CompanyRoutes()
+		return CompanyRoutesSingleton.#instance
+	}
 }
 
-export {buildCompanyRoutes}
-export default CompanyRoutes
+export default CompanyRoutesSingleton 

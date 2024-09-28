@@ -3,7 +3,8 @@
 import ViewSingleton from './view.js'
 import ModelSingleton from './model.js'
 
-import {buildCompanyRoutes} from './routes/CompanyRoutes.js'
+// TODO clean import {buildCompanyRoutes} from './routes/CompanyRoutes.js'
+import CompanyRoutesSingleton from './routes/CompanyRoutes.js'
 
 const API_VERSION = 'v1'
 
@@ -37,7 +38,9 @@ class Controller {
             view.json(response, { success, message })
         })
 
-        this.#companyRoutes = buildCompanyRoutes(config, expressApp)
+        // TODO cleanup this.#companyRoutes = buildCompanyRoutes(config, expressApp)
+        this.#companyRoutes = CompanyRoutesSingleton.getInstance()
+        this.#companyRoutes.initialize(config, expressApp)
     }
 
 }

@@ -15,8 +15,7 @@ describe('Check database', () => {
         const COMPANY_LIST_ROUTE = '/api/v1/company/list'
 		it(`Control route ${COMPANY_LIST_ROUTE }`, async () => {
 			let json = await jsonGet(COMPANY_LIST_ROUTE)
-			expect(json).to.have.property('success')
-			expect(json.success).to.be.a('boolean').and.equal(true)
+			expect(json).to.have.property('companyList')
 		})
 
 	})

@@ -3,7 +3,8 @@
 import mysql from 'promise-mysql'
 
 import { sleep } from './util.js'
-import CompanyModel, {buildCompanyModel} from './models/CompanyModel.js'
+//import CompanyModel, {buildCompanyModel} from './models/CompanyModel.js'
+import CompanyModelSingleton  from './models/CompanyModel.js'
 
 class Model {
     #config = null
@@ -48,7 +49,8 @@ class Model {
         if (dbConnection === null)
             throw new Error(`Can not connect database`)
 
-        this.#companyModel = buildCompanyModel(dbConnection)
+        this.#companyModel = CompanyModelSingleton.getInstance()
+        this.#companyModel.initialize(dbConnection)
         this.#dbConnection = dbConnection
         this.#config = config
     }
