@@ -1,0 +1,22 @@
+-- Project {{project.name}} 
+-- Database schema version {{project.attributes.database_schema_version}}
+-- MySQL Database clear script
+
+USE {{project.attributes.database_name}}
+
+--------------------------------------------------------------------------------
+--     Tables                                                                 --
+--------------------------------------------------------------------------------
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+{% for object in project.objects -%}
+--
+-- Table {{object.attributes.table_name}}
+--
+DROP TABLE IF EXISTS {{object.attributes.table_name}};
+{% endfor %}
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+--- end of sql script
