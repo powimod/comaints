@@ -3,6 +3,7 @@
 import ViewSingleton from '../view.js'
 import ModelSingleton from '../model.js'
 import ControllerSingleton from '../controller.js'
+import { ComaintErrorInvalidRequest } from '../../../common/src/error.mjs'
 
 class CompanyRoutes {
 
@@ -15,10 +16,23 @@ class CompanyRoutes {
 
         // TODO ajouter withAuth
 	    expressApp.get('/api/v1/company/list', async (request, response) => {
-			const companyList = await companyModel.findCompanyList();
+			const companyList = await companyModel.findCompanyList()
             view.json(response, { companyList })
         })
 
+        // TODO ajouter withAuth
+        expressApp.post('/api/v1/company', async (request, response) => {
+            try {
+                let company = request.body.company;
+                if (company === undefined)
+                    throw new ComaintErrorInvalidRequest(`Can't find «company» in request body`);
+			    company = await companyModel.createCompany(company);
+                view.json(response, company)
+            }
+            catch(error) {
+                view.error(response, error)
+            }
+        })
     }
 
 }

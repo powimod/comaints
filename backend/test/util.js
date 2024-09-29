@@ -30,7 +30,8 @@ const jsonFull = async (routeUrl, httpMethod, requestBody) => {
 			'Accept-Language': 'fr, fr-FR'
 		}
 	}
-	if (httpMethod in ['POST', 'PUT', 'PATCH'])
+    const methodsWithBody = ['POST', 'PUT', 'PATCH']
+	if (methodsWithBody.includes(httpMethod))
 		fetchParam.body = JSON.stringify(requestBody)
 	const response = await fetch(url, fetchParam)
 	if (! response.ok) {

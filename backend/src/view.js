@@ -12,6 +12,10 @@ class View {
         response.send(JSON.stringify(jsonContent) + '\n')
     }
 
+    error(response, error) {
+        const errorMessage = error.message ? error.message : error
+        response.status(error.httpStatus || 500).send(errorMessage)
+    }
 }
 
 class ViewSingleton {

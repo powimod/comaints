@@ -148,8 +148,13 @@ files:
   - scope:  "project"
     input:  "common/init-db.sql.liquid"
     output: "build/init-db.sql"
+
   - scope:  "project"
     input:  "common/clear-db.sql.liquid"
     output: "build/clear-db.sql"
+
+  - scope:  "object"
+    input:  "common/object-def.js.liquid"
+    output: "build/common/src/objects/{{object.name | kebabCase}}-object-def.mjs"
 
 

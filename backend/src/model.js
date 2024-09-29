@@ -22,7 +22,6 @@ class Model {
                 throw new Error(`Parameter «${parameterName}» not defined`)
         }
 
-
 		// connection retry loop
 		const retryInterval = dbConfig.retry_interval
 		let maxRetries = dbConfig.max_retries
@@ -33,7 +32,12 @@ class Model {
 		for (let retry = 0; retry < maxRetries ; retry++){
 			console.log(`Connecting database ...`)
 			try {
-                dbConnection = await mysql.createConnection(dbConfig)
+                dbConnection = await mysql.createConnection({
+                    host: dbConfig.host,
+                    database: dbConfig.name,
+                    user: dbConfig.user,
+                    password: dbConfig.password,
+                })
 				if (dbConnection.code === undefined)
 					break
 				console.error(`Can not open database : ${db.code}`)

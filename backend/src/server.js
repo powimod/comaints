@@ -32,7 +32,7 @@ const main = async () => {
             port: process.env.DB_PORT || 3306, // MySQL default port
             user: process.env.DB_USER || 'admin',
             retry_interval: process.env.DB_RETRY_INTERVAL || 10, // seconds
-            max_retries: process.env.DB_MAX_RETRIES || -1, // in seconds (-1:infinity)
+            max_retries: process.env.DB_MAX_RETRIES || -1, // -1:infinity
             password: DB_PASSWORD
         }
     }
