@@ -1,0 +1,144 @@
+-- Project {{project.name}} 
+-- Database schema version {{project.attributes.database_schema_version}}
+-- MySQL Database initialization script
+
+-- CREATE SCHEMA db_comaint;
+USE {{project.attributes.database_name}}
+-- CREATE USER 'comaint'@'localhost' IDENTIFIED BY 'g4m0-KauM1nt';
+-- GRANT ALL PRIVILEGES ON db_comaint.* TO 'comaint'@'localhost';
+
+
+--------------------------------------------------------------------------------
+--     Tables                                                                 --
+--------------------------------------------------------------------------------
+
+{% for object in project.objects %}
+--
+-- Table {{object.attributes.table_name}}
+--
+CREATE TABLE {{object.attributes.table_name}}(
+	{% for property in object.properties %}
+		{%- if property.type.name == 'id' -%}
+			{{property.name | snakeCase }} INTEGER NOT NULL auto_increment, 
+		{%- endif -%}
+	{%- endfor -%}
+
+	{% for link in object.links %}
+	{%-   assign constraint = " NOT NULL" %}
+	{%-   if link.mandatory == false %}
+	{%-     assign constraint = "" %}
+	{%-   endif %}
+	id_{{link.name | snakeCase }} INTEGER{{constraint}}, 
+	{%- endfor -%}
+
+	{% for property in object.properties %}
+		{%- liquid
+		    if property.maximum
+			assign data_size = property.maximum
+		    else
+			assign data_size = 255
+		    endif 
+		    if property.mandatory
+			 assign mandatory = " NOT NULL"
+		    else
+			 assign mandatory = ""
+		    endif 
+		   case property.type.name
+		      when "string"
+			 assign data_type = data_size | prepend: "VARCHAR(" | append: ")"
+		      when "text"
+			 assign data_type = "TEXT"
+		      when "integer"
+			 assign data_type = "INTEGER"
+			 if property.maximum
+			   if property.maximum <= 32767
+			     assign data_type = "SMALLINT"
+			   endif
+			   if property.maximum <= 127
+			     assign data_type = "TINYINT"
+			   endif
+			 endif
+		      when "date"
+			 assign data_type = "DATE"
+		      when "time"
+			 assign data_type = "TIME"
+		      when "datetime"
+			 assign data_type = "DATETIME"
+		      when "boolean"
+			 assign data_type = "BOOLEAN"
+		      when "price"
+			 assign data_type = "DECIMAL(8,2)"
+		      when "uuid"
+			 assign data_type = "VARCHAR(36)"
+		      when "image"
+			 assign data_type = "VARCHAR(36)"
+		      when "email"
+			 assign data_type = "VARCHAR(96)"
+		      else
+			 assign data_type = property.type.name | append: ">>>" | prepend: "<<<"
+		   endcase
+		   if property.defaultValue != nil 
+		     assign default_value = property.defaultValue | prepend: " DEFAULT '" | append: "'"
+		     if property.type.name == 'boolean'
+		       assign default_value = property.defaultValue | prepend: " DEFAULT "
+		     endif
+		   else
+		     assign default_value = ""
+	           endif -%}
+		{%- if property.type.name != 'id' -%}
+			{{property.name | snakeCase }} {{data_type}}{{mandatory}}{{default_value}}, 
+		{%- endif %}
+	{% endfor -%}
+
+	{% for property in object.properties %}
+		{%- if property.type.name == 'id' -%}
+			PRIMARY KEY ({{property.name | snakeCase }})
+		{%- endif -%}
+	{%- endfor %}
+);
+
+{% for index in object.indexes%}
+{% liquid
+   if index.unique
+	assign unicity = "UNIQUE "
+   else
+	assign unicity = ""
+   endif -%}
+CREATE {{unicity}}INDEX idx_{{index.name | snakeCase }} ON {{object.attributes.table_name}}(
+	{% for key in index.keys -%}
+	{%- liquid
+	  case key.type
+	     when "property"
+	        assign key_target = key.reference.name | snakeCase
+	     when "link"
+	        assign key_target = key.reference.name | snakeCase | prepend: "id_" 
+	  else
+	        assign key_target = "???"
+	  endcase
+	  if key.last
+		assign separator = ''
+	  else
+		assign separator = ','
+	  endif -%}
+	{{key_target}}{{separator}}
+	{% endfor -%}
+);
+{%- endfor %}
+{% endfor %}
+
+--------------------------------------------------------------------------------
+--     Foreign keys                                                           --
+--------------------------------------------------------------------------------
+
+{% for object in project.objects -%}
+{%- for link in object.links %}
+{%- assign target_table = link.target.attributes.table_name %}
+ALTER TABLE {{object.attributes.table_name}} ADD CONSTRAINT fk_{{object.attributes.table_name}}_{{link.name | snakeCase}}
+	FOREIGN KEY (id_{{link.name | snakeCase }})
+	REFERENCES {{target_table}}(id)
+	ON DELETE CASCADE;
+
+{%- endfor -%}
+{%- endfor %}
+
+--- end of sql script

@@ -1,0 +1,31 @@
+{
+  "name": "comaint-backend",
+  "version": "0.0.1",
+  "description": "Comaint backend",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon node src/server.js",
+    "test": "mocha --timeout 10000 --exit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/powimod/comaints.git"
+  },
+  "author": "Dominique Parisot",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/powimod/comaints/issues"
+  },
+  "homepage": "https://github.com/powimod/comaints#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "nodemon": "^3.1.7",
+    "promise-mysql": "^5.2.0"
+  },
+  "devDependencies": {
+    "chai": "^5.1.1",
+    "mocha": "^10.7.3"
+  }
+}

@@ -1,0 +1,38 @@
+'use strict'
+const {{object.name|camelCase}}ObjectDef = {
+{%- for property in object.properties %} 
+	{%- assign camelCaseName = property.name|camelCase %}
+	{%- assign snakeCaseName = property.name|snakeCase %}
+	"{{camelCaseName}}" : {
+		"type": "{{ property.type.name }}",
+		{%- if camelCaseName  != snakeCaseName %}
+		"field": "{{ snakeCaseName }}",
+		{%- endif %}
+		{%- if property.minimum != nil  %}
+		"minimum": "{{ property.minimum }}",
+		{%- endif %}
+		{%- if property.maximum != nil %}
+		"maximum": "{{ property.maximum }}",
+		{%- endif %}
+		{%- if property.defaultValue != nil %}
+		"default": "{{ property.defaultValue }}",
+		{%- endif %}
+		{%- if property.mandatory != nil %}
+		"mandatory": "{{ property.mandatory }}",
+		{%- endif %}
+		{%- if property.secret == true %}
+		"secret": "{{ property.secret }}",
+		{%- endif %}
+	},
+{%- endfor %}
+{%- for link in object.links %} 
+	"{{link.name|camelCase}}Id" : {
+		"type": "link",
+		"target" : "{{link.target.name}}",
+		"field" : "id_{{link.name|snakeCase}}",
+		"table" : "{{link.target.attributes.table_name}}"
+	},
+{%- endfor %}
+}
+
+export default {{object.name|camelCase}}ObjectDef
