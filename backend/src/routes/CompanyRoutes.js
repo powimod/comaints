@@ -3,7 +3,7 @@
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import ControllerSingleton from '../controller.js'
-import { ComaintErrorInvalidRequest } from '../../../common/src/error.mjs'
+import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
 
 import { controlObject } from '../../../common/src/objects/object-util.mjs'
 import companyObjectDef from '../../../common/src/objects/company-object-def.mjs'
@@ -29,12 +29,12 @@ class CompanyRoutes {
             try {
                 let company = request.body.company
                 if (company === undefined)
-                    throw new ComaintErrorInvalidRequest(view.translation('error.request_param_not_found', { parameter: 'company'}))
+                    throw new ComaintApiErrorInvalidRequest(view.translation('error.request_param_not_found', { parameter: 'company'}))
                 if (typeof(company) !== 'object')
-                    throw new ComaintErrorInvalidRequest(view.translation('error.request_param_invalid', { parameter: 'company'}))
+                    throw new ComaintApiErrorInvalidRequest(view.translation('error.request_param_invalid', { parameter: 'company'}))
                 const [ errorMsg, errorParam ] = controlObject(companyObjectDef, company, { fullCheck:true, checkId:false })
                 if (errorMsg)
-                    throw new ComaintErrorInvalidRequest(view.translation(errorMsg, errorParam))
+                    throw new ComaintApiErrorInvalidRequest(view.translation(errorMsg, errorParam))
 			    company = await companyModel.createCompany(company)
                 view.json(company)
             }
