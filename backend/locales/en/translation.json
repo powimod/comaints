@@ -1,0 +1,35 @@
+{
+    "general": {
+        "welcome": "Welcome",
+        "hello": "Hello {{firstname}} {{lastname}}"
+    },
+    "error": {
+        "request_param_not_found": "Parameter «{{parameter}} not found in request body",
+        "request_param_invalid": "Parameter «{{parameter}} invalid in request body",
+		"prop": {
+			"is_not_defined": "Property «{{property}}» is not defined",
+			"has_no_value": "Property «{{property}}» has no value",
+			"is_null": "Property «{{property}}» is null",
+			"is_not_an_integer": "Property «{{property}}» is not an integer",
+			"is_too_small": "Property «{{property}}» is too small",
+			"is_too_large": "Property «{{property}}» is too large",
+			"is_not_a_string": "Property «{{property}}» is not a string",
+			"is_too_short": "Property «{{property}}» is too short",
+			"is_too_long": "Property «{{property}}» is too long",
+			"is_not_a_boolean": "Property «{{property}}» is not a boolean",
+			"is_not_a_date": "Property «{{property}}» is not a date",
+			"is_not_a_pure_date": "Property «{{property}}» is not a (pure) date",
+			"is_not_a_date_time": "Property «{{property}}» is not a date/time",
+			"is_malformed_email": "Property «{{property}}» is not a valid email",
+			"is_malformed_uuid": "Property «{{property}}» is not a valid uuid",
+			"is_malformed": "Property «{{property}}» is malformed",
+            "contains_line_feeds": "Property «{{property}}» contains line feeds",
+			"password_to_small": "Password is too small",
+			"password_no_lowercase_letter": "Password does not contain lowercase letter",
+			"password_no_uppercase_letter": "Password does not contain uppercase letter",
+			"password_no_digit_character": "Password does not contain digit character",
+			"password_no_special_character": "Password does not contain special character"
+		}
+
+    }
+}

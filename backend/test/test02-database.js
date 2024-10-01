@@ -29,10 +29,11 @@ describe('Check database', () => {
 		})
     })
 
-	describe('Test company list API', () => {
+	describe('Test company creation API', () => {
 
         const COMPANY_CREATE = '/api/v1/company'
-		it(`Control route ${COMPANY_CREATE} without argument`, async () => {
+
+		it(`Control route ${COMPANY_CREATE} without parameter`, async () => {
             let success = false
             try {
                 const json = await jsonPost(COMPANY_CREATE)
@@ -40,7 +41,33 @@ describe('Check database', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Can't find «company» in request body)`)
+                expect(error.message).to.equal(`Server status 400 (Parameter «company not found in request body)`)
+            }
+            expect(success, 'Should generate an error').to.equal(false)
+		})
+
+		it(`Control route ${COMPANY_CREATE} with invalid parameter`, async () => {
+            let success = false
+            try {
+                const json = await jsonPost(COMPANY_CREATE, { company: 'abc' })
+                success = true
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 400 (Parameter «company invalid in request body)`)
+            }
+            expect(success, 'Should generate an error').to.equal(false)
+		})
+
+		it(`Control route ${COMPANY_CREATE} with empty parameter`, async () => {
+            let success = false
+            try {
+                const json = await jsonPost(COMPANY_CREATE, { company: {} })
+                success = true
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 400 (Property «name» is not defined)`)
             }
             expect(success, 'Should generate an error').to.equal(false)
 		})

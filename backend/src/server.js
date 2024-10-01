@@ -2,10 +2,12 @@
 const BACKEND_VERSION = '0.0.1'
 
 import express from 'express'
+import i18next from 'i18next'
+import Backend from 'i18next-fs-backend'
+import middleware from 'i18next-http-middleware'
 import dotenv from 'dotenv'
 
 import ModelSingleton from './model.js'
-import ViewSingleton from './view.js'
 import ControllerSingleton from './controller.js'
 
 dotenv.config()
@@ -15,6 +17,16 @@ const main = async () => {
     const app = express()
     app.use(express.json())
     app.use(express.urlencoded({extended: true}))
+
+    // i18n support
+    i18next.use(Backend).use(middleware.LanguageDetector).init({
+        fallbackLng: 'en',
+        preload: ['en', 'fr'],
+        backend: {
+            loadPath: './locales/{{lng}}/translation.json'
+        }
+    })
+    app.use(middleware.handle(i18next))
 
     // configuration is defined in «.env» file
     const DB_PASSWORD = process.env.DB_PASSWORD
@@ -39,9 +51,6 @@ const main = async () => {
 
 	const model = ModelSingleton.getInstance()
 	await model.initialize(config)
-
-	const view = ViewSingleton.getInstance()
-	await view.initialize(config)
 
 	const controller = ControllerSingleton.getInstance()
 	await controller.initialize(config, app)

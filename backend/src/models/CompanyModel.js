@@ -40,13 +40,7 @@ class CompanyModel {
 
 
 	async createCompany(company) {
-		const error = controlObject(companyObjectDef, company, { fullCheck:true, checkId:false })
-		if ( error)
-			throw new Error(error)
-
-
 		const companyDb = convertObjectToDb(companyObjectDef, company)
-
         const [ fieldNames, fieldValues ] = buildFieldArrays(companyObjectDef, companyDb)
         const markArray = Array(fieldValues.length).fill('?').join(',')
 
@@ -59,7 +53,6 @@ class CompanyModel {
 		const companyId = result.insertId
 		company = this.getCompanyById(companyId)
 		return company
-
     }
 }
 

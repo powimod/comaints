@@ -11,7 +11,7 @@
  * @param {Object} object - object to control.
  * @param {Object} options
  * @param {boolean} [options.fullCheck=true] - indicates if all properties must be present or not.
- * @param {boolean} [options.controlId=true] - indicates if object ID property should be controlled or not
+ * @param {boolean} [options.checkId=true] - indicates if object ID property should be controlled or not
  *                  (useful with a newly created object for which the ID is not yet valued).
  * @param {function} - I18next function called to translate the error message ID into a translated string
  *                  (if this function is null the error string ID will be return).
@@ -30,8 +30,8 @@
  *
  */
 const controlObject = (objDef, object, options) => {
-    const fullCheck = options.fullCheck ?? true
-    const controlId =  options.controlId ?? true
+    const fullCheck =  options.fullCheck === undefined ? true : options.fullCheck
+    const checkId =  options.checkId === undefined ? true : options.checkId
 	if (objDef === undefined)
 		throw new Error('objDef argument is missing')
 	if (typeof(objDef) != 'object')
@@ -43,22 +43,19 @@ const controlObject = (objDef, object, options) => {
 
 	if (typeof(fullCheck) != 'boolean')
 		throw new Error('fullCheck argument is not an boolean')
-	if (typeof(controlId) != 'boolean')
-		throw new Error('controlId argument is not an boolean')
+	if (typeof(checkId) != 'boolean')
+		throw new Error('checkId argument is not an boolean')
 
 	for (const [propName, propDef] of Object.entries(objDef)) {
-		if (propDef.type === 'id' && controlId === false)
+		if (propDef.type === 'id' && checkId === false)
 			continue
 		const propValue = object[propName]
 		if (propValue === undefined || propValue === null) {
-			if (fullCheck && objDef.mandatory)
-				return `Property ${propName} is not defined` // TODO i18n
+			if (fullCheck && propDef.mandatory)
+                return [ 'error.prop.is_not_defined', { property: propName } ]
 		}
 		else {
-			const error = controlObjectProperty (objDef, propName, object[propName])
-			if (error)
-				return error
-
+			return controlObjectProperty (objDef, propName, object[propName])
 		}
 	}
 	return false // no error
@@ -73,15 +70,13 @@ const controlObject = (objDef, object, options) => {
  * @param {Object} objDef - object definition containing the property to control.
  * @param {string} propName - name of the property to control (will be searched in object definition).
  * @param {variant} propValue - the value of the property.
- * @param {function} - I18next function called to translate the error message ID into a translated string
- *                  (if this function is null the error string ID will be return).
  * @returns {boolean} - returns false if all properties are correct (never return true)
- * @returns {string} - returns a error message with the violated constraint.
+ * @returns {<string>, <object>} : returns a translation message ID and an oject with it's parameters value
  *
  * @example
- *	const errorMessage = objectUtil.controlProperty(userDef, 'password', myPassword, t)
- *	if (errorMessage)
- *		throw new Error(errorMessage)
+ *	const res = objectUtil.controlProperty(userDef, 'password', myPassword, t)
+ *	if (res)
+ *		throw new Error(i18n(res[0], )
  *
  */
 const controlObjectProperty = (objDef, propName, propValue) => {
@@ -98,13 +93,13 @@ const controlObjectProperty = (objDef, propName, propValue) => {
 		throw new Error(`Invalid property name [${propName}]`)
 
 	if (propValue === undefined)
-		return `Property «${propName}» is not defined`
+		return ['error.prop.has_no_value', {property: propName}]
 
 	if (propValue === null) {
 		if (propDef.mandatory)
-		    return `Property «${propName}» can not be null`
+			return ['error.prop.is_null', {property: propName}]
 		else
-			return null
+			return null // FIXME 
 	}
 
 	if (propDef.secret)
@@ -115,60 +110,60 @@ const controlObjectProperty = (objDef, propName, propValue) => {
 		case 'id':
 		case 'link':
 			if (typeof(propValue) !== 'number' )
-		        return `Property «${propName}» is not a integer`
-			return false // no error
+				return ['error.prop.is_not_an_integer', {property: propName}]
+            return [ false ] // no error
 
 		case 'integer':
 			if (typeof(propValue) !== 'number' )
-		        return `Property «${propName}» is not a integer`
+				return ['error.prop.is_not_an_integer', {property: propName}]
 			if (propDef.minimum && propValue < propDef.minimum )
-		        return `Property «${propName}» is too small (minimum ${propDef.minimum})`
+				return ['error.prop.is_too_small', {property: propName, size: propDef.minimum}]
 			if (propDef.maximum && propValue > propDef.maximum )
-		        return `Property «${propName}» is too large (minimum ${propDef.maximum})`
-			return false // no error
+				return ['error.prop.is_too_large', {property: propName, size: propDef.maximum}]
+            return [ false ] // no error
 
 		case 'string':
 		case 'text':
 		case 'image':
 			if (typeof(propValue) !== 'string' )
-		        return `Property «${propName}» is not a string`
+				return ['error.prop.is_not_a_string', {property: propName}]
 			if (propDef.minimum && propValue.length < propDef.minimum )
-		        return `Property «${propName}» is too short (minimum ${propDef.minimum})`
+				return ['error.prop.is_too_short', {property: propName, size: propDef.minimum}]
 			if (propDef.maximum && propValue.length > propDef.maximum )
-		        return `Property «${propName}» is too long (minimum ${propDef.maximum})`
+				return ['error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
 			if (propDef.type !== 'text' && propValue.includes('\n'))
-		        return `Property «${propName}» can not contain line feed characters`
-			return false // no error
+				return ['error.prop.contains_line_feeds',  {property: propName, size: propDef.maximum}]
+            return [ false ] // no error
 
 		case 'email':
 			if (typeof(propValue) !== 'string' )
-		        return `Property «${propName}» is not a string`
+				return ['error.prop.is_not_a_string', {property: propName}]
 			if (propDef.minimum && propValue.length < propDef.minimum )
-		        return `Property «${propName}» is too short (minimum ${propDef.minimum})`
+				return ['error.prop.is_too_short', {property: propName, size: propDef.minimum}]
 			if (propDef.maximum && propValue.length > propDef.maximum )
-		        return `Property «${propName}» is too long (minimum ${propDef.maximum})`
+				return ['error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
 			if (propValue.match(/\S+@\S+\.\S+/) === null)
-		        return `Property «${propName}» is not a valid email address`
-			return false // no error
+				return ['error.prop.is_malformed_email', {property: 'email'}]
+            return [ false ] // no error
 
 		case 'date':
 		case 'datetime':
 			if (typeof(propValue) !== 'object' || propValue.constructor.name !== 'date')
-		        return `Property «${propName}» is not a date`
-			return false // no error
+				return ['error.prop.is_not_a_date', {property: propName}]
+            return [ false ] // no error
 
 		case 'boolean':
 			if (typeof(propValue) !== 'boolean')
-		        return `Property «${propName}» is not a boolean`
-			return false // no error
+				return ['error.prop.is_not_a_boolean', {property: propName}]
+            return [ false ] // no error
 
         case 'secret':
             // FIXME secret property is only supported for string properties
             // (replace "secret" property by a "password" property type
             if (typeof(propValue) !== 'string' )
-                return `Property «${propName}» is not a string`
+			    return ['error.prop.is_not_a_string', {property: propName}]
             if (propDef.minimum && propValue.length < propDef.minimum )
-                return `Property «${propName}» is too small`
+			    return ['error.prop.password_to_small', {property: propName, size: propDef.minimum}]
             let nLower = 0
             let nUpper = 0
             let nDigit = 0
@@ -180,15 +175,14 @@ const controlObjectProperty = (objDef, propName, propValue) => {
                 else nSpec++
             }
             if (nLower == 0)
-                return `Property «${propName}» does not contain a lower case character`
+			    return ['error.prop.password_no_lowercase_letter', {property: propName}]
             if (nUpper == 0)
-                return `Property «${propName}» does not contain an upper case character`
+			    return ['error.prop.password_no_uppercase_letter', {property: propName}]
             if (nDigit == 0)
-                return `Property «${propName}» does not contain a digit character`
+			    return ['error.prop.password_no_digit_character', {property: propName}]
             if (nSpec == 0)
-                return `Property «${propName}» does not contain a special character`
-            return false // no error
-
+			    return ['error.prop.password_no_special_character', {property: propName}]
+            return [ false ] // no error
 
 		default:
 			throw new Error(`Property type [${propDef.type}] not supported`)

@@ -16,23 +16,29 @@ const loadConfig = () => {
 
 }
 
-const jsonFull = async (routeUrl, httpMethod, requestBody) => {
+const jsonFull = async (routeUrl, httpMethod, options, requestBody) => {
 	if (! backendUrl)
         throw new Error('Config not loaded')
+
     if (routeUrl.startsWith('/'))
         routeUrl = routeUrl.substr(1)
 	let url=`${backendUrl}/${routeUrl}`
+
+    const lang = options.lang ?? 'en'
+
 	const fetchParam = {
 		method : httpMethod,
 		headers:  {
 			'Accept': 'application/json',
 			'Content-Type': 'application/json',
-			'Accept-Language': 'fr, fr-FR'
+			'Accept-Language': lang 
 		}
 	}
+
     const methodsWithBody = ['POST', 'PUT', 'PATCH']
 	if (methodsWithBody.includes(httpMethod))
 		fetchParam.body = JSON.stringify(requestBody)
+
 	const response = await fetch(url, fetchParam)
 	if (! response.ok) {
         //console.log(response)
@@ -44,24 +50,24 @@ const jsonFull = async (routeUrl, httpMethod, requestBody) => {
 }
 
 
-const jsonGet = async (routeUrl) => {
-	return await jsonFull(routeUrl, 'GET')
+const jsonGet = async (routeUrl, options = {}) => {
+	return await jsonFull(routeUrl, 'GET', options)
 }
 
-const jsonPost = async (routeUrl, body) => {
-	return await jsonFull(routeUrl, 'POST', body)
+const jsonPost = async (routeUrl, body, options = {}) => {
+	return await jsonFull(routeUrl, 'POST', options, body)
 }
 
-const jsonPut = async (routeUrl, body) => {
-	return await jsonFull(routeUrl, 'PUT', body)
+const jsonPut = async (routeUrl, body, options = {}) => {
+	return await jsonFull(routeUrl, 'PUT', options, body)
 }
 
-const jsonPatch = async (routeUrl, body) => {
-	return await jsonFull(routeUrl, 'PATCH', body)
+const jsonPatch = async (routeUrl, body, options = {}) => {
+	return await jsonFull(routeUrl, 'PATCH', options, body)
 }
 
-const jsonDelete = async (routeUrl) => {
-	return await jsonFull(routeUrl, 'DELETE')
+const jsonDelete = async (routeUrl, options = {}) => {
+	return await jsonFull(routeUrl, 'DELETE', options)
 }
 
 export {

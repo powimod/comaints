@@ -1,34 +1,28 @@
 'use strict'
 
 class View {
-    #config = null
 
-    initialize(config) {
-        this.#config = config
+    #request = null
+    #response = null
+
+    constructor(request, response) {
+        this.request = request
+        this.response = response
     }
 
-    json(response, jsonContent) {
+    translation(messageId, prop = {}) {
+        return this.request.t(messageId, prop)
+    }
+
+    json(jsonContent) {
         // use «response.send()» instead of «response.json()» to add a CR at the end
-        response.send(JSON.stringify(jsonContent) + '\n')
+        this.response.send(JSON.stringify(jsonContent) + '\n')
     }
 
-    error(response, error) {
+    error(error) {
         const errorMessage = error.message ? error.message : error
-        response.status(error.httpStatus || 500).send(errorMessage)
+        this.response.status(error.httpStatus || 500).send(errorMessage)
     }
 }
 
-class ViewSingleton {
-
-	constructor() {
-		throw new Error('Can not instanciate ViewSingleton!')
-	}
-
-	static getInstance() {
-		if (! ViewSingleton.instance)
-			ViewSingleton.instance = new View()
-		return ViewSingleton.instance
-	}
-}
-
-export default ViewSingleton
+export default View

@@ -21,6 +21,10 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "i18next": "^23.15.1",
+    "i18next-express-middleware": "^2.0.0",
+    "i18next-fs-backend": "^2.3.2",
+    "i18next-http-middleware": "^3.6.0",
     "nodemon": "^3.1.7",
     "promise-mysql": "^5.2.0"
   },
