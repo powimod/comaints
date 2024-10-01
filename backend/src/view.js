@@ -1,5 +1,7 @@
 'use strict'
 
+import { ComaintApiError } from '../../common/src/error.mjs'
+
 class View {
 
     #request = null
@@ -20,7 +22,11 @@ class View {
     }
 
     error(error) {
-        const errorMessage = error.message ? error.message : error
+        let errorMessage
+        if (error instanceof ComaintApiError) 
+            errorMessage = error.translate(this.request.t)
+        else 
+            errorMessage = error.message ? error.message : error
         this.response.status(error.httpStatus || 500).send(errorMessage)
     }
 }

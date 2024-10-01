@@ -29,9 +29,9 @@ class CompanyRoutes {
             try {
                 let company = request.body.company
                 if (company === undefined)
-                    throw new ComaintApiErrorInvalidRequest(view.translation('error.request_param_not_found', { parameter: 'company'}))
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'company'})
                 if (typeof(company) !== 'object')
-                    throw new ComaintApiErrorInvalidRequest(view.translation('error.request_param_invalid', { parameter: 'company'}))
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'company'})
                 const [ errorMsg, errorParam ] = controlObject(companyObjectDef, company, { fullCheck:true, checkId:false })
                 if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(view.translation(errorMsg, errorParam))
