@@ -1,8 +1,9 @@
 'use strict'
 
-const checkApiLib = () => {
-    return 'Comaint api-lib is working !'
+if (import.meta.url === `file://${process.argv[1]}`) {
+    console.error('Comaint api-lib can not be run directly')
+    process.exit(1)
 }
 
-export { checkApiLib }
+export { default as ComaintBackendApi } from './ComaintBackendApi.js';
 
