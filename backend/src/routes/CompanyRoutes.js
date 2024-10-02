@@ -34,7 +34,7 @@ class CompanyRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'company'})
                 const [ errorMsg, errorParam ] = controlObject(companyObjectDef, company, { fullCheck:true, checkId:false })
                 if (errorMsg)
-                    throw new ComaintApiErrorInvalidRequest(view.translation(errorMsg, errorParam))
+                    throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
 			    company = await companyModel.createCompany(company)
                 view.json(company)
             }
