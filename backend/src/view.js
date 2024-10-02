@@ -1,34 +1,34 @@
 'use strict'
 
+import { ComaintApiError } from '../../common/src/error.mjs'
+
 class View {
-    #config = null
 
-    initialize(config) {
-        this.#config = config
+    #request = null
+    #response = null
+
+    constructor(request, response) {
+        this.request = request
+        this.response = response
     }
 
-    json(response, jsonContent) {
+    translation(messageId, prop = {}) {
+        return this.request.t(messageId, prop)
+    }
+
+    json(jsonContent) {
         // use «response.send()» instead of «response.json()» to add a CR at the end
-        response.send(JSON.stringify(jsonContent) + '\n')
+        this.response.send(JSON.stringify(jsonContent) + '\n')
     }
 
-    error(response, error) {
-        const errorMessage = error.message ? error.message : error
-        response.status(error.httpStatus || 500).send(errorMessage)
+    error(error) {
+        let errorMessage
+        if (error instanceof ComaintApiError) 
+            errorMessage = error.translate(this.request.t)
+        else 
+            errorMessage = error.message ? error.message : error
+        this.response.status(error.httpStatus || 500).send(errorMessage)
     }
 }
 
-class ViewSingleton {
-
-	constructor() {
-		throw new Error('Can not instanciate ViewSingleton!')
-	}
-
-	static getInstance() {
-		if (! ViewSingleton.instance)
-			ViewSingleton.instance = new View()
-		return ViewSingleton.instance
-	}
-}
-
-export default ViewSingleton
+export default View

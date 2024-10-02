@@ -1,43 +1,59 @@
 'use strict'
 
-class ComaintError extends Error {
-    constructor(message, errorId, httpStatus) {
-        super(message)
+class ComaintTranslatedError extends Error {
+
+  constructor(msgId, msgParams = {}, i18nFunction = null) {
+    super()
+    this.msgId = msgId
+    this.msgParams = msgParams
+    this.message = i18nFunction ? i18nFunction(msgId, msgParams) : `Error ${msgId}`
+  }
+
+  translate(i18nFunction) {
+    return i18nFunction(this.msgId, this.msgParams)
+  }
+}
+
+
+class ComaintApiError extends ComaintTranslatedError {
+    constructor(msgId, msgParams, errorId, httpStatus) {
+        super(msgId, msgParams)
         this.httpStatus = httpStatus
         this.errorId = errorId
     }
 }
 
-class ComaintErrorNotFound extends ComaintError {
-    constructor(message) {
-        super(message, 'NotFound', 404)
+class ComaintApiErrorNotFound extends ComaintApiError {
+    constructor(msgId, msgParams) {
+        super(msgId, msgParams, 'NotFound', 404)
     }
 }
 
-class ComaintErrorInvalidRequest extends ComaintError {
-    constructor(message) {
-        super(message, 'InvalidRequest', 400)
-    }
-}
-
-
-class ComaintErrorConflict extends ComaintError {
-    constructor(message) {
-        super(message, 'Conflict', 409)
+class ComaintApiErrorInvalidRequest extends ComaintApiError {
+    constructor(msgId, msgParams) {
+        super(msgId, msgParams, 'InvalidRequest', 400)
     }
 }
 
 
-class ComaintErrorInternalError extends ComaintError {
-    constructor(message) {
-        super(message, 'InternalError', 500)
+class ComaintApiErrorConflict extends ComaintApiError {
+    constructor(msgId, msgParams) {
+        super(msgId, msgParams, 'Conflict', 409)
+    }
+}
+
+
+class ComaintApiErrorInternalError extends ComaintApiError {
+    constructor(msgId, msgParams) {
+        super(msgId, msgParams, 'InternalError', 500)
     }
 }
 
 export {
-    ComaintError,
-    ComaintErrorNotFound,
-    ComaintErrorInvalidRequest,
-    ComaintErrorConflict,
-    ComaintErrorInternalError
+    ComaintTranslatedError,
+    ComaintApiError,
+    ComaintApiErrorNotFound,
+    ComaintApiErrorInvalidRequest,
+    ComaintApiErrorConflict,
+    ComaintApiErrorInternalError
 }

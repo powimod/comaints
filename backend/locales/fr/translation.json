@@ -1,0 +1,34 @@
+{
+    "general": {
+        "welcome": "Bienvenue",
+        "hello": "Bonjour {{firstname}} {{lastname}}"
+    },
+    "error": {
+        "request_param_not_found": "Paramètre «{{parameter}} non trouvé dans le corps de la requête",
+        "request_param_invalid": "Paramètre «{{parameter}} invalide dans le corps de la requête", 
+		"prop": {
+			"is_not_defined": "La propriété «{{property}}» n'est pas définie",
+			"has_no_value": "La propriété«{{property}}» n'a pas de valeur",
+			"is_null": "La propriété «{{property}}» est vide",
+			"is_not_an_integer": "La propriété «{{property}}» n'est pas définie",
+			"is_too_small": "La propriété «{{property}}» est trop petite",
+			"is_too_large": "La propriété «{{property}}» est trop grande",
+			"is_not_a_string": "La propriété «{{property}}» n'est pas une chaîne",
+			"is_too_short": "La propriété «{{property}}» est trop courte",
+			"is_too_long": "La propriété «{{property}}» est trop longue",
+			"is_not_a_boolean": "La propriété «{{property}}» n'est pas un booléen",
+			"is_not_a_date": "La propriété «{{property}}» n'est pas une date",
+			"is_not_a_pure_date": "La propriété «{{property}}» n'est pas une date",
+			"is_not_a_date_time": "La propriété «{{property}}» n'est pas une date/heure",
+			"is_malformed_email": "La propriété «{{property}}» n'est pas une adresse mail valide",
+			"is_malformed_uuid": "La propriété «{{property}}» n'est pas un UUID valide",
+			"is_malformed": "La propriété «{{property}}» est mal formatée",
+            "contains_line_feeds": "La propriété «{{property}}» contient des sauts à la ligne",
+			"password_to_small": "Le mot de passe est trop petit",
+			"password_no_lowercase_letter": "Le mot de passe ne contient pas de lettre minuscule",
+			"password_no_uppercase_letter": "Le mot de passe ne contient pas de lettre majsucule",
+			"password_no_digit_character": "Le mot de passe ne contient pas de caractère numérique",
+			"password_no_special_character": "Le mot de passe ne contient pas de caractère spécial"
+		}
+    }
+}

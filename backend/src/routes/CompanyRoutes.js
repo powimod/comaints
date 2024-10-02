@@ -1,36 +1,45 @@
 'use strict'
 
-import ViewSingleton from '../view.js'
+import View from '../view.js'
 import ModelSingleton from '../model.js'
 import ControllerSingleton from '../controller.js'
-import { ComaintErrorInvalidRequest } from '../../../common/src/error.mjs'
+import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
+
+import { controlObject } from '../../../common/src/objects/object-util.mjs'
+import companyObjectDef from '../../../common/src/objects/company-object-def.mjs'
 
 class CompanyRoutes {
 
     initialize(config, expressApp) {
         const controller = ControllerSingleton.getInstance()
-	    const view = ViewSingleton.getInstance()
 	    const model  = ModelSingleton.getInstance()
         
         const companyModel = model.getCompanyModel()
 
         // TODO ajouter withAuth
 	    expressApp.get('/api/v1/company/list', async (request, response) => {
+            const view = new View(request, response)
 			const companyList = await companyModel.findCompanyList()
-            view.json(response, { companyList })
+            view.json({ companyList })
         })
 
         // TODO ajouter withAuth
         expressApp.post('/api/v1/company', async (request, response) => {
+            const view = new View(request, response)
             try {
-                let company = request.body.company;
+                let company = request.body.company
                 if (company === undefined)
-                    throw new ComaintErrorInvalidRequest(`Can't find «company» in request body`);
-			    company = await companyModel.createCompany(company);
-                view.json(response, company)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'company'})
+                if (typeof(company) !== 'object')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'company'})
+                const [ errorMsg, errorParam ] = controlObject(companyObjectDef, company, { fullCheck:true, checkId:false })
+                if (errorMsg)
+                    throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
+			    company = await companyModel.createCompany(company)
+                view.json(company)
             }
             catch(error) {
-                view.error(response, error)
+                view.error(error)
             }
         })
     }
