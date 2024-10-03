@@ -5,13 +5,14 @@ import ModelSingleton from './model.js'
 import View from './view.js'
 import { ComaintApiErrorInvalidRequest } from '../../common/src/error.mjs'
 
-// TODO clean import {buildCompanyRoutes} from './routes/CompanyRoutes.js'
+import AuthRoutesSingleton from './routes/AuthRoutes.js'
 import CompanyRoutesSingleton from './routes/CompanyRoutes.js'
 
 const API_VERSION = 'v1'
 
 class Controller {
 
+	#authRoutes = null;
 	#companyRoutes = null;
 
     async initialize(config, expressApp) {
@@ -69,9 +70,11 @@ class Controller {
             view.json({ success, message })
         })
 
-        // TODO cleanup this.#companyRoutes = buildCompanyRoutes(config, expressApp)
         this.#companyRoutes = CompanyRoutesSingleton.getInstance()
         this.#companyRoutes.initialize(config, expressApp)
+
+        this.#authRoutes = AuthRoutesSingleton.getInstance()
+        this.#authRoutes.initialize(config, expressApp)
     }
 
 }
