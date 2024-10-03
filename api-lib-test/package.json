@@ -1,0 +1,17 @@
+{
+  "name": "test-api",
+  "version": "0.0.1",
+  "description": "Small test program for the Comaint API library",
+  "author": "Dominique Parisot",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/powimod/comaints#readme",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "comaint-api-lib": "file:../api-lib",
+    "dotenv": "^16.4.5"
+  }
+}

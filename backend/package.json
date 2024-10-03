@@ -2,6 +2,9 @@
   "name": "comaint-backend",
   "version": "0.0.1",
   "description": "Comaint backend",
+  "author": "Dominique Parisot",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/powimod/comaints#readme",
   "type": "module",
   "main": "src/server.js",
   "scripts": {
@@ -12,12 +15,9 @@
     "type": "git",
     "url": "git+https://github.com/powimod/comaints.git"
   },
-  "author": "Dominique Parisot",
-  "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/powimod/comaints/issues"
   },
-  "homepage": "https://github.com/powimod/comaints#readme",
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.21.0",

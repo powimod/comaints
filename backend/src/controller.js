@@ -3,6 +3,7 @@
 import ViewSingleton from './view.js'
 import ModelSingleton from './model.js'
 import View from './view.js'
+import { ComaintApiErrorInvalidRequest } from '../../common/src/error.mjs'
 
 // TODO clean import {buildCompanyRoutes} from './routes/CompanyRoutes.js'
 import CompanyRoutesSingleton from './routes/CompanyRoutes.js'
@@ -27,8 +28,12 @@ class Controller {
         expressApp.post(`/api/welcome`, (request, response) => {
             const view = new View(request, response)
             try {
-                const firstname = 'John'
-                const lastname = 'Doe'
+                const firstname = request.body.firstname
+                if (firstname === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'firstname'})
+                if (typeof(firstname) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'firstname'})
+                const lastname = request.body.lastname
                 view.json({
                     response: view.translation('general.hello', { firstname, lastname })
                 })
