@@ -29,23 +29,33 @@ const main = async () => {
     app.use(middleware.handle(i18next))
 
     // configuration is defined in «.env» file
-    const DB_PASSWORD = process.env.DB_PASSWORD
-    if (! DB_PASSWORD)
+    const dbPassword = process.env.DB_PASSWORD
+    if (! dbPassword)
         throw new Error('DB_PASSWORD not defined')
+    const tokenSecret = process.env.TOKEN_SECRET
+    if (! tokenSecret)
+        throw new Error('TOKEN_SECRET not defined')
 
+    const env = process.env
     let config = {
         version: BACKEND_VERSION,
         server: {
             port: process.env.PORT || 9101
         },
         database: {
-            name: process.env.DB_NAME || 'comaint',
-            host: process.env.DB_HOST || 'localhost',
-            port: process.env.DB_PORT || 3306, // MySQL default port
-            user: process.env.DB_USER || 'admin',
-            retry_interval: process.env.DB_RETRY_INTERVAL || 10, // seconds
-            max_retries: process.env.DB_MAX_RETRIES || -1, // -1:infinity
-            password: DB_PASSWORD
+            name: env.DB_NAME || 'comaint',
+            host: env.DB_HOST || 'localhost',
+            port: env.DB_PORT || 3306, // MySQL default port
+            user: env.DB_USER || 'admin',
+            retry_interval: env.DB_RETRY_INTERVAL || 10, // seconds
+            max_retries: env.DB_MAX_RETRIES || -1, // -1:infinity
+            password: dbPassword
+        },
+        security: {
+            token_secret: tokenSecret,
+            token_hash_salt: env.TOKEN_HASH_SALT || 10,
+            refresh_token_lifespan: env.REFRESH_TOKEN_LIFESPAN || 365, // days
+            access_token_lifespan: env.ACCESS_TOKEN_LIFESPAN  || 120 // seconds
         }
     }
 

@@ -14,14 +14,22 @@ class Model {
 
     async initialize(config) {
 
+        // check «database» configuration section 
         const dbConfig = config.database
         if (dbConfig === undefined)
             throw new Error(`Config «database» section not defined`)
-
-        for (const parameterName of [ 'name', 'host', 'port', 'user', 'password', 'retry_interval', 'max_retries' ]) {
+        const dbParameterNames = [ 
+            'name', 'host', 'port', 'user', 'password', 
+            'retry_interval', 'max_retries'
+        ]
+        for (const parameterName of dbParameterNames ) {
             if (dbConfig[parameterName] === undefined)
                 throw new Error(`Parameter «${parameterName}» not defined`)
         }
+
+        // check «security» configuration section 
+        if (config.security === undefined)
+            throw new Error(`Config «security» section not defined`)
 
 		// connection retry loop
 		const retryInterval = dbConfig.retry_interval
@@ -56,11 +64,12 @@ class Model {
 
         this.#companyModel = CompanyModelSingleton.getInstance()
         this.#companyModel.initialize(dbConnection)
+
         this.#authModel = AuthModelSingleton.getInstance()
-        this.#authModel.initialize(dbConnection)
+        this.#authModel.initialize(dbConnection, config.security)
 
         this.#dbConnection = dbConnection
-        this.#config = config
+        this.#config = config.TOKEN_SECRET
     }
 
     async terminate() {
