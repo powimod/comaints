@@ -100,12 +100,6 @@ objects:
       - name: "administrator"
         type: "boolean"
         default: false
-      - name: "stockRole"
-        type: "integer"
-        mandatory: false
-        default: 0
-        minimum: 0
-        maximum: 4
     links:
       - name: "company"
         target: "Company"

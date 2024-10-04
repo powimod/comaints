@@ -4,13 +4,17 @@ import mysql from 'promise-mysql'
 
 import { sleep } from './util.js'
 import CompanyModelSingleton  from './models/CompanyModel.js'
-import AuthModelSingleton  from './models/AuthModel.js'
+import UserModelSingleton     from './models/UserModel.js'
+import TokenModelSingleton    from './models/TokenModel.js'
+import AuthModelSingleton     from './models/AuthModel.js'
 
 class Model {
     #config = null
     #dbConnection = null
     #authModel = null
     #companyModel = null
+    #userModel = null
+    #tokenModel = null
 
     async initialize(config) {
 
@@ -65,11 +69,17 @@ class Model {
         this.#companyModel = CompanyModelSingleton.getInstance()
         this.#companyModel.initialize(dbConnection)
 
+        this.#userModel = UserModelSingleton.getInstance()
+        this.#userModel.initialize(dbConnection)
+
+        this.#tokenModel = TokenModelSingleton.getInstance()
+        this.#tokenModel.initialize(dbConnection)
+
         this.#authModel = AuthModelSingleton.getInstance()
         this.#authModel.initialize(dbConnection, config.security)
 
         this.#dbConnection = dbConnection
-        this.#config = config.TOKEN_SECRET
+        this.#config = config
     }
 
     async terminate() {
@@ -91,11 +101,20 @@ class Model {
             throw new Error('Invalid result')
     }
 
-    getAuthModel() {
-        return this.#authModel
-    }
     getCompanyModel() {
         return this.#companyModel
+    }
+
+    getUserModel() {
+        return this.#userModel
+    }
+
+    getTokenModel() {
+        return this.#tokenModel
+    }
+
+    getAuthModel() {
+        return this.#authModel
     }
 }
 

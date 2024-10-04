@@ -4,7 +4,7 @@
 
 -- CREATE SCHEMA db_comaint;
 USE db_comaint
--- CREATE USER 'comaint'@'localhost' IDENTIFIED BY '<PASSWORD>';
+-- CREATE USER 'comaint'@'localhost' IDENTIFIED BY 'g4m0-KauM1nt';
 -- GRANT ALL PRIVILEGES ON db_comaint.* TO 'comaint'@'localhost';
 
 
@@ -43,7 +43,6 @@ CREATE TABLE users(
 	active BOOLEAN NOT NULL DEFAULT true,
 	last_use DATETIME,
 	administrator BOOLEAN NOT NULL DEFAULT false,
-	stock_role TINYINT DEFAULT '0',
 	PRIMARY KEY (id)
 );
 
