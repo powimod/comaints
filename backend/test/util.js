@@ -38,6 +38,7 @@ const jsonFull = async (routeUrl, httpMethod, options, requestBody) => {
     if (routeUrl.startsWith('/'))
         routeUrl = routeUrl.substr(1)
 	let url=`${backendUrl}/${routeUrl}`
+    //console.log("Request URL", url)
 
     const lang = options.lang ?? 'en'
 

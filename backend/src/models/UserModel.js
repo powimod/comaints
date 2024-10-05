@@ -2,6 +2,7 @@
 
 import { convertObjectToDb, buildFieldArrays, controlObject } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
+import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs'
 
 class UserModel {
     #db = null
@@ -46,13 +47,25 @@ class UserModel {
         const sqlRequest = `
             INSERT INTO users(${fieldNames.join(', ')}) VALUES (${markArray});
         `
-        const result = await this.#db.query(sqlRequest, fieldValues)
-        if (result.code)
-            throw new Error(result.code)
-        const userId = result.insertId
-        user = await this.getUserById(userId)
-        // TODO generate ComaintApiErrorConflict 
-        return user
+        try {
+            const result = await this.#db.query(sqlRequest, fieldValues)
+            const userId = result.insertId
+            user = await this.getUserById(userId)
+            return user
+        }
+        catch (error) {
+            // TODO duplicated code
+            if (error.code === 'ER_DUP_ENTRY') {
+                const match = error.message.match(/Duplicate entry '.*' for key '(\w+)'/)
+                if (match) {
+                    let field = match[1]
+                    if (field.startsWith("idx_"))
+                        field = field.slice(4)
+                    error = buildComaintError(comaintErrors.CONFLICT_ERROR, {field, object: 'user'})
+                }
+            }
+            throw error
+        }
     }
 }
 

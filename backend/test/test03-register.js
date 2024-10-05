@@ -151,6 +151,21 @@ describe('Test user registration', () => {
             console.log(json)
         })
 
+        it('Check registration attempt with an existing email', async () => {
+            try {
+                let json = await jsonPost(ROUTE_REGISTER, {
+                        email:userEmail,
+                        password:'aBcdef+ghijkl9'
+                    })
+                expect.fail('Invalid «password» parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 409 (Duplicated «email» field for object «user»)')
+            }
+        })
+
+
         /* TODO cleanup
         it("check user table", async () => {
             const userList = await requestDb('select * from users')
