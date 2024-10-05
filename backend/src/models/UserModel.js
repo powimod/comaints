@@ -1,14 +1,21 @@
 'use strict'
 
+import assert from 'assert'
+import bcrypt from 'bcrypt'
+
 import { buildFieldArrays, controlObject, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs'
 
 class UserModel {
     #db = null
+    #hashSalt = null
 
-    initialize (db) {
+    initialize (db, hashSalt) {
+        assert (db !== undefined)
+        assert (hashSalt !== undefined)
         this.#db = db
+        this.#hashSalt = parseInt(hashSalt)
     }
 
     async findUserList() {
@@ -44,6 +51,11 @@ class UserModel {
 
     async createUser(user) {
         user.accountLocked = true
+
+		if (user.password === undefined || user.password === null)
+			throw new Error('User password missing')
+		await this.encryptPasswordIfPresent(user)
+
         const [ fieldNames, fieldValues ] = buildFieldArrays(userObjectDef, user)
         const markArray = Array(fieldValues.length).fill('?').join(',')
         const sqlRequest = `
@@ -70,6 +82,14 @@ class UserModel {
             throw error
         }
     }
+
+	async encryptPasswordIfPresent(user) {
+		assert (user !== undefined)
+		if (user.password === undefined)
+			return
+		user.password = await bcrypt.hash(user.password, this.#hashSalt)
+	}
+
 }
 
 

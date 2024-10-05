@@ -2,6 +2,7 @@
 
 import assert from 'assert' 
 import ModelSingleton from '../model.js'
+import jwt from 'jsonwebtoken'
 
 class AuthModel {
     #db = null

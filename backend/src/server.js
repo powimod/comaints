@@ -53,7 +53,7 @@ const main = async () => {
         },
         security: {
             token_secret: tokenSecret,
-            token_hash_salt: env.TOKEN_HASH_SALT || 10,
+            hash_salt: env.HASH_SALT || 10,
             refresh_token_lifespan: env.REFRESH_TOKEN_LIFESPAN || 365, // days
             access_token_lifespan: env.ACCESS_TOKEN_LIFESPAN  || 120 // seconds
         }
