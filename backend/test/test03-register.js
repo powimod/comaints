@@ -20,118 +20,121 @@ describe('Test user registration', () => {
     describe(`Call route /${ROUTE_REGISTER} with invalid data`, () => {
 
         it(`Should detect missing email in request body`, async () => {
-                try {
-                    let json = await jsonPost(ROUTE_REGISTER, {
-                            email_missing:'',
-                            password:''
-                        })
-                    expect.fail("Missing «email» parameter not detected")
-                }
-                catch (error) {
-                    expect(error).to.be.instanceOf(Error)
-                    expect(error.message).to.equal(`Server status 400 (Parameter «email» not found in request body)`)
-                }
+            try {
+                let json = await jsonPost(ROUTE_REGISTER, {
+                        email_missing:'',
+                        password:''
+                    })
+                expect.fail("Missing «email» parameter not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 400 (Parameter «email» not found in request body)`)
+            }
         })
 
 
         it(`Should detect empty email in request body`, async () => {
-                try {
-                    let json = await jsonPost(ROUTE_REGISTER, {
-                            email:'',
-                            password:''
-                        })
-                    expect.fail("Missing «email» parameter not detected")
-                }
-                catch (error) {
-                    expect(error).to.be.instanceOf(Error)
-                    expect(error.message).to.equal(`Server status 400 (Property «email» is too short)`)
-                }
+            try {
+                let json = await jsonPost(ROUTE_REGISTER, {
+                        email:'',
+                        password:''
+                    })
+                expect.fail("Missing «email» parameter not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 400 (Property «email» is too short)`)
+            }
         })
 
         it(`Should detect malformed email in request body`, async () => {
-                    try {
-                        let json = await jsonPost(ROUTE_REGISTER, {
-                                email:'abcdef',
-                                password:''
-                            })
-                        expect.fail("Missing «email» parameter not detected")
-                    }
-                    catch (error) {
-                        expect(error).to.be.instanceOf(Error)
-                        expect(error.message).to.equal(`Server status 400 (Property «email» is not a valid email)`)
-                    }
+            try {
+                let json = await jsonPost(ROUTE_REGISTER, {
+                        email:'abcdef',
+                        password:''
+                    })
+                expect.fail("Missing «email» parameter not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 400 (Property «email» is not a valid email)`)
+            }
         })
 
 
         it('Should detect missing password in request body', async () => {
-                    try {
-                        let json = await jsonPost(ROUTE_REGISTER, {
-                                email:'a@b.c',
-                                password_missing:''
-                            })
-                        expect.fail('Missing «password» parameter not detected')
-                    }
-                    catch (error) {
-                        expect(error).to.be.instanceOf(Error)
-                        expect(error.message).to.equal('Server status 400 (Parameter «password» not found in request body)')
-                    }
+            try {
+                let json = await jsonPost(ROUTE_REGISTER, {
+                        email:'a@b.c',
+                        password_missing:''
+                    })
+                expect.fail('Missing «password» parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 400 (Parameter «password» not found in request body)')
+            }
         })
 
         it('Should detect too small password in request body', async () => {
-                    try {
-                        let json = await jsonPost(ROUTE_REGISTER, {
-                                email:'a@b.c',
-                                password:'abc'
-                            })
-                        expect.fail('Invalid «password» parameter not detected')
-                    }
-                    catch (error) {
-                        expect(error).to.be.instanceOf(Error)
-                        expect(error.message).to.equal('Server status 400 (Password is too small)')
-                    }
+            try {
+                let json = await jsonPost(ROUTE_REGISTER, {
+                        email:'a@b.c',
+                        password:'abc'
+                    })
+                expect.fail('Invalid «password» parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 400 (Password is too small)')
+            }
         })
 
         it('Should detect password with no uppercase letter in request body', async () => {
-                    try {
-                        let json = await jsonPost(ROUTE_REGISTER, {
-                                email:'a@b.c',
-                                password:'abcdefghijk9.'
-                            })
-                        expect.fail('Invalid «password» parameter not detected')
-                    }
-                    catch (error) {
-                        expect(error).to.be.instanceOf(Error)
-                        expect(error.message).to.equal('Server status 400 (Password does not contain uppercase letter)')
-                    }
+            try {
+                let json = await jsonPost(ROUTE_REGISTER, {
+                        email:'a@b.c',
+                        password:'abcdefghijk9.'
+                    })
+                expect.fail('Invalid «password» parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 400 (Password does not contain uppercase letter)')
+            }
         })
 
         it('Should detect password with no digit character in request body', async () => {
-                    try {
-                        let json = await jsonPost(ROUTE_REGISTER, {
-                                email:'a@b.c',
-                                password:'aBcdefghijkl.'
-                            })
-                        expect.fail('Invalid «password» parameter not detected')
-                    }
-                    catch (error) {
-                        expect(error).to.be.instanceOf(Error)
-                        expect(error.message).to.equal('Server status 400 (Password does not contain digit character)')
-                    }
+            try {
+                let json = await jsonPost(ROUTE_REGISTER, {
+                        email:'a@b.c',
+                        password:'aBcdefghijkl.'
+                    })
+                expect.fail('Invalid «password» parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 400 (Password does not contain digit character)')
+            }
         })
 
         it('Should detect password with no special character in request body', async () => {
-                    try {
-                        let json = await jsonPost(ROUTE_REGISTER, {
-                                email:'a@b.c',
-                                password:'aBcdefghijkl9'
-                            })
-                        expect.fail('Invalid «password» parameter not detected')
-                    }
-                    catch (error) {
-                        expect(error).to.be.instanceOf(Error)
-                        expect(error.message).to.equal('Server status 400 (Password does not contain special character)')
-                    }
+            try {
+                let json = await jsonPost(ROUTE_REGISTER, {
+                        email:'a@b.c',
+                        password:'aBcdefghijkl9'
+                    })
+                expect.fail('Invalid «password» parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 400 (Password does not contain special character)')
+            }
         })
+    })
+
+    describe(`Call route /${ROUTE_REGISTER} with invalid data`, () => {
 
 
         /* TODO cleanup
