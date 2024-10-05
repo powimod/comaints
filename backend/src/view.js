@@ -23,9 +23,9 @@ class View {
 
     error(error) {
         let errorMessage
-        if (error instanceof ComaintApiError) 
+        if (error instanceof ComaintApiError)
             errorMessage = error.translate(this.request.t)
-        else 
+        else
             errorMessage = error.message ? error.message : error
         this.response.status(error.httpStatus || 500).send(errorMessage)
     }

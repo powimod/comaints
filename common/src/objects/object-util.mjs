@@ -102,9 +102,33 @@ const controlObjectProperty = (objDef, propName, propValue) => {
 			return null // FIXME 
 	}
 
-	if (propDef.secret)
-        throw new Error(`Replace «secret» property with «secret» type`)
-	
+
+	if (propDef.secret)  {
+        if (typeof(propValue) !== 'string' )
+            return ['error.prop.is_not_a_string', {property: propName}]
+        if (propDef.minimum && propValue.length < propDef.minimum )
+            return ['error.prop.password_to_small', {property: propName, size: propDef.minimum}]
+        let nLower = 0
+        let nUpper = 0
+        let nDigit = 0
+        let nSpec = 0
+        for (const c of propValue) {
+            if (c >= 'a' && c <= 'z') nLower++
+            else if (c >= 'A' && c <= 'Z') nUpper++
+            else if (c >= '0' && c <= '9') nDigit++
+            else nSpec++
+        }
+        if (nLower == 0)
+            return ['error.prop.password_no_lowercase_letter', {property: propName}]
+        if (nUpper == 0)
+            return ['error.prop.password_no_uppercase_letter', {property: propName}]
+        if (nDigit == 0)
+            return ['error.prop.password_no_digit_character', {property: propName}]
+        if (nSpec == 0)
+            return ['error.prop.password_no_special_character', {property: propName}]
+        return [ false ] // no error
+    }
+
 	switch (propDef.type) {
 
 		case 'id':
@@ -157,32 +181,6 @@ const controlObjectProperty = (objDef, propName, propValue) => {
 				return ['error.prop.is_not_a_boolean', {property: propName}]
             return [ false ] // no error
 
-        case 'secret':
-            // FIXME secret property is only supported for string properties
-            // (replace "secret" property by a "password" property type
-            if (typeof(propValue) !== 'string' )
-			    return ['error.prop.is_not_a_string', {property: propName}]
-            if (propDef.minimum && propValue.length < propDef.minimum )
-			    return ['error.prop.password_to_small', {property: propName, size: propDef.minimum}]
-            let nLower = 0
-            let nUpper = 0
-            let nDigit = 0
-            let nSpec = 0
-            for (const c of propValue) {
-                if (c >= 'a' && c <= 'z') nLower++
-                else if (c >= 'A' && c <= 'Z') nUpper++
-                else if (c >= '0' && c <= '9') nDigit++
-                else nSpec++
-            }
-            if (nLower == 0)
-			    return ['error.prop.password_no_lowercase_letter', {property: propName}]
-            if (nUpper == 0)
-			    return ['error.prop.password_no_uppercase_letter', {property: propName}]
-            if (nDigit == 0)
-			    return ['error.prop.password_no_digit_character', {property: propName}]
-            if (nSpec == 0)
-			    return ['error.prop.password_no_special_character', {property: propName}]
-            return [ false ] // no error
 
 		default:
 			throw new Error(`Property type [${propDef.type}] not supported`)
