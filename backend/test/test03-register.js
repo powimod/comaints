@@ -134,8 +134,16 @@ describe('Test user registration', () => {
         })
     })
 
-    describe(`Call route /${ROUTE_REGISTER} with invalid data`, () => {
+    describe(`Call route /${ROUTE_REGISTER} with valid data`, () => {
 
+        it('User regisration', async () => {
+            let json = await jsonPost(ROUTE_REGISTER, {
+                    email:'a@b.c',
+                    password:'aBcdef+ghijkl9'
+            })
+            expect(json).to.be.instanceOf(Object)
+            console.log(json)
+        })
 
         /* TODO cleanup
         it("check user table", async () => {
@@ -149,5 +157,6 @@ describe('Test user registration', () => {
         })
         */
     })
+    // TODO test registration with an existing email
         
 })

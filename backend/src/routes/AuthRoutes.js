@@ -16,7 +16,7 @@ class AuthRoutes {
         
         const authModel = model.getAuthModel()
 
-        // TODO ajouter withAuth
+        // public route 
         expressApp.post('/api/v1/auth/register', async (request, response) => {
             const view = new View(request, response)
             try {
@@ -47,7 +47,13 @@ class AuthRoutes {
                 if (errorMsg2) 
                     throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
 
-                view.json({})
+                // make a random validation code which will be sent by email to unlock account
+                const validationCode = authModel.generateValidationCode();
+                console.log(`Validation code is ${ validationCode }`); // TODO remove this
+
+                const result = await authModel.register(email, password, validationCode)
+
+                view.json(result)
             }
             catch(error) {
                 view.error(error)
@@ -61,15 +67,15 @@ class AuthRoutesSingleton {
 
     static #instance = null
 
-	constructor() {
-		throw new Error('Can not instanciate AuthRoutesSingleton!')
-	}
+    constructor() {
+        throw new Error('Can not instanciate AuthRoutesSingleton!')
+    }
 
-	static getInstance() {
-		if (! AuthRoutesSingleton.#instance)
-			AuthRoutesSingleton.#instance = new AuthRoutes()
-		return AuthRoutesSingleton.#instance
-	}
+    static getInstance() {
+        if (! AuthRoutesSingleton.#instance)
+            AuthRoutesSingleton.#instance = new AuthRoutes()
+        return AuthRoutesSingleton.#instance
+    }
 }
 
 export default AuthRoutesSingleton 

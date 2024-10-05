@@ -51,7 +51,7 @@ class CompanyModel {
 		if (result.code)
 			throw new Error(result.code)
 		const companyId = result.insertId
-		company = this.getCompanyById(companyId)
+		company = await this.getCompanyById(companyId)
 		return company
     }
 }

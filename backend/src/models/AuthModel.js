@@ -1,9 +1,11 @@
 'se strict'
 
 import assert from 'assert' 
+import ModelSingleton from '../model.js'
 
 class AuthModel {
     #db = null
+    #userModel = null
     #tokenSecret = null
     #tokenHashSalt = null
     #refreshTokenLifespan = null
@@ -25,9 +27,22 @@ class AuthModel {
         this.#refreshTokenLifespan = config.refreshTokenLifespan
         this.#accessTokenLifespan = config.refreshTokenLifespan
         this.#db = db
+        const model  = ModelSingleton.getInstance()
+        this.#userModel = model.getUserModel()
     }
 
-    static async generateAccessToken(userId, companyId) {
+    generateValidationCode() {
+        const minimum = 10000;
+        const maximum = 99999;
+        return parseInt(Math.random() * (maximum - minimum) + minimum);
+    }
+
+    async register(email, password, validationCode) {
+        const user = await this.#userModel.createUser({email, password, validationCode})
+        return user
+    }
+
+    async generateAccessToken(userId, companyId) {
         assert(userId !== undefined)
         assert(companyId !== undefined)
         const payload = {
@@ -47,15 +62,15 @@ class AuthModelSingleton {
 
     static #instance = null
 
-	constructor() {
-		throw new Error('Can not instanciate AuthModelSingleton!')
-	}
+    constructor() {
+        throw new Error('Can not instanciate AuthModelSingleton!')
+    }
 
-	static getInstance() {
-		if (! AuthModelSingleton.#instance)
-			AuthModelSingleton.#instance = new AuthModel()
-		return AuthModelSingleton.#instance
-	}
+    static getInstance() {
+        if (! AuthModelSingleton.#instance)
+            AuthModelSingleton.#instance = new AuthModel()
+        return AuthModelSingleton.#instance
+    }
 }
 
 export default AuthModelSingleton
