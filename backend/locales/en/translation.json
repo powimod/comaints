@@ -4,8 +4,8 @@
         "hello": "Hello {{firstname}} {{lastname}}"
     },
     "error": {
-        "request_param_not_found": "Parameter «{{parameter}} not found in request body",
-        "request_param_invalid": "Parameter «{{parameter}} invalid in request body",
+        "request_param_not_found": "Parameter «{{parameter}}» not found in request body",
+        "request_param_invalid": "Parameter «{{parameter}}» invalid in request body",
 		"prop": {
 			"is_not_defined": "Property «{{property}}» is not defined",
 			"has_no_value": "Property «{{property}}» has no value",

@@ -4,8 +4,8 @@
         "hello": "Bonjour {{firstname}} {{lastname}}"
     },
     "error": {
-        "request_param_not_found": "Paramètre «{{parameter}} non trouvé dans le corps de la requête",
-        "request_param_invalid": "Paramètre «{{parameter}} invalide dans le corps de la requête", 
+        "request_param_not_found": "Paramètre «{{parameter}}» non trouvé dans le corps de la requête",
+        "request_param_invalid": "Paramètre «{{parameter}}» invalide dans le corps de la requête", 
 		"prop": {
 			"is_not_defined": "La propriété «{{property}}» n'est pas définie",
 			"has_no_value": "La propriété«{{property}}» n'a pas de valeur",
