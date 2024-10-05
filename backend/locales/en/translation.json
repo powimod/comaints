@@ -6,6 +6,10 @@
     "error": {
         "request_param_not_found": "Parameter «{{parameter}}» not found in request body",
         "request_param_invalid": "Parameter «{{parameter}}» invalid in request body",
+        "not_found_error": "TODO change message",
+        "invalid_request_error": "TODO change message",
+        "internal_error": "TODO change message",
+        "confict_error" : "Duplicated «{{field}}» field for object «{{object}}»",
 		"prop": {
 			"is_not_defined": "Property «{{property}}» is not defined",
 			"has_no_value": "Property «{{property}}» has no value",

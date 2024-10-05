@@ -6,6 +6,10 @@
     "error": {
         "request_param_not_found": "Paramètre «{{parameter}}» non trouvé dans le corps de la requête",
         "request_param_invalid": "Paramètre «{{parameter}}» invalide dans le corps de la requête", 
+        "not_found_error": "TODO change message",
+        "invalid_request_error": "TODO change message",
+        "internal_error": "TODO change message",
+        "confict_error" : "Doublon sur le champ «{{field}»} pour l'ojet «{{object}}»",
 		"prop": {
 			"is_not_defined": "La propriété «{{property}}» n'est pas définie",
 			"has_no_value": "La propriété«{{property}}» n'a pas de valeur",
