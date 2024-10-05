@@ -78,9 +78,11 @@ objects:
         maximum: 70 # 61 is the minimum size of bcrypt hash
       - name: "firstname"
         type: "string"
+        mandatory: false
         maximum: 30
       - name: "lastname"
         type: "string"
+        mandatory: false
         maximum: 30
       - name: "accountLocked"
         type: "boolean"

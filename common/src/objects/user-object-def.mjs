@@ -20,12 +20,12 @@ const userObjectDef = {
 	"firstname" : {
 		"type": "string",
 		"maximum": "30",
-		"mandatory": "true",
+		"mandatory": "false",
 	},
 	"lastname" : {
 		"type": "string",
 		"maximum": "30",
-		"mandatory": "true",
+		"mandatory": "false",
 	},
 	"accountLocked" : {
 		"type": "boolean",
