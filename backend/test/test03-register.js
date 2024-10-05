@@ -148,7 +148,45 @@ describe('Test user registration', () => {
                     password:'aBcdef+ghijkl9'
             })
             expect(json).to.be.instanceOf(Object)
-            console.log(json)
+            expect(json).to.have.property('user')
+            const user = json.user
+            expect(user).to.be.instanceOf(Object)
+
+            expect(user).to.have.property('id')
+            expect(user.id).to.a('number').and.to.be.above(0)
+            expect(user).to.have.property('email')
+            expect(user.email).to.a('string').and.to.equal(userEmail)
+            expect(user).to.have.property('firstname')
+            expect(user.firstname).to.equal(null)
+            expect(user).to.have.property('lastname')
+            expect(user.lastname).to.equal(null)
+            expect(user).to.have.property('accountLocked')
+            expect(user.accountLocked).to.a('boolean').and.to.equal(true)
+            expect(user).to.have.property('administrator')
+            expect(user.administrator).to.a('boolean').and.to.equal(false)
+
+            expect(user).not.to.have.property('validationCode')
+            expect(user).not.to.have.property('password')
+
+            //console.log(user)
+            /*
+            {
+                  id: 101,
+                      id_company: null,
+                      email: 'u1728130707175@x.y',
+                      password: 'aBcdef+ghijkl9',
+                      firstname: null,
+                      lastname: null,
+                      account_locked: 0,
+                      validation_code: 0,
+                      active: 1,
+                      last_use: null,
+                      administrator: 0
+            }
+            */
+             
+
+
         })
 
         it('Check registration attempt with an existing email', async () => {

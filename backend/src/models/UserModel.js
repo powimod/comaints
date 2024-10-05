@@ -1,6 +1,6 @@
 'use strict'
 
-import { convertObjectToDb, buildFieldArrays, controlObject } from '../../../common/src/objects/object-util.mjs'
+import { buildFieldArrays, controlObject, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs'
 
@@ -41,8 +41,8 @@ class UserModel {
 
 
     async createUser(user) {
-        const userDb = convertObjectToDb(userObjectDef, user)
-        const [ fieldNames, fieldValues ] = buildFieldArrays(userObjectDef, userDb)
+        user.accountLocked = true
+        const [ fieldNames, fieldValues ] = buildFieldArrays(userObjectDef, user)
         const markArray = Array(fieldValues.length).fill('?').join(',')
         const sqlRequest = `
             INSERT INTO users(${fieldNames.join(', ')}) VALUES (${markArray});
@@ -50,7 +50,8 @@ class UserModel {
         try {
             const result = await this.#db.query(sqlRequest, fieldValues)
             const userId = result.insertId
-            user = await this.getUserById(userId)
+            const dbUser = await this.getUserById(userId)
+            user = convertObjectFromDb(userObjectDef, dbUser)
             return user
         }
         catch (error) {

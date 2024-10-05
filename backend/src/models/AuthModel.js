@@ -39,7 +39,7 @@ class AuthModel {
 
     async register(email, password, validationCode) {
         const user = await this.#userModel.createUser({email, password, validationCode})
-        return user
+        return { user }
     }
 
     async generateAccessToken(userId, companyId) {
