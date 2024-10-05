@@ -9,11 +9,16 @@ const ROUTE_VALIDATE = 'api/v1/auth/validateRegistration'
 
 describe('Test user registration', () => {
 
+    const dte = new Date()
+    const userEmail = `u${dte.getTime()}@x.y`
+
     before( async () =>  {
         loadConfig()
         await connectDb()
     }),
+
     after( async () =>  {
+        await requestDb('DELETE FROM users WHERE email=?', userEmail)
         await disconnectDb()
     }),
 
@@ -136,9 +141,10 @@ describe('Test user registration', () => {
 
     describe(`Call route /${ROUTE_REGISTER} with valid data`, () => {
 
+
         it('User regisration', async () => {
             let json = await jsonPost(ROUTE_REGISTER, {
-                    email:'a@b.c',
+                    email:userEmail,
                     password:'aBcdef+ghijkl9'
             })
             expect(json).to.be.instanceOf(Object)
