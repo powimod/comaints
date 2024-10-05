@@ -2,18 +2,33 @@
 
 import fs from 'fs'
 import dotenv from 'dotenv'
+import promise_mysql from 'promise-mysql'
+
 
 const CONF_FILE = './test/.env'
 dotenv.config({ path: CONF_FILE });
 
 let backendUrl = null
+let db = null
+let dbHost
+let dbPort
+let dbDatabase
+let dbUser
+let dbPassword 
+
 
 const loadConfig = () => {
-	backendUrl = process.env.backend_url
-
+	backendUrl = process.env.BACKEND_URL
 	if (backendUrl === undefined)
-		throw new Error(`Parameter «backend_url» not found in «${CONF_FILE}»`)
+		throw new Error(`Parameter «BACKEND_URL» not found in «${CONF_FILE}»`)
 
+	dbHost = process.env.DB_HOST || 'localhost'
+	dbPort = process.env.DB_PORT || 3306
+	dbDatabase = process.env.DB_DATABASE || 'db_comaint'
+	dbUser = process.env.DB_USER || 'comaint'
+	dbPassword = process.env.DB_PASSWORD
+	if (dbPassword === undefined)
+		throw new Error(`Parameter «DB_PASSWORD» not found in «${CONF_FILE}»`)
 }
 
 const jsonFull = async (routeUrl, httpMethod, options, requestBody) => {
@@ -70,12 +85,56 @@ const jsonDelete = async (routeUrl, options = {}) => {
 	return await jsonFull(routeUrl, 'DELETE', options)
 }
 
+const connectDb = async () => {
+	db = await promise_mysql.createConnection({
+		host: dbHost,
+		port: dbPort,
+		database: dbDatabase,
+		user: dbUser,
+		password: dbPassword
+	})
+	if (db.code) 
+		throw new Error(`Can't connect database`)
+}
+
+const disconnectDb = async () => {
+	if (db === null)
+		return
+	db.end()
+	db = null
+}
+
+const requestDb = async (sqlQuery, sqlValues = []) => {
+	if (db === null)
+		await connectDb()
+	const result = await db.query(sqlQuery, sqlValues);
+	if (result.code) 
+		throw new Error(`SQL error : ${result.code}`)
+	return result
+}
+
+const util = {
+	loadConfig,
+	jsonGet,
+	jsonPost,
+	jsonPut,
+	jsonPatch,
+	jsonDelete,
+    connectDb,
+    disconnectDb,
+    requestDb
+}
+
+export default util
 export {
 	loadConfig,
 	jsonGet,
 	jsonPost,
 	jsonPut,
 	jsonPatch,
-	jsonDelete
+	jsonDelete,
+    connectDb,
+    disconnectDb,
+    requestDb
 }
 
