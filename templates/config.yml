@@ -89,6 +89,7 @@ objects:
         default: false
       - name : "validationCode"
         type: "integer"
+        secret: true
         mandatory: false
         default: 0
         minimum: 0 

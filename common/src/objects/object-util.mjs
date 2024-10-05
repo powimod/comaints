@@ -103,9 +103,7 @@ const controlObjectProperty = (objDef, propName, propValue) => {
 	}
 
 
-	if (propDef.secret)  {
-        if (typeof(propValue) !== 'string' )
-            return ['error.prop.is_not_a_string', {property: propName}]
+	if (propName === 'password')  {
         if (propDef.minimum && propValue.length < propDef.minimum )
             return ['error.prop.password_to_small', {property: propName, size: propDef.minimum}]
         let nLower = 0
@@ -242,10 +240,10 @@ const convertObjectFromDb = (objDef, dbRecord) => {
 	for (const [propName, propDef] of Object.entries(objDef)) {
 	    if (propDef.secret)
             continue
-		const fieldName = propDef.field ? propDef.field : propName
+		const fieldName = (propDef.field === undefined) ? propName : propDef.field
 		let fieldValue = dbRecord[fieldName]
 		if (fieldValue === undefined)  // should never happen
-			throw new Error(`Property [${propName}] it not defined in DB record`)
+			throw new Error(`Property [${fieldName}] is not defined in DB record`)
 		if (fieldValue !== null) {
 			if (propDef.type === 'boolean') 
 				fieldValue = (fieldValue === 1) ? true : false

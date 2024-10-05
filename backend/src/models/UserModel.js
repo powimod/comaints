@@ -17,8 +17,10 @@ class UserModel {
         if (result.code)
             throw new Error(result.code)
         const userList = []
-        for (let userRecord of result)
-            userList.push(userRecord)
+        for (let userRecord of result) {
+            const user = convertObjectFromDb(userObjectDef, userRecord)
+            userList.push(user)
+        }
         return userList;
     }
 
@@ -50,8 +52,8 @@ class UserModel {
         try {
             const result = await this.#db.query(sqlRequest, fieldValues)
             const userId = result.insertId
-            const dbUser = await this.getUserById(userId)
-            user = convertObjectFromDb(userObjectDef, dbUser)
+            const userRecord = await this.getUserById(userId)
+            user = convertObjectFromDb(userObjectDef, userRecord)
             return user
         }
         catch (error) {

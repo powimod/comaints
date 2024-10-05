@@ -53,8 +53,6 @@ class AuthRoutes {
 
                 const result = await authModel.register(email, password, validationCode)
 
-                // FIXME validation code should be secret
-                delete result.user['validationCode']
                 if (result.validationCode)
                     throw new Error('User object should not have a validation code property')
                 if (result.password)
