@@ -11,8 +11,9 @@ describe('Test user registration', () => {
 
     const dte = new Date()
     const userEmail = `u${dte.getTime()}@x.y`
-    let userId = null
     let validationCode  = null
+    let accessToken = null
+    let refreshToken = null
 
     before( async () =>  {
         loadConfig()
@@ -158,46 +159,12 @@ describe('Test user registration', () => {
                 sendCodeByEmail: false
             })
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-
-            expect(user).to.have.property('id')
-            expect(user.id).to.a('number').and.to.be.above(0)
-            expect(user).to.have.property('email')
-            expect(user.email).to.a('string').and.to.equal(userEmail)
-            expect(user).to.have.property('firstname')
-            expect(user.firstname).to.equal(null)
-            expect(user).to.have.property('lastname')
-            expect(user.lastname).to.equal(null)
-            expect(user).to.have.property('accountLocked')
-            expect(user.accountLocked).to.a('boolean').and.to.equal(true)
-            expect(user).to.have.property('administrator')
-            expect(user.administrator).to.a('boolean').and.to.equal(false)
-
-            expect(user).not.to.have.property('validationCode')
-            expect(user).not.to.have.property('password')
-
-            userId = user.id
-            //console.log(user)
-            /*
-            {
-                  id: 101,
-                      id_company: null,
-                      email: 'u1728130707175@x.y',
-                      password: 'aBcdef+ghijkl9',
-                      firstname: null,
-                      lastname: null,
-                      account_locked: 0,
-                      validation_code: 0,
-                      active: 1,
-                      last_use: null,
-                      administrator: 0
-            }
-            */
-             
-
-
+            expect(json).to.have.property('access-token')
+            accessToken = json['access-token']
+            expect(accessToken).to.be.a('string')
+            expect(json).to.have.property('refresh-token')
+            refreshToken = json['refresh-token']
+            expect(refreshToken).to.be.a('string')
         })
 
         it('Check registration attempt with an existing email', async () => {
@@ -214,6 +181,33 @@ describe('Test user registration', () => {
                 expect(error.message).to.equal('Server status 409 (Duplicated «email» field for object «user»)')
             }
         })
+
+        it('check newly created user in database', async () => {
+            const res = await requestDb('select * from users where email=?', [ userEmail ])
+            expect(res).to.be.instanceOf(Array)
+            const user = res[0]
+            expect(user).to.be.instanceOf(Object)
+
+            expect(user).to.have.property('id')
+            expect(user.id).to.a('number').and.to.be.above(0)
+            expect(user).to.have.property('email')
+            expect(user.email).to.a('string').and.to.equal(userEmail)
+            expect(user).to.have.property('firstname')
+            expect(user.firstname).to.equal(null)
+            expect(user).to.have.property('lastname')
+            expect(user.lastname).to.equal(null)
+            expect(user).to.have.property('account_locked')
+            expect(user.account_locked).to.a('number').and.to.equal(1)
+            expect(user).to.have.property('administrator')
+            expect(user.administrator).to.a('number').and.to.equal(0)
+
+            expect(user).to.have.property('validation_code')
+            const validationCode = user.validation_code
+            expect(validationCode).to.be.a('number')
+        })
+
+
+        // TODO try to access private route with accesToken while user registration is not finished
 
         it('Try to validate registration without code', async () => {
             try {
@@ -248,14 +242,6 @@ describe('Test user registration', () => {
             }
         })
 
-
-        it('Get validation code in database', async () => {
-            const res = await requestDb('select validation_code from users where id=?', [ userId ])
-            expect(res).to.be.instanceOf(Array)
-            expect(res[0]).to.have.property('validation_code')
-            const validationCode = res[0].validation_code
-            expect(validationCode).to.be.a('number')
-        })
 
         /*
         it('Send incorrect validation code', async () => {

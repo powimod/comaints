@@ -87,7 +87,10 @@ class AuthRoutes {
 
                 // TODO use newly create access and refresh tokens
 
-                view.json({user})
+                view.json({
+                    'access-token': newAccessToken,
+                    'refresh-token': newRefreshToken
+                })
             }
             catch(error) {
                 view.error(error)
