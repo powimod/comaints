@@ -97,7 +97,7 @@ class AuthModel {
         assert(userId !== undefined)
         assert(companyId !== undefined)
         assert(this.#tokenSecret !== undefined)
-		assert(this.#accessTokenLifespan !== undefined)
+        assert(this.#accessTokenLifespan !== undefined)
         const payload = {
             type: 'access',
             user_id: userId,
@@ -108,25 +108,88 @@ class AuthModel {
         })
     }
 
-	async generateRefreshToken(userId, companyId) {
+
+    checkAccessToken(token) {
+        const decodeTokenPromise = new Promise( (resolve, reject) => {
+            jwt.verify(token, this.#tokenSecret, (err, payload) => {
+                if (err !== null)  {
+                    if (err.constructor.name === 'TokenExpiredError')
+                        reject('Expired token') // DO NOT translate (used by API lib)
+                    else
+                        reject('Invalid token')
+                    return
+                }
+                if (payload.type !== 'access') {
+                    reject('Not an access token')
+                    return
+                }
+                if (isNaN(payload.user_id)) {
+                    reject(`Invalid token content`)
+                    return
+                }
+                if (isNaN(payload.company_id)) {
+                    reject(`Invalid token content`)
+                    return
+                }
+                resolve([payload.user_id, payload.company_id])
+            })
+        })
+        return decodeTokenPromise
+    }
+
+
+    async generateRefreshToken(userId, companyId) {
         assert(companyId !== undefined)
         assert(this.#tokenSecret !== undefined)
-		assert(this.#refreshTokenLifespan !== undefined)
+        assert(this.#refreshTokenLifespan !== undefined)
 
-		const refreshTokenLifespan = this.#refreshTokenLifespan
-		const expiresAt = new Date (Date.now() + refreshTokenLifespan * 86400000) // 24 hours in ms
+        const refreshTokenLifespan = this.#refreshTokenLifespan
+        const expiresAt = new Date (Date.now() + refreshTokenLifespan * 86400000) // 24 hours in ms
         const token = await this.#tokenModel.createToken({ userId, expiresAt })
-		const tokenId = token.id
+        const tokenId = token.id
 
-		const payload = {
-			type: 'refresh',
-			token_id: tokenId,
-			user_id: userId,
-			company_id: companyId
-		}
-		return jwt.sign(payload, this.#tokenSecret, { expiresIn: `${refreshTokenLifespan}days` })
-	}
+        const payload = {
+            type: 'refresh',
+            token_id: tokenId,
+            user_id: userId,
+            company_id: companyId
+        }
+        return jwt.sign(payload, this.#tokenSecret, { expiresIn: `${refreshTokenLifespan}days` })
+    }
 
+    async checkRefreshToken(token) {
+        const decodeTokenPromise = new Promise( (resolve, reject) => {
+            jwt.verify(token, this.#tokenSecret, (err, payload) => {
+                if (err !== null)  {
+                    if (err.constructor.name === 'TokenExpiredError')
+                        reject('Expired token') // DO NOT translate (used by API lib)
+                    else
+                        reject('Invalid token')
+                    return
+                }
+                if (payload.type !== 'refresh') {
+                    reject('Not an refresh token')
+                    return
+                }
+                if (isNaN(payload.token_id) || isNaN(payload.user_id)) {
+                    reject(`Invalid token content`)
+                    return
+                }
+                resolve([payload.token_id, payload.user_id, payload.company_id])
+            })
+        })
+        const [tokenId, userId, companyId] = await decodeTokenPromise
+
+        assert(tokenId !== undefined)
+        assert(userId !== undefined)
+        assert(companyId !== undefined)
+
+        token = await this.#tokenModel.getTokenById(userId)
+        const tokenFound = (token !== null)
+
+        //TODO return extra field
+        return [tokenFound, tokenId, userId, companyId]
+    }
 }
 
 
