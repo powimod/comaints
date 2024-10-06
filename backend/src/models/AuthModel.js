@@ -5,6 +5,8 @@ import ModelSingleton from '../model.js'
 import { ComaintTranslatedError } from '../../../common/src/error.mjs'
 import jwt from 'jsonwebtoken'
 
+import { sendMail } from '../util.js'
+
 class AuthModel {
     #db = null
     #userModel = null
@@ -12,22 +14,31 @@ class AuthModel {
     #tokenHashSalt = null
     #refreshTokenLifespan = null
     #accessTokenLifespan = null
-    
+    #mailServerConfig = null
 
-    initialize (db, config) {
+    initialize (db, securityConfig, mailServerConfig) {
 
         // check «security» configuration section 
         const securityParameterNames = [ 'token_secret', 'refresh_token_lifespan' , 'access_token_lifespan']
         for (const parameterName of securityParameterNames ) {
-            if (config[parameterName] === undefined)
-                throw new Error(`Parameter «${parameterName}» not defined`)
+            if (securityConfig[parameterName] === undefined)
+                throw new Error(`Parameter «${parameterName}» not defined is security configuration`)
         }
 
-        assert(config.token_secret !== undefined)
-        this.#tokenSecret = config.tokenSecret
-        this.#tokenHashSalt =  config.tokenHashSalt
-        this.#refreshTokenLifespan = config.refreshTokenLifespan
-        this.#accessTokenLifespan = config.refreshTokenLifespan
+        assert(securityConfig.token_secret !== undefined)
+        this.#tokenSecret = securityConfig.tokenSecret
+        this.#tokenHashSalt =  securityConfig.tokenHashSalt
+        this.#refreshTokenLifespan = securityConfig.refreshTokenLifespan
+        this.#accessTokenLifespan = securityConfig.refreshTokenLifespan
+
+        // check «mailServer» configuration section 
+        const mailServerParameterNames = [ 'host', 'port', 'user', 'password', 'from']
+        for (const parameterName of mailServerParameterNames ) {
+            if (mailServerConfig[parameterName] === undefined)
+                throw new Error(`Parameter «${parameterName}» not defined in mail server configuration`)
+        }
+        this.#mailServerConfig = mailServerConfig
+
         this.#db = db
         const model  = ModelSingleton.getInstance()
         this.#userModel = model.getUserModel()
@@ -74,7 +85,24 @@ class AuthModel {
         await this.#userModel.editUser(user)
     }
 
-
+    async sendRegisterValidationCode(code, email, i18n_t) {
+        assert(code !== undefined)
+        assert(typeof(code) === 'number')
+        assert(email !== undefined)
+        assert(typeof(email) === 'string')
+        assert(i18n_t !== undefined)
+        assert(typeof(i18n_t) === 'function')
+        const subject = i18n_t('register.mail_title')
+        const textBody = i18n_t('register.mail_body', { 'code' : code })
+        const htmlBody = i18n_t('register.mail_body', { 'code' : `<b>${code}</b>code` })
+        return await sendMail(
+                email,
+                subject,
+                textBody,
+                htmlBody,
+                this.#mailServerConfig
+        )
+    }
 
 }
 

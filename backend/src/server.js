@@ -29,14 +29,21 @@ const main = async () => {
     app.use(middleware.handle(i18next))
 
     // configuration is defined in «.env» file
-    const dbPassword = process.env.DB_PASSWORD
+    const env = process.env
+    const dbPassword = env.DB_PASSWORD
     if (! dbPassword)
         throw new Error('DB_PASSWORD not defined')
-    const tokenSecret = process.env.TOKEN_SECRET
+    const tokenSecret = env.TOKEN_SECRET
     if (! tokenSecret)
         throw new Error('TOKEN_SECRET not defined')
 
-    const env = process.env
+    const mailServerPassword = env.MAIL_SERVER_PASSWORD 
+    if (! mailServerPassword)
+        throw new Error('MAIL_SERVER_PASSWORD not defined')
+    const mailServerFrom = env.MAIL_SERVER_FROM
+    if (! mailServerFrom)
+        throw new Error('MAIL_SERVER_FROM not defined')
+
     let config = {
         version: BACKEND_VERSION,
         server: {
@@ -56,6 +63,13 @@ const main = async () => {
             hash_salt: env.HASH_SALT || 10,
             refresh_token_lifespan: env.REFRESH_TOKEN_LIFESPAN || 365, // days
             access_token_lifespan: env.ACCESS_TOKEN_LIFESPAN  || 120 // seconds
+        },
+        mail: {
+            host: env.MAIL_SERVER_HOST || 'localhost',
+            port: env.MAIL_SERVER_PORT || 25,
+            user: env.MAIL_SERVER_USER || 'comaint',
+            password: mailServerPassword,
+            from: mailServerFrom,
         }
     }
 
@@ -72,7 +86,6 @@ const main = async () => {
 	    await model.terminate()
         process.exit(0)
     })
-
 
     const port = config.server.port
     

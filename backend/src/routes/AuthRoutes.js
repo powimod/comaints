@@ -12,7 +12,7 @@ class AuthRoutes {
 
     initialize(config, expressApp) {
         const controller = ControllerSingleton.getInstance()
-	    const model  = ModelSingleton.getInstance()
+        const model  = ModelSingleton.getInstance()
         
         const authModel = model.getAuthModel()
 
@@ -53,14 +53,37 @@ class AuthRoutes {
 
                 const result = await authModel.register(email, password, validationCode)
 
-                if (result.validationCode)
+                const user = result.user
+                if (! user)
+                    throw new Error('User not found in result')
+
+                if (user.validationCode !== undefined)
                     throw new Error('User object should not have a validation code property')
-                if (result.password)
+                if (user.password !== undefined)
                     throw new Error('User object should not have a password property')
-                if (result.administrator)
+                if (user.administrator === true)
                     throw new Error('User object should not be administrator')
 
-                view.json(result)
+                const userId = user.id
+                if (! userId)
+                    throw new Error('userId not found')
+
+                const companyId = user.companyId
+                if (companyId === undefined )
+                    throw new Error('companyId not found')
+                if (companyId !== null)
+                    throw new Error('companyId should be null')
+
+
+                await authModel.sendRegisterValidationCode(validationCode, email, view.translation)
+
+                // generate access and refresh tokens
+                /* TODO
+                const newAccessToken  = await authModel.generateAccessToken(userId, companyId)
+                const newRefreshToken = await authModel.generateRefreshToken(userId, companyId)
+                */
+
+                view.json({user})
             }
             catch(error) {
                 view.error(error)
