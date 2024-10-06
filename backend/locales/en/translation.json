@@ -10,6 +10,9 @@
         "invalid_request_error": "TODO change message",
         "internal_error": "TODO change message",
         "confict_error" : "Duplicated «{{field}}» field for object «{{object}}»",
+		"account_locked": "Account is locked",
+		"account_not_locked": "Account is not locked",
+		"account_not_found": "This account does not exist",
 		"prop": {
 			"is_not_defined": "Property «{{property}}» is not defined",
 			"has_no_value": "Property «{{property}}» has no value",

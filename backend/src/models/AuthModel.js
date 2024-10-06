@@ -2,6 +2,7 @@
 
 import assert from 'assert' 
 import ModelSingleton from '../model.js'
+import { ComaintTranslatedError } from '../../../common/src/error.mjs'
 import jwt from 'jsonwebtoken'
 
 class AuthModel {
@@ -55,6 +56,25 @@ class AuthModel {
             expiresIn: `${this.#accessTokenLifespan}s` // seconds
         });
     }
+
+    async validateRegistration(userId, validationCode) {
+        // filter fields
+        let user = await this.#userModel.getUserById(userId)
+        if (user === null)
+            throw new Error('Unknown User Id'); // FIXME translation
+        if (validationCode !== user.validationCode)
+            throw new Error('Invalid code'); // FIXME translation
+        if (! user.accountLocked)
+            throw new ComaintTranslatedError('error.account_not_locked')
+
+        // unlock User account and reset validation code
+        user.accountLocked = false
+        user.validationCode = 0
+        delete user.password // do not re-encrypt already encrypted password !
+        await this.#userModel.editUser(user)
+    }
+
+
 
 }
 

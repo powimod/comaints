@@ -10,6 +10,9 @@
         "invalid_request_error": "TODO change message",
         "internal_error": "TODO change message",
         "confict_error" : "Doublon sur le champ «{{field}»} pour l'ojet «{{object}}»",
+		"account_locked": "Le compte est verrouillé",
+		"account_not_locked": "Le compte n'est pas verrouillé",
+		"account_not_found": "Ce compte n'existe pas",
 		"prop": {
 			"is_not_defined": "La propriété «{{property}}» n'est pas définie",
 			"has_no_value": "La propriété«{{property}}» n'a pas de valeur",

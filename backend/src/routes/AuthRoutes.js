@@ -67,6 +67,31 @@ class AuthRoutes {
             }
         })
 
+
+        // public route 
+        expressApp.post('/api/v1/auth/validateRegistration', async (request, response) => {
+            const view = new View(request, response)
+            try {
+                let code = request.body.code
+                if (code === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'code'})
+                if (typeof(code) !== 'number')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'code'})
+                const [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'validationCode',code) 
+                if (errorMsg) 
+                    throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
+                /*
+                const result = await authModel.validateRegistration((email, password, validationCode)
+                view.json(result)
+                */
+                const result = false // TODO
+            }
+            catch(error) {
+                view.error(error)
+            }
+        })
+
+
     }
 }
 

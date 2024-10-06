@@ -11,6 +11,8 @@ describe('Test user registration', () => {
 
     const dte = new Date()
     const userEmail = `u${dte.getTime()}@x.y`
+    let userId = null
+    let validationCode  = null
 
     before( async () =>  {
         loadConfig()
@@ -168,6 +170,7 @@ describe('Test user registration', () => {
             expect(user).not.to.have.property('validationCode')
             expect(user).not.to.have.property('password')
 
+            userId = user.id
             //console.log(user)
             /*
             {
@@ -203,18 +206,70 @@ describe('Test user registration', () => {
             }
         })
 
+        it('Try to validate registration without code', async () => {
+            try {
+                let json = await jsonPost(ROUTE_VALIDATE, {})
+                expect.fail("Missing «code» parameter not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 400 (Parameter «code» not found in request body)`)
+            }
+        })
 
-        /* TODO cleanup
-        it("check user table", async () => {
-            const userList = await requestDb('select * from users')
-            expect(userList).to.be.instanceOf(Array)
-            if (userList.length > 0) {
-                const user = userList[0]
-                expect(user).to.be.instanceOf(Object)
-                expect(user).to.have.property('id')
+        it('Try to validate registration with invalid code', async () => {
+            try {
+                let json = await jsonPost(ROUTE_VALIDATE, { code: 'abcd' })
+                expect.fail("Invalid «code» parameter not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 400 (Parameter «code» invalid in request body)`)
+            }
+        })
+
+        it('Try to validate registration with too large code', async () => {
+            try {
+                let json = await jsonPost(ROUTE_VALIDATE, { code: 1234567 })
+                expect.fail("Too large «code» parameter not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 400 (Property «validationCode» is too large)`)
+            }
+        })
+
+
+        it('Get validation code in database', async () => {
+            const res = await requestDb('select validation_code from users where id=?', [ userId ])
+            expect(res).to.be.instanceOf(Array)
+            expect(res[0]).to.have.property('validation_code')
+            const validationCode = res[0].validation_code
+            expect(validationCode).to.be.a('number')
+        })
+
+        /*
+        it('Send incorrect validation code', async () => {
+            const incorrectCode = validationCode + 1
+            let json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
+            console.log(json)
+            expect.fail("Missing «code» parameter not detected")
+        })
+
+
+        it('Send validation code', async () => {
+            try {
+                let json = await jsonPost(ROUTE_VALIDATE, { code })
+                expect.fail("Missing «code» parameter not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 400 (Parameter «code» not found in request body)`)
             }
         })
         */
+
+
     })
     // TODO test registration with an existing email
         
