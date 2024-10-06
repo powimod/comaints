@@ -58,12 +58,15 @@ class AuthModel {
 
 
     async validateRegistration(userId, validationCode) {
+
+        const validated = await this.#userModel.checkValidationCode(userId, validationCode)
+        if (! validated)
+            return false
+
         // filter fields
         let user = await this.#userModel.getUserById(userId)
         if (user === null)
-            throw new Error('Unknown User Id'); // FIXME translation
-        if (validationCode !== user.validationCode)
-            throw new Error('Invalid code'); // FIXME translation
+            throw new Error('User not found')
         if (! user.accountLocked)
             throw new ComaintTranslatedError('error.account_not_locked')
 
@@ -72,6 +75,7 @@ class AuthModel {
         user.validationCode = 0
         delete user.password // do not re-encrypt already encrypted password !
         await this.#userModel.editUser(user)
+        return true
     }
 
     async sendRegisterValidationCode(code, email, i18n_t) {

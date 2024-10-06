@@ -14,6 +14,7 @@ describe('Test user registration', () => {
     let validationCode  = null
     let accessToken = null
     let refreshToken = null
+    let userId = null
 
     before( async () =>  {
         loadConfig()
@@ -182,14 +183,15 @@ describe('Test user registration', () => {
             }
         })
 
-        it('check newly created user in database', async () => {
+        it('Check newly created user in database', async () => {
             const res = await requestDb('select * from users where email=?', [ userEmail ])
             expect(res).to.be.instanceOf(Array)
             const user = res[0]
             expect(user).to.be.instanceOf(Object)
 
             expect(user).to.have.property('id')
-            expect(user.id).to.a('number').and.to.be.above(0)
+            userId = user.id
+            expect(userId).to.a('number').and.to.be.above(0)
             expect(user).to.have.property('email')
             expect(user.email).to.a('string').and.to.equal(userEmail)
             expect(user).to.have.property('firstname')
@@ -197,13 +199,13 @@ describe('Test user registration', () => {
             expect(user).to.have.property('lastname')
             expect(user.lastname).to.equal(null)
             expect(user).to.have.property('account_locked')
-            expect(user.account_locked).to.a('number').and.to.equal(1)
+            expect(user.account_locked).to.a('number').and.to.equal(1) // true
             expect(user).to.have.property('administrator')
-            expect(user.administrator).to.a('number').and.to.equal(0)
+            expect(user.administrator).to.a('number').and.to.equal(0) // false
 
             expect(user).to.have.property('validation_code')
             validationCode = user.validation_code
-            expect(validationCode).to.be.a('number')
+            expect(validationCode).to.be.a('number').and.to.be.above(0)
         })
 
 
@@ -243,32 +245,49 @@ describe('Test user registration', () => {
         })
 
 
-        /*
         it('Send incorrect validation code', async () => {
             const incorrectCode = validationCode + 1
-            try {
-                let json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
-                expect.fail("Incorrect code not detected")
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Property «validationCode» is too large)`)
-            }
-
+            const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('validated')
+            expect(json.validated).to.be.a('boolean').and.to.equal(false)
+            expect(json).to.have.property('userId')
+            expect(json.userId).to.be.a('number').and.to.equal(userId)
         })
 
 
         it('Send validation code', async () => {
-            try {
-                let json = await jsonPost(ROUTE_VALIDATE, { code })
-                expect.fail("Missing «code» parameter not detected")
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Parameter «code» not found in request body)`)
-            }
+            const json = await jsonPost(ROUTE_VALIDATE, { code: validationCode})
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('validated')
+            expect(json.validated).to.be.a('boolean').and.to.equal(true)
+            expect(json).to.have.property('userId')
+            expect(json.userId).to.be.a('number').and.to.equal(userId)
         })
-        */
+
+        it('Check newly registered user in database', async () => {
+            const res = await requestDb('select * from users where id=?', [ userId ])
+            expect(res).to.be.instanceOf(Array)
+            const user = res[0]
+            expect(user).to.be.instanceOf(Object)
+
+            expect(user).to.have.property('id')
+            userId = user.id
+            expect(userId).to.a('number').and.to.be.above(0)
+            expect(user).to.have.property('email')
+            expect(user.email).to.a('string').and.to.equal(userEmail)
+            expect(user).to.have.property('firstname')
+            expect(user.firstname).to.equal(null)
+            expect(user).to.have.property('lastname')
+            expect(user.lastname).to.equal(null)
+            expect(user).to.have.property('account_locked')
+            expect(user.account_locked).to.a('number').and.to.equal(0) // false
+            expect(user).to.have.property('administrator')
+            expect(user.administrator).to.a('number').and.to.equal(0)
+
+            expect(user).to.have.property('validation_code')
+            expect(user.validation_code).to.be.a('number').and.to.equal(0) // false
+        })
 
 
     })

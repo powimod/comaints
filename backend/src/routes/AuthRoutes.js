@@ -18,30 +18,30 @@ class AuthRoutes {
         
         const authModel = model.getAuthModel()
 
-        // cookie middleware to manage access token
+        // middleware to check access token
         expressApp.use( async (request, response, next) => {
-            console.log(`Cookie middleware : load access token for request ${request.url} ...`)
+            console.log(`Token middleware : load access token for request ${request.url} ...`)
             assert(authModel !== null)
             let userId = null
             let companyId = null
             const token = request.headers['x-access-token']
             if (token === undefined) {
-                console.log(`Cookie middleware -> access token absent (anonymous request)`)
+                console.log(`Token middleware -> access token absent (anonymous request)`)
             }
             else {
                 try {
                     [userId, companyId] = await authModel.checkAccessToken(token)
-                    console.log(`Cookie middleware -> cookie userId = ${ userId }`)
-                    console.log(`Cookie middleware -> cookie companyId = ${ companyId }`)
+                    console.log(`Token middleware -> userId = ${ userId }`)
+                    console.log(`Token middleware -> companyId = ${ companyId }`)
                 }
                 catch (error) {
-                    console.log(`Cookie middleware -> cookie error : ${ error.message ? error.message : error }`)
+                    console.log(`Token middleware -> error : ${ error.message ? error.message : error }`)
                     // TODO View.sendJsonError(response, error)
                     throw new Error("renvoyer une erreur via view!")
                     return
                 }
             }
-            console.log(`Cookie middleware : userId=${userId}, companyId=${companyId}`)
+            console.log(`Token middleware : userId=${userId}, companyId=${companyId}`)
             request.userId = userId
             request.companyId = companyId
             next()
@@ -134,7 +134,9 @@ class AuthRoutes {
         expressApp.post('/api/v1/auth/validateRegistration', async (request, response) => {
             const view = new View(request, response)
             try {
-                const userId = request.userId
+                const userId = request.userId // ID obtained from HTTP header
+                if (userId === null)
+                    throw new Error('User ID not found in request header')
                 let code = request.body.code
                 if (code === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'code'})
@@ -143,11 +145,8 @@ class AuthRoutes {
                 const [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'validationCode',code) 
                 if (errorMsg) 
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
-                /*
-                const result = await authModel.validateRegistration((email, password, validationCode)
-                view.json(result)
-                */
-                view.json({userId}) // send userId to make API-Lib detect context change
+                const validated = await authModel.validateRegistration(userId, code)
+                view.json({validated, userId}) // send userId to make API-Lib detect context change
             }
             catch(error) {
                 view.error(error)
