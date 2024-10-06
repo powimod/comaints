@@ -59,10 +59,10 @@ const main = async () => {
             password: dbPassword
         },
         security: {
-            token_secret: tokenSecret,
-            hash_salt: env.HASH_SALT || 10,
-            refresh_token_lifespan: env.REFRESH_TOKEN_LIFESPAN || 365, // days
-            access_token_lifespan: env.ACCESS_TOKEN_LIFESPAN  || 120 // seconds
+            tokenSecret: tokenSecret,
+            hashSalt: env.HASH_SALT || 10,
+            refreshTokenLifespan: env.REFRESH_TOKEN_LIFESPAN || 365, // days
+            accessTokenLifespan: env.ACCESS_TOKEN_LIFESPAN  || 120 // seconds
         },
         mail: {
             host: env.MAIL_SERVER_HOST || 'localhost',

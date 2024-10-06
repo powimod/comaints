@@ -47,9 +47,12 @@ class AuthRoutes {
                 if (errorMsg2) 
                     throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
 
+                // self-tests does not send validation code by email
+                let sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ? request.body.sendCodeByEmail : true
+
                 // make a random validation code which will be sent by email to unlock account
-                const validationCode = authModel.generateValidationCode();
-                console.log(`Validation code is ${ validationCode }`); // TODO remove this
+                const validationCode = authModel.generateValidationCode()
+                console.log(`Validation code is ${ validationCode }`) // TODO remove this
 
                 const result = await authModel.register(email, password, validationCode)
 
@@ -75,13 +78,14 @@ class AuthRoutes {
                     throw new Error('companyId should be null')
 
 
-                await authModel.sendRegisterValidationCode(validationCode, email, view.translation)
+                if (sendCodeByEmail)
+                    await authModel.sendRegisterValidationCode(validationCode, email, view.translation)
 
                 // generate access and refresh tokens
-                /* TODO
                 const newAccessToken  = await authModel.generateAccessToken(userId, companyId)
                 const newRefreshToken = await authModel.generateRefreshToken(userId, companyId)
-                */
+
+                // TODO use newly create access and refresh tokens
 
                 view.json({user})
             }

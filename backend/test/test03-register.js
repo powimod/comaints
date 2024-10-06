@@ -30,7 +30,8 @@ describe('Test user registration', () => {
             try {
                 let json = await jsonPost(ROUTE_REGISTER, {
                         email_missing:'',
-                        password:''
+                        password:'',
+                        sendCodeByEmail: false
                     })
                 expect.fail("Missing «email» parameter not detected")
             }
@@ -45,7 +46,8 @@ describe('Test user registration', () => {
             try {
                 let json = await jsonPost(ROUTE_REGISTER, {
                         email:'',
-                        password:''
+                        password:'',
+                        sendCodeByEmail: false
                     })
                 expect.fail("Missing «email» parameter not detected")
             }
@@ -59,7 +61,8 @@ describe('Test user registration', () => {
             try {
                 let json = await jsonPost(ROUTE_REGISTER, {
                         email:'abcdef',
-                        password:''
+                        password:'',
+                        sendCodeByEmail: false
                     })
                 expect.fail("Missing «email» parameter not detected")
             }
@@ -74,7 +77,8 @@ describe('Test user registration', () => {
             try {
                 let json = await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
-                        password_missing:''
+                        password_missing:'',
+                        sendCodeByEmail: false
                     })
                 expect.fail('Missing «password» parameter not detected')
             }
@@ -88,7 +92,8 @@ describe('Test user registration', () => {
             try {
                 let json = await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
-                        password:'abc'
+                        password:'abc',
+                        sendCodeByEmail: false
                     })
                 expect.fail('Invalid «password» parameter not detected')
             }
@@ -102,7 +107,8 @@ describe('Test user registration', () => {
             try {
                 let json = await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
-                        password:'abcdefghijk9.'
+                        password:'abcdefghijk9.',
+                        sendCodeByEmail: false
                     })
                 expect.fail('Invalid «password» parameter not detected')
             }
@@ -116,7 +122,8 @@ describe('Test user registration', () => {
             try {
                 let json = await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
-                        password:'aBcdefghijkl.'
+                        password:'aBcdefghijkl.',
+                        sendCodeByEmail: false
                     })
                 expect.fail('Invalid «password» parameter not detected')
             }
@@ -130,7 +137,8 @@ describe('Test user registration', () => {
             try {
                 let json = await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
-                        password:'aBcdefghijkl9'
+                        password:'aBcdefghijkl9',
+                        sendCodeByEmail: false
                     })
                 expect.fail('Invalid «password» parameter not detected')
             }
@@ -143,11 +151,11 @@ describe('Test user registration', () => {
 
     describe(`Call route /${ROUTE_REGISTER} with valid data`, () => {
 
-
         it('User regisration', async () => {
             let json = await jsonPost(ROUTE_REGISTER, {
-                    email:userEmail,
-                    password:'aBcdef+ghijkl9'
+                email:userEmail,
+                password:'aBcdef+ghijkl9',
+                sendCodeByEmail: false
             })
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('user')
@@ -196,7 +204,8 @@ describe('Test user registration', () => {
             try {
                 let json = await jsonPost(ROUTE_REGISTER, {
                         email:userEmail,
-                        password:'aBcdef+ghijkl9'
+                        password:'aBcdef+ghijkl9',
+                        sendCodeByEmail: false
                     })
                 expect.fail('Invalid «password» parameter not detected')
             }

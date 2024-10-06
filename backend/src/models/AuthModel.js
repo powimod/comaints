@@ -1,6 +1,6 @@
-'se strict'
+'use strict'
 
-import assert from 'assert' 
+import assert from 'assert'
 import ModelSingleton from '../model.js'
 import { ComaintTranslatedError } from '../../../common/src/error.mjs'
 import jwt from 'jsonwebtoken'
@@ -10,6 +10,7 @@ import { sendMail } from '../util.js'
 class AuthModel {
     #db = null
     #userModel = null
+    #tokenModel = null
     #tokenSecret = null
     #tokenHashSalt = null
     #refreshTokenLifespan = null
@@ -18,20 +19,19 @@ class AuthModel {
 
     initialize (db, securityConfig, mailServerConfig) {
 
-        // check «security» configuration section 
-        const securityParameterNames = [ 'token_secret', 'refresh_token_lifespan' , 'access_token_lifespan']
+        // check «security» configuration section
+        const securityParameterNames = [ 'tokenSecret', 'refreshTokenLifespan' , 'accessTokenLifespan']
         for (const parameterName of securityParameterNames ) {
             if (securityConfig[parameterName] === undefined)
                 throw new Error(`Parameter «${parameterName}» not defined is security configuration`)
         }
 
-        assert(securityConfig.token_secret !== undefined)
         this.#tokenSecret = securityConfig.tokenSecret
         this.#tokenHashSalt =  securityConfig.tokenHashSalt
         this.#refreshTokenLifespan = securityConfig.refreshTokenLifespan
-        this.#accessTokenLifespan = securityConfig.refreshTokenLifespan
+        this.#accessTokenLifespan = securityConfig.accessTokenLifespan
 
-        // check «mailServer» configuration section 
+        // check «mailServer» configuration section
         const mailServerParameterNames = [ 'host', 'port', 'user', 'password', 'from']
         for (const parameterName of mailServerParameterNames ) {
             if (mailServerConfig[parameterName] === undefined)
@@ -42,12 +42,13 @@ class AuthModel {
         this.#db = db
         const model  = ModelSingleton.getInstance()
         this.#userModel = model.getUserModel()
+        this.#tokenModel = model.getTokenModel()
     }
 
     generateValidationCode() {
-        const minimum = 10000;
-        const maximum = 99999;
-        return parseInt(Math.random() * (maximum - minimum) + minimum);
+        const minimum = 10000
+        const maximum = 99999
+        return parseInt(Math.random() * (maximum - minimum) + minimum)
     }
 
     async register(email, password, validationCode) {
@@ -55,18 +56,6 @@ class AuthModel {
         return { user }
     }
 
-    async generateAccessToken(userId, companyId) {
-        assert(userId !== undefined)
-        assert(companyId !== undefined)
-        const payload = {
-            company_id: companyId,
-            user_id: userId,
-            type: 'access',
-        };
-        return jwt.sign(payload, this.#tokenSecret, { 
-            expiresIn: `${this.#accessTokenLifespan}s` // seconds
-        });
-    }
 
     async validateRegistration(userId, validationCode) {
         // filter fields
@@ -103,6 +92,40 @@ class AuthModel {
                 this.#mailServerConfig
         )
     }
+
+    generateAccessToken(userId, companyId) {
+        assert(userId !== undefined)
+        assert(companyId !== undefined)
+        assert(this.#tokenSecret !== undefined)
+		assert(this.#accessTokenLifespan !== undefined)
+        const payload = {
+            type: 'access',
+            user_id: userId,
+            company_id: companyId
+        }
+        return jwt.sign(payload, this.#tokenSecret, {
+            expiresIn: `${this.#accessTokenLifespan}s` // seconds
+        })
+    }
+
+	async generateRefreshToken(userId, companyId) {
+        assert(companyId !== undefined)
+        assert(this.#tokenSecret !== undefined)
+		assert(this.#refreshTokenLifespan !== undefined)
+
+		const refreshTokenLifespan = this.#refreshTokenLifespan
+		const expiresAt = new Date (Date.now() + refreshTokenLifespan * 86400000) // 24 hours in ms
+        const token = await this.#tokenModel.createToken({ userId, expiresAt })
+		const tokenId = token.id
+
+		const payload = {
+			type: 'refresh',
+			token_id: tokenId,
+			user_id: userId,
+			company_id: companyId
+		}
+		return jwt.sign(payload, this.#tokenSecret, { expiresIn: `${refreshTokenLifespan}days` })
+	}
 
 }
 

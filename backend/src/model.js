@@ -70,7 +70,7 @@ class Model {
         this.#companyModel.initialize(dbConnection)
 
         this.#userModel = UserModelSingleton.getInstance()
-        this.#userModel.initialize(dbConnection, config.security.hash_salt)
+        this.#userModel.initialize(dbConnection, config.security.hashSalt)
 
         this.#tokenModel = TokenModelSingleton.getInstance()
         this.#tokenModel.initialize(dbConnection)

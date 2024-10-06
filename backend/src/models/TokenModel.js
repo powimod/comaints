@@ -1,6 +1,6 @@
 'use strict'
 
-import { convertObjectToDb, buildFieldArrays, controlObject } from '../../../common/src/objects/object-util.mjs'
+import { buildFieldArrays, controlObject } from '../../../common/src/objects/object-util.mjs'
 import tokenObjectDef from '../../../common/src/objects/token-object-def.mjs'
 
 class TokenModel {
@@ -11,7 +11,7 @@ class TokenModel {
     }
 
     async findTokenList() {
-		let sql = `SELECT * FROM companies`
+		let sql = `SELECT * FROM tokens`
 		const result = await this.#db.query(sql)
 		if (result.code)
 			throw new Error(result.code)
@@ -27,7 +27,7 @@ class TokenModel {
 			throw new Error('Argument <tokenId> required');
 		if (isNaN(tokenId))
 			throw new Error('Argument <tokenId> is not a number');
-		let sql = `SELECT * FROM companies WHERE id = ?`;
+		let sql = `SELECT * FROM tokens WHERE id = ?`;
 		const result = await this.#db.query(sql, [tokenId]);
 		if (result.code)
 			throw new Error(result.code);
@@ -40,12 +40,11 @@ class TokenModel {
 
 
 	async createToken(token) {
-		const tokenDb = convertObjectToDb(tokenObjectDef, token)
-        const [ fieldNames, fieldValues ] = buildFieldArrays(tokenObjectDef, tokenDb)
-        const markArray = Array(fieldValues.length).fill('?').join(',')
 
+        const [ fieldNames, fieldValues ] = buildFieldArrays(tokenObjectDef, token)
+        const markArray = Array(fieldValues.length).fill('?').join(',')
 		const sqlRequest = `
-			INSERT INTO companies(${fieldNames.join(', ')}) VALUES (${markArray});
+			INSERT INTO tokens(${fieldNames.join(', ')}) VALUES (${markArray});
 		`
 		const result = await this.#db.query(sqlRequest, fieldValues)
 		if (result.code)
