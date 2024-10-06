@@ -1,5 +1,7 @@
 'use strict'
 
+import assert from 'assert'
+
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import ControllerSingleton from '../controller.js'
@@ -15,6 +17,36 @@ class AuthRoutes {
         const model  = ModelSingleton.getInstance()
         
         const authModel = model.getAuthModel()
+
+        // cookie middleware to manage access token
+        expressApp.use( async (request, response, next) => {
+            console.log(`Cookie middleware : load access token for request ${request.url} ...`)
+            assert(authModel !== null)
+            let userId = null
+            let companyId = null
+            const token = request.headers['x-access-token']
+            if (token === undefined) {
+                console.log(`Cookie middleware -> access token absent (anonymous request)`)
+            }
+            else {
+                try {
+                    [userId, companyId] = await authModel.checkAccessToken(token)
+                    console.log(`Cookie middleware -> cookie userId = ${ userId }`)
+                    console.log(`Cookie middleware -> cookie companyId = ${ companyId }`)
+                }
+                catch (error) {
+                    console.log(`Cookie middleware -> cookie error : ${ error.message ? error.message : error }`)
+                    // TODO View.sendJsonError(response, error)
+                    throw new Error("renvoyer une erreur via view!")
+                    return
+                }
+            }
+            console.log(`Cookie middleware : userId=${userId}, companyId=${companyId}`)
+            request.userId = userId
+            request.companyId = companyId
+            next()
+        })
+
 
         // public route 
         expressApp.post('/api/v1/auth/register', async (request, response) => {
@@ -102,6 +134,7 @@ class AuthRoutes {
         expressApp.post('/api/v1/auth/validateRegistration', async (request, response) => {
             const view = new View(request, response)
             try {
+                const userId = request.userId
                 let code = request.body.code
                 if (code === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'code'})
@@ -114,14 +147,12 @@ class AuthRoutes {
                 const result = await authModel.validateRegistration((email, password, validationCode)
                 view.json(result)
                 */
-                const result = false // TODO
+                view.json({userId}) // send userId to make API-Lib detect context change
             }
             catch(error) {
                 view.error(error)
             }
         })
-
-
     }
 }
 

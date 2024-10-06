@@ -1,6 +1,5 @@
 'use strict'
 
-import ViewSingleton from './view.js'
 import ModelSingleton from './model.js'
 import View from './view.js'
 import { ComaintApiErrorInvalidRequest } from '../../common/src/error.mjs'
@@ -22,6 +21,18 @@ class Controller {
     async initialize(config, expressApp) {
 	    const model  = ModelSingleton.getInstance()
 
+        // IMPORTANT :authRoutes must be initialized first because it has a middleware to handle session cookies
+        this.#authRoutes = AuthRoutesSingleton.getInstance()
+        this.#authRoutes.initialize(config, expressApp)
+
+        this.#companyRoutes = CompanyRoutesSingleton.getInstance()
+        this.#companyRoutes.initialize(config, expressApp)
+
+        this.#userRoutes = UserRoutesSingleton.getInstance()
+        this.#userRoutes.initialize(config, expressApp)
+
+        this.#tokenRoutes = TokenRoutesSingleton.getInstance()
+        this.#tokenRoutes.initialize(config, expressApp)
 
         // special API route to check i18n support
         expressApp.get(`/api/welcome`, (request, response) => {
@@ -74,17 +85,6 @@ class Controller {
             view.json({ success, message })
         })
 
-        this.#companyRoutes = CompanyRoutesSingleton.getInstance()
-        this.#companyRoutes.initialize(config, expressApp)
-
-        this.#userRoutes = UserRoutesSingleton.getInstance()
-        this.#userRoutes.initialize(config, expressApp)
-
-        this.#tokenRoutes = TokenRoutesSingleton.getInstance()
-        this.#tokenRoutes.initialize(config, expressApp)
-
-        this.#authRoutes = AuthRoutesSingleton.getInstance()
-        this.#authRoutes.initialize(config, expressApp)
     }
 
 }

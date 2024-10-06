@@ -1,17 +1,37 @@
 'use strict'
 
+import assert from 'assert'
+
 import { ComaintApiError } from '../../common/src/error.mjs'
 
 class View {
 
     #request = null
     #response = null
+    #userId = null
+    #companyId = null
 
     constructor(request, response) {
+
+        // request.userId and request.companyId are defined by the cookie middleware in AuthRoute
+        assert(request.userId !== undefined)
+        assert(request.companyId !== undefined)
+        this.userId = request.userId
+        this.companyId = request.companyId
+
         this.request = request
         this.response = response
+
         // ensure that the translation function is mapped to this class
         this.translation = this.translation.bind(this)
+    }
+
+    getRequestUserId() {
+        return this.#userId
+    }
+
+    getRequestCompanyId() {
+        return this.#companyId
     }
 
     translation(messageId, prop = {}) {

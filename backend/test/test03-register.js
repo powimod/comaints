@@ -202,7 +202,7 @@ describe('Test user registration', () => {
             expect(user.administrator).to.a('number').and.to.equal(0)
 
             expect(user).to.have.property('validation_code')
-            const validationCode = user.validation_code
+            validationCode = user.validation_code
             expect(validationCode).to.be.a('number')
         })
 
@@ -234,7 +234,7 @@ describe('Test user registration', () => {
         it('Try to validate registration with too large code', async () => {
             try {
                 let json = await jsonPost(ROUTE_VALIDATE, { code: 1234567 })
-                expect.fail("Too large «code» parameter not detected")
+                expect.fail("Too large code not detected")
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
@@ -246,9 +246,15 @@ describe('Test user registration', () => {
         /*
         it('Send incorrect validation code', async () => {
             const incorrectCode = validationCode + 1
-            let json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
-            console.log(json)
-            expect.fail("Missing «code» parameter not detected")
+            try {
+                let json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
+                expect.fail("Incorrect code not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 400 (Property «validationCode» is too large)`)
+            }
+
         })
 
 
