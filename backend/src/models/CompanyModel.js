@@ -14,8 +14,6 @@ class CompanyModel {
     async findCompanyList() {
         let sql = `SELECT * FROM companies`
         const result = await this.#db.query(sql)
-        if (result.code)
-            throw new Error(result.code)
         const companyList = []
         for (let companyRecord of result){
             const company = convertObjectFromDb(companyObjectDef, companyRecord)
@@ -32,8 +30,6 @@ class CompanyModel {
             throw new Error('Argument <companyId> is not a number');
         let sql = `SELECT * FROM companies WHERE id = ?`;
         const result = await this.#db.query(sql, [companyId]);
-        if (result.code)
-            throw new Error(result.code);
         if (result.length === 0)
             return null;
         const companyRecord = result[0]
@@ -52,8 +48,6 @@ class CompanyModel {
             INSERT INTO companies(${fieldNames.join(', ')}) VALUES (${markArray});
         `
         const result = await this.#db.query(sqlRequest, fieldValues)
-        if (result.code)
-            throw new Error(result.code)
         const companyId = result.insertId
         company = await this.getCompanyById(companyId)
         return company

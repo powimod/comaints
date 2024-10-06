@@ -13,8 +13,6 @@ class TokenModel {
     async findTokenList() {
 		let sql = `SELECT * FROM tokens`
 		const result = await this.#db.query(sql)
-		if (result.code)
-			throw new Error(result.code)
 		const tokenList = []
 		for (let tokenRecord of result)
 			tokenList.push(tokenRecord)
@@ -29,8 +27,6 @@ class TokenModel {
 			throw new Error('Argument <tokenId> is not a number');
 		let sql = `SELECT * FROM tokens WHERE id = ?`;
 		const result = await this.#db.query(sql, [tokenId]);
-		if (result.code)
-			throw new Error(result.code);
 		if (result.length === 0)
 			return null;
 		const token = result[0]
@@ -47,8 +43,6 @@ class TokenModel {
 			INSERT INTO tokens(${fieldNames.join(', ')}) VALUES (${markArray});
 		`
 		const result = await this.#db.query(sqlRequest, fieldValues)
-		if (result.code)
-			throw new Error(result.code)
 		const tokenId = result.insertId
 		token = this.getTokenById(tokenId)
 		return token

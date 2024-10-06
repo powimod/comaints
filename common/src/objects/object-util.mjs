@@ -2,21 +2,25 @@
 
 
 /**
- * Control each properties of the object passed as argument according to the object definition passed as the objDef parameter.
- * Returns false if no error was detected, otherwise a message explaining the encountred error for the first property which
- * do not respect its contraints in object definition.
+ * Contrôle les propriétés de l'objet passé en second argument en accord avec la définition d'objet passée
+ * en premier argument.
+ * Renvoie un tableau de deux éléments.
+ * Le premier élément est soit un booléen contenant la valeur «false» si toutes les propriétés de l'objet 
+ * sont valides, soit un identifiant de message d'erreur indiquant le problème rencontré.
+ * Le deuxième élément du tableau est un objet contenant les clés/valeurs des différents paramètres du
+ * message d'erreur.
+ * La fonction accepte troisième argument des options qui indiquent si toutes les propriétes doivent 
+ * être présentes ou pas et si l'identifiant de l'objet doit être contrôlé ou pas.
  *
  * @function
- * @param {Object} objDef - object containing definition of each properties of the object.
- * @param {Object} object - object to control.
+ * @param {Object} objDef - objet contenant la définition des propriétés de l'objet
+ * @param {Object} object - objet à contrôler
  * @param {Object} options
  * @param {boolean} [options.fullCheck=true] - indicates if all properties must be present or not.
  * @param {boolean} [options.checkId=true] - indicates if object ID property should be controlled or not
  *                  (useful with a newly created object for which the ID is not yet valued).
- * @param {function} - I18next function called to translate the error message ID into a translated string
- *                  (if this function is null the error string ID will be return).
- * @returns {boolean} - returns false if all properties are correct (never return true)
- * @returns {string} - returns a error message for the first property does not respect its definition in objectDef.
+ * @returns {[boolean|string, null] } - returns false if all properties are correct (never returns true)
+ * @returns {[string, object]} : returns a translation message ID and an object with it's parameters
  *
  * @example
  *	const myUser = {
@@ -24,9 +28,9 @@
  *		firstname = 'John',
  *		// ...
  *	}
- *	const errorMessage = objectUtil.controlObject(userDef, myUser, true, true, t)
- *	if (errorMessage)
- *		throw new Error(errorMessage)
+ *  const [ errorMsg, errorParams ] = controlObject(tokenObjectDef, token, {fullCheck:true, checkId:false})
+ *  if (errorMsg)
+ *      throw new ComaintTranslatedError(errorMsg, errorParams)
  *
  */
 const controlObject = (objDef, object, options) => {
@@ -58,25 +62,30 @@ const controlObject = (objDef, object, options) => {
 			return controlObjectProperty (objDef, propName, object[propName])
 		}
 	}
-	return false // no error
+	return [ false ] // no error
 }
 
 /**
- * Control an object property according to the object definition passed as the objDef parameter.
- * The property name and its value are passed as argument.
- * Returns false if the property value is OK, otherwise returns a message explaining what constraint was violated.
- *
+ * Contrôle une propriété d'un objet dont le nom est passé en deuxième argument et dont la valeur est passée
+ * en troisième argument avec la définition d'objet passée en premier argument.
+ * Renvoie un tableau de deux éléments.
+ * Le premier élément est soit un booléen contenant la valeur «false» la propriété contrôlée est valide
+ * soit un identifiant de message d'erreur indiquant le problème rencontré.
+ * Le deuxième élément du tableau est un objet contenant les clés/valeurs des différents paramètres du
+ * message d'erreur.
+ 
  * @function
  * @param {Object} objDef - object definition containing the property to control.
  * @param {string} propName - name of the property to control (will be searched in object definition).
  * @param {variant} propValue - the value of the property.
- * @returns {boolean} - returns false if all properties are correct (never return true)
- * @returns {<string>, <object>} : returns a translation message ID and an oject with it's parameters value
+ *
+ * @returns {[boolean|string, null] } - returns false if all properties are correct (never returns true)
+ * @returns {[string, object]} : returns a translation message ID and an object with it's parameters
  *
  * @example
- *	const res = objectUtil.controlProperty(userDef, 'password', myPassword, t)
- *	if (res)
- *		throw new Error(i18n(res[0], )
+ *  const [ errorMsg, errorParams ] = controlProperty(userDef, 'password', myPassword)
+ *  if (errorMsg)
+ *      throw new ComaintTranslatedError(errorMsg, errorParams)
  *
  */
 const controlObjectProperty = (objDef, propName, propValue) => {
@@ -259,6 +268,7 @@ const convertObjectFromDb = (objDef, dbRecord) => {
 	}
 	return object
 }
+
 /**
  * Returns two arrays containing field names and field values for the properties which are present in
  * the object passed as parameter.
@@ -272,14 +282,12 @@ const convertObjectFromDb = (objDef, dbRecord) => {
  *
  * @example
  *
- *	const objectUtils = require('../objects/object-util.cjs')
- *
  * 	static async getUserList(filters) {
- *                const [ sqlValues, sqlFilters ] = objectUtils.buildFieldArrays(userObjectDef, filters)
- *                const whereClause = sqlFilters.length === 0 ? '' :
- *                        'WHERE ' + sqlFilters.map(f => `${f} = ?`).join(' AND ')
- *                let sql = `SELECT * FROM users ${whereClause}`
- *                const result = await db.query(sql, sqlValues)
+ *     const [ sqlValues, sqlFilters ] = buildFieldArrays(userObjectDef, filters)
+ *     const whereClause = sqlFilters.length === 0 ? '' :
+ *         'WHERE ' + sqlFilters.map(f => `${f} = ?`).join(' AND ')
+ *     let sql = `SELECT * FROM users ${whereClause}`
+ *     const result = await db.query(sql, sqlValues)
  *
  */
 const buildFieldArrays = (objDef, object) => {
