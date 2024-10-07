@@ -152,6 +152,9 @@ class AuthRoutes {
                 view.error(error)
             }
         })
+
+
+
         // public route 
         expressApp.post('/api/v1/auth/login', async (request, response) => {
             const view = new View(request, response)
@@ -185,8 +188,19 @@ class AuthRoutes {
             catch(error) {
                 view.error(error)
             }
+        })
 
-
+        expressApp.get('/api/v1/profile', requireUserAuth, async (request, response) => {
+            console.log("dOm route profile")
+            const view = new View(request, response)
+            try {
+                const userId = view.getRequestUserId()
+                const user = authModel.getUserProfile(userId) 
+                view.json({ user })
+            }
+            catch(error) {
+                view.error(error)
+            }
         })
 
 
@@ -208,4 +222,14 @@ class AuthRoutesSingleton {
     }
 }
 
+const requireUserAuth = (request, response, next) => {
+    const userId = request.userId
+    console.log("dOm require user auth", userId)
+    assert(userId !== undefined)
+    if (userId === null) 
+        return response.status(401).json({ error: 'Unauthorized' })
+    next()
+}
+
+export { requireUserAuth }
 export default AuthRoutesSingleton 

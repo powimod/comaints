@@ -194,6 +194,11 @@ class AuthModel {
         //TODO return extra field
         return [tokenFound, tokenId, userId, companyId]
     }
+
+    async getUserProfile(userId) {
+        return await this.#userModel.getUserById(userId)
+    }
+
 }
 
 

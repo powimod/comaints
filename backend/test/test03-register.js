@@ -6,6 +6,7 @@ import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb } fro
 
 const ROUTE_REGISTER = 'api/v1/auth/register'
 const ROUTE_VALIDATE = 'api/v1/auth/validateRegistration'
+const ROUTE_PROFILE  = 'api/v1/profile'
 
 describe('Test user registration', () => {
 
@@ -208,8 +209,16 @@ describe('Test user registration', () => {
             expect(validationCode).to.be.a('number').and.to.be.above(0)
         })
 
-
-        // TODO try to access private route with accesToken while user registration is not finished
+        it('Try to access profile without being logged in', async () => {
+            try {
+                let json = await jsonGet(ROUTE_PROFILE)
+                expect.fail('Profile access without being connected was not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+            }
+        })
 
         it('Try to validate registration without code', async () => {
             try {
@@ -287,6 +296,11 @@ describe('Test user registration', () => {
 
             expect(user).to.have.property('validation_code')
             expect(user.validation_code).to.be.a('number').and.to.equal(0) // false
+        })
+
+        it('Check profile access when connected', async () => {
+            let json = await jsonGet(ROUTE_PROFILE)
+            console.log(json)
         })
 
 

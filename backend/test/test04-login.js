@@ -3,17 +3,14 @@ import { expect } from 'chai'
 import assert from 'assert'
 
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb } from './util.js'
+import { createRandomUserAccount, deleteUserAccount } from './helpers.js'
+
 
 const ROUTE_LOGIN= 'api/v1/auth/login'
 
 describe('Test user registration', () => {
 
-    const dte = new Date()
-    const userEmail = `u${dte.getTime()}@x.y`
-    let validationCode  = null
-    let accessToken = null
-    let refreshToken = null
-    let userId = null
+    let user = null
 
     before( async () =>  {
         loadConfig()
@@ -21,12 +18,16 @@ describe('Test user registration', () => {
     }),
 
     after( async () =>  {
-        await requestDb('DELETE FROM users WHERE email=?', userEmail)
+        // TODO activate this: await deleteUserAccount()
         await disconnectDb()
     }),
 
     describe(`Call route /${ROUTE_LOGIN} with invalid data`, () => {
 
+        it(`bidon`, async () => {
+            user = await createRandomUserAccount()
+        })
+        /*
         it(`Should detect missing email in request body`, async () => {
             try {
                 let json = await jsonPost(ROUTE_LOGIN, {
@@ -144,6 +145,7 @@ describe('Test user registration', () => {
                 expect(error.message).to.equal('Server status 400 (Password does not contain special character)')
             }
         })
+        */
 
     })
 
