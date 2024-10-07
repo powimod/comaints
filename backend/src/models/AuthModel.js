@@ -97,15 +97,17 @@ class AuthModel {
         )
     }
 
-    generateAccessToken(userId, companyId) {
+    generateAccessToken(userId, companyId, connected) {
         assert(userId !== undefined)
         assert(companyId !== undefined)
+        assert(connected !== undefined)
         assert(this.#tokenSecret !== undefined)
         assert(this.#accessTokenLifespan !== undefined)
         const payload = {
             type: 'access',
             user_id: userId,
-            company_id: companyId
+            company_id: companyId,
+            connected: connected
         }
         return jwt.sign(payload, this.#tokenSecret, {
             expiresIn: `${this.#accessTokenLifespan}s` // seconds
@@ -135,7 +137,12 @@ class AuthModel {
                     reject(`Invalid token content`)
                     return
                 }
-                resolve([payload.user_id, payload.company_id])
+                const connected = payload.connected
+                if (connected !== true && connected !== false) {
+                    reject(`Invalid token content`)
+                    return
+                }
+                resolve([payload.user_id, payload.company_id, connected])
             })
         })
         return decodeTokenPromise

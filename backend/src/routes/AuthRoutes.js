@@ -24,15 +24,17 @@ class AuthRoutes {
             assert(authModel !== null)
             let userId = null
             let companyId = null
+            let connected = false
             const token = request.headers['x-access-token']
             if (token === undefined) {
                 console.log(`Token middleware -> access token absent (anonymous request)`)
             }
             else {
                 try {
-                    [userId, companyId] = await authModel.checkAccessToken(token)
-                    console.log(`Token middleware -> userId = ${ userId }`)
-                    console.log(`Token middleware -> companyId = ${ companyId }`)
+                    [userId, companyId, connected] = await authModel.checkAccessToken(token)
+                    console.log(`Token middleware -> userId = ${userId}`)
+                    console.log(`Token middleware -> companyId = ${companyId}`)
+                    console.log(`Token middleware -> connected = ${connected}`)
                 }
                 catch (error) {
                     console.log(`Token middleware -> error : ${ error.message ? error.message : error }`)
@@ -41,9 +43,10 @@ class AuthRoutes {
                     return
                 }
             }
-            console.log(`Token middleware : userId=${userId}, companyId=${companyId}`)
+            console.log(`Token middleware : userId=${userId}, companyId=${companyId}, connected=${connected}`)
             request.userId = userId
             request.companyId = companyId
+            request.userConnected = connected
             next()
         })
 
@@ -113,8 +116,8 @@ class AuthRoutes {
                 if (sendCodeByEmail)
                     await authModel.sendRegisterValidationCode(validationCode, email, view.translation)
 
-                // generate access and refresh tokens
-                const newAccessToken  = await authModel.generateAccessToken(userId, companyId)
+                // access token with userConnected = false
+                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, false)
                 const newRefreshToken = await authModel.generateRefreshToken(userId, companyId)
 
                 // TODO use newly create access and refresh tokens
@@ -135,6 +138,7 @@ class AuthRoutes {
             const view = new View(request, response)
             try {
                 const userId = request.userId // ID obtained from HTTP header
+                const companyId = request.companyId // ID obtained from HTTP header
                 if (userId === null)
                     throw new Error('User ID not found in request header')
                 let code = request.body.code
@@ -146,7 +150,15 @@ class AuthRoutes {
                 if (errorMsg) 
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
                 const validated = await authModel.validateRegistration(userId, code)
-                view.json({validated, userId}) // send userId to make API-Lib detect context change
+
+                const response = { validated, userId } // send userId to make API-Lib detect context change
+                if (validated) {
+                    // access token with userConnected = true
+                    const newAccessToken  = await authModel.generateAccessToken(userId, companyId, true)
+                    response['access-token'] = newAccessToken
+                } 
+
+                view.json(response)
             }
             catch(error) {
                 view.error(error)
@@ -191,11 +203,10 @@ class AuthRoutes {
         })
 
         expressApp.get('/api/v1/profile', requireUserAuth, async (request, response) => {
-            console.log("dOm route profile")
             const view = new View(request, response)
             try {
-                const userId = view.getRequestUserId()
-                const user = authModel.getUserProfile(userId) 
+                const userId = request.userId
+                const user = await authModel.getUserProfile(userId) 
                 view.json({ user })
             }
             catch(error) {
@@ -203,12 +214,10 @@ class AuthRoutes {
             }
         })
 
-
     }
 }
 
 class AuthRoutesSingleton {
-
     static #instance = null
 
     constructor() {
@@ -224,9 +233,11 @@ class AuthRoutesSingleton {
 
 const requireUserAuth = (request, response, next) => {
     const userId = request.userId
-    console.log("dOm require user auth", userId)
+    const connected = request.userConnected
     assert(userId !== undefined)
-    if (userId === null) 
+    assert(connected !== undefined)
+    console.log(`require user auth, userId:${userId}, connected:${connected}`)
+    if (userId === null || connected !== true)
         return response.status(401).json({ error: 'Unauthorized' })
     next()
 }
