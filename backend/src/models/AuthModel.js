@@ -97,9 +97,10 @@ class AuthModel {
         )
     }
 
-    generateAccessToken(userId, companyId, connected) {
+    generateAccessToken(userId, companyId, refreshTokenId, connected) {
         assert(userId !== undefined)
         assert(companyId !== undefined)
+        assert(refreshTokenId !== undefined)
         assert(connected !== undefined)
         assert(this.#tokenSecret !== undefined)
         assert(this.#accessTokenLifespan !== undefined)
@@ -107,7 +108,8 @@ class AuthModel {
             type: 'access',
             user_id: userId,
             company_id: companyId,
-            connected: connected
+            connected: connected,
+            refresh_token_id: refreshTokenId
         }
         return jwt.sign(payload, this.#tokenSecret, {
             expiresIn: `${this.#accessTokenLifespan}s` // seconds
@@ -129,11 +131,18 @@ class AuthModel {
                     reject('Not an access token')
                     return
                 }
-                if (isNaN(payload.user_id)) {
+                const userId = payload.user_id
+                if (isNaN(userId)) {
                     reject(`Invalid token content`)
                     return
                 }
-                if (isNaN(payload.company_id)) {
+                const companyId = payload.company_id
+                if (isNaN(companyId )) {
+                    reject(`Invalid token content`)
+                    return
+                }
+                const refreshTokenId = payload.refresh_token_id
+                if (isNaN(refreshTokenId )) {
                     reject(`Invalid token content`)
                     return
                 }
@@ -142,7 +151,7 @@ class AuthModel {
                     reject(`Invalid token content`)
                     return
                 }
-                resolve([payload.user_id, payload.company_id, connected])
+                resolve([userId, companyId, refreshTokenId, connected ])
             })
         })
         return decodeTokenPromise
@@ -165,7 +174,8 @@ class AuthModel {
             user_id: userId,
             company_id: companyId
         }
-        return jwt.sign(payload, this.#tokenSecret, { expiresIn: `${refreshTokenLifespan}days` })
+        const jwtToken = jwt.sign(payload, this.#tokenSecret, { expiresIn: `${refreshTokenLifespan}days` })
+        return [ jwtToken, tokenId ]
     }
 
     async checkRefreshToken(token) {

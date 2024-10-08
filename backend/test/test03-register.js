@@ -6,6 +6,7 @@ import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb } fro
 
 const ROUTE_REGISTER = 'api/v1/auth/register'
 const ROUTE_VALIDATE = 'api/v1/auth/validateRegistration'
+const ROUTE_LOGOUT   = 'api/v1/auth/logout'
 const ROUTE_PROFILE  = 'api/v1/profile'
 
 describe('Test user registration', () => {
@@ -300,10 +301,29 @@ describe('Test user registration', () => {
 
         it('Check profile access when connected', async () => {
             let json = await jsonGet(ROUTE_PROFILE)
-            console.log(json)
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('user')
+            const user = json.user
+            expect(user).to.be.instanceOf(Object)
+            expect(user).to.have.property('id')
+            expect(user.id).to.be.a('number')
+            expect(user).to.have.property('email')
+            expect(user.email).to.be.a('string').and.to.equal(userEmail)
+            expect(user).to.have.property('accountLocked')
+            expect(user.accountLocked).to.be.a('boolean').and.to.equal(false)
+            expect(user).to.have.property('active')
+            expect(user.active).to.be.a('boolean').and.to.equal(true)
         })
 
 
+    })
+
+    describe(`Call route /${ROUTE_LOGOUT}`, () => {
+        it('Call logout route', async () => {
+            let json = await jsonPost(ROUTE_LOGOUT, {})
+            expect(json).to.be.instanceOf(Object)
+        })
+ 
     })
     // TODO test registration with an existing email
         

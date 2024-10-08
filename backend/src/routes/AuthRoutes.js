@@ -24,6 +24,7 @@ class AuthRoutes {
             assert(authModel !== null)
             let userId = null
             let companyId = null
+            let refreshTokenId = null
             let connected = false
             const token = request.headers['x-access-token']
             if (token === undefined) {
@@ -31,9 +32,10 @@ class AuthRoutes {
             }
             else {
                 try {
-                    [userId, companyId, connected] = await authModel.checkAccessToken(token)
+                    [userId, companyId, refreshTokenId, connected] = await authModel.checkAccessToken(token)
                     console.log(`Token middleware -> userId = ${userId}`)
                     console.log(`Token middleware -> companyId = ${companyId}`)
+                    console.log(`Token middleware -> refreshTokenId = ${refreshTokenId}`)
                     console.log(`Token middleware -> connected = ${connected}`)
                 }
                 catch (error) {
@@ -46,6 +48,7 @@ class AuthRoutes {
             console.log(`Token middleware : userId=${userId}, companyId=${companyId}, connected=${connected}`)
             request.userId = userId
             request.companyId = companyId
+            request.refreshTokenId = refreshTokenId
             request.userConnected = connected
             next()
         })
@@ -117,14 +120,14 @@ class AuthRoutes {
                     await authModel.sendRegisterValidationCode(validationCode, email, view.translation)
 
                 // access token with userConnected = false
-                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, false)
-                const newRefreshToken = await authModel.generateRefreshToken(userId, companyId)
+                const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId)
+                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , false)
 
                 // TODO use newly create access and refresh tokens
 
                 view.json({
-                    'access-token': newAccessToken,
-                    'refresh-token': newRefreshToken
+                    'refresh-token': newRefreshToken,
+                    'access-token': newAccessToken
                 })
             }
             catch(error) {
@@ -137,10 +140,14 @@ class AuthRoutes {
         expressApp.post('/api/v1/auth/validateRegistration', async (request, response) => {
             const view = new View(request, response)
             try {
-                const userId = request.userId // ID obtained from HTTP header
-                const companyId = request.companyId // ID obtained from HTTP header
+                // get IDs obtained from HTTP header token
+                const userId = request.userId
                 if (userId === null)
                     throw new Error('User ID not found in request header')
+                const companyId = request.companyId // can be null with newly registered user
+                const refreshTokenId = request.refreshTokenId
+                assert (refreshTokenId !== null)
+
                 let code = request.body.code
                 if (code === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'code'})
@@ -151,14 +158,14 @@ class AuthRoutes {
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
                 const validated = await authModel.validateRegistration(userId, code)
 
-                const response = { validated, userId } // send userId to make API-Lib detect context change
+                const jsonResponse = { validated, userId } // send userId to make API-Lib detect context change
                 if (validated) {
-                    // access token with userConnected = true
-                    const newAccessToken  = await authModel.generateAccessToken(userId, companyId, true)
-                    response['access-token'] = newAccessToken
+                    // generate a new access token with userConnected = true
+                    const newAccessToken  = await authModel.generateAccessToken(userId, companyId, refreshTokenId, true)
+                    jsonResponse['access-token'] = newAccessToken
                 } 
 
-                view.json(response)
+                view.json(jsonResponse)
             }
             catch(error) {
                 view.error(error)
@@ -201,6 +208,24 @@ class AuthRoutes {
                 view.error(error)
             }
         })
+
+        expressApp.post('/api/v1/auth/logout', async (request, response) => {
+            const view = new View(request, response)
+            try {
+                const userId = request.userId
+                //const validated = await authModel.logout(userId)
+                const jsonResponse = {
+                    'userId': null,
+                    'access-token': null,
+                    'refresh-token': null
+                } 
+                view.json(jsonResponse)
+            }
+            catch(error) {
+                view.error(error)
+            }
+        })
+
 
         expressApp.get('/api/v1/profile', requireUserAuth, async (request, response) => {
             const view = new View(request, response)
