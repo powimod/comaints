@@ -5,21 +5,26 @@ import { expect } from 'chai'
 import { jsonGet, jsonPost, requestDb } from './util.js'
 
 const ROUTE_REGISTER = 'api/v1/auth/register'
+const ROUTE_LOGOUT = 'api/v1/auth/logout'
 const ROUTE_VALIDATE = 'api/v1/auth/validateRegistration'
 
-const createRandomUserAccount = async () => {
+const DEFAULT_PASSWORD = 'abC.dEf.GH1.lMn!'
 
-    const dte = new Date()
-    const userEmail = `u${dte.getTime()}@x.y`
-    const userPassword = 'abC.dEf.GH1.lMn!'
+const createUserAccount = async (options = {}) => {
+    let {
+        email = null,
+        password = DEFAULT_PASSWORD,
+        logout = false
+    } = options
 
-	let json = await jsonPost(ROUTE_REGISTER, {
-        email: userEmail,
-        password: userPassword,
-        sendCodeByEmail: false
-    })
+    if (email === null) {
+        const dte = new Date()
+        email = `u${dte.getTime()}@x.y`
+    }
 
-    const res = await requestDb('select * from users where email=?', [ userEmail ])
+	let json = await jsonPost(ROUTE_REGISTER, { email, password, sendCodeByEmail: false })
+
+    const res = await requestDb('select * from users where email=?', [ email ])
     expect(res).to.be.instanceOf(Array)
     const user = res[0]
     expect(user).to.be.instanceOf(Object)
@@ -31,11 +36,13 @@ const createRandomUserAccount = async () => {
     expect(json).to.have.property('validated')
     expect(json.validated).to.be.a('boolean').and.to.equal(true)
 
+    if (logout)
+        await jsonPost(ROUTE_LOGOUT)
+
     return {
         id: user.id,
         email: user.email
     }
-
 }
 
 const deleteUserAccount = async (user) => {
@@ -45,6 +52,6 @@ const deleteUserAccount = async (user) => {
 }
 
 export {
-    createRandomUserAccount,
+    createUserAccount,
     deleteUserAccount
 }
