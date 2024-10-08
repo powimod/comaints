@@ -71,9 +71,11 @@ const jsonFull = async (routeUrl, httpMethod, options, requestBody) => {
 
     const json = await response.json()
 
-    if (json['access-token'])
+    // detect access/refresh token parameters in JSON response
+    // (they are null to unset them when logout route is called)
+    if (json['access-token'] !== undefined)
         accessToken = json['access-token']
-    if (json['refresh-token'])
+    if (json['refresh-token'] !== undefined)
         refreshToken = json['refresh-token']
 
     return json
@@ -137,7 +139,9 @@ const util = {
     jsonDelete,
     connectDb,
     disconnectDb,
-    requestDb
+    requestDb,
+    accessToken,
+    refreshToken 
 }
 
 export default util
@@ -150,6 +154,8 @@ export {
     jsonDelete,
     connectDb,
     disconnectDb,
-    requestDb
+    requestDb,
+    accessToken,
+    refreshToken 
 }
 

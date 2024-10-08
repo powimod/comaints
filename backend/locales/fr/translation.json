@@ -13,6 +13,7 @@
 		"account_locked": "Le compte est verrouillé",
 		"account_not_locked": "Le compte n'est pas verrouillé",
 		"account_not_found": "Ce compte n'existe pas",
+        "user_not_logged_in": "L'utilisateur n'est pas connecté",
 		"prop": {
 			"is_not_defined": "La propriété «{{property}}» n'est pas définie",
 			"has_no_value": "La propriété«{{property}}» n'a pas de valeur",

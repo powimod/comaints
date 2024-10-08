@@ -1,4 +1,5 @@
 'use strict'
+import assert from 'assert'
 
 import { buildFieldArrays, controlObject } from '../../../common/src/objects/object-util.mjs'
 import tokenObjectDef from '../../../common/src/objects/token-object-def.mjs'
@@ -36,7 +37,6 @@ class TokenModel {
 
 
 	async createToken(token) {
-
         const [ fieldNames, fieldValues ] = buildFieldArrays(tokenObjectDef, token)
         const markArray = Array(fieldValues.length).fill('?').join(',')
 		const sqlRequest = `
@@ -46,6 +46,15 @@ class TokenModel {
 		const tokenId = result.insertId
 		token = this.getTokenById(tokenId)
 		return token
+    }
+
+    async deleteTokenById(tokenId){
+        assert(tokenId !== undefined)
+		if (typeof(tokenId) !== 'number')
+			throw new Error('Argument <tokenId> is not a number');
+		const sql = `DELETE FROM tokens WHERE id = ?`;
+		const result = await this.#db.query(sql, [tokenId]);
+		return (result.affectedRows !== 0)
     }
 }
 

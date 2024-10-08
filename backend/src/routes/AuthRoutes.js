@@ -5,7 +5,7 @@ import assert from 'assert'
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import ControllerSingleton from '../controller.js'
-import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
+import { ComaintApiErrorInvalidRequest, ComaintTranslatedError } from '../../../common/src/error.mjs'
 import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 
@@ -15,7 +15,7 @@ class AuthRoutes {
     initialize(config, expressApp) {
         const controller = ControllerSingleton.getInstance()
         const model  = ModelSingleton.getInstance()
-        
+
         const authModel = model.getAuthModel()
 
         // middleware to check access token
@@ -54,7 +54,7 @@ class AuthRoutes {
         })
 
 
-        // public route 
+        // public route
         expressApp.post('/api/v1/auth/register', async (request, response) => {
             const view = new View(request, response)
             try {
@@ -63,8 +63,8 @@ class AuthRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'email'})
                 if (typeof(email) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'})
-                const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email) 
-                if (errorMsg1) 
+                const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email)
+                if (errorMsg1)
                     throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1)
 
 
@@ -76,13 +76,13 @@ class AuthRoutes {
                 // FIXME strange error «Cannot set properties of undefined (setting 'undefined')»
                 // let errorMsg, errorParam
                 // First call :
-                //      [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'password', password) 
+                //      [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'password', password)
                 //      => no error
                 // Second call :
-                //      [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'password', password) 
+                //      [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'password', password)
                 //      => Error «Cannot set properties of undefined (setting 'undefined')»
-                const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', password) 
-                if (errorMsg2) 
+                const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', password)
+                if (errorMsg2)
                     throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
 
                 // self-tests does not send validation code by email
@@ -136,7 +136,7 @@ class AuthRoutes {
         })
 
 
-        // public route 
+        // public route
         expressApp.post('/api/v1/auth/validateRegistration', async (request, response) => {
             const view = new View(request, response)
             try {
@@ -153,8 +153,8 @@ class AuthRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'code'})
                 if (typeof(code) !== 'number')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'code'})
-                const [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'validationCode',code) 
-                if (errorMsg) 
+                const [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'validationCode',code)
+                if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
                 const validated = await authModel.validateRegistration(userId, code)
 
@@ -163,7 +163,7 @@ class AuthRoutes {
                     // generate a new access token with userConnected = true
                     const newAccessToken  = await authModel.generateAccessToken(userId, companyId, refreshTokenId, true)
                     jsonResponse['access-token'] = newAccessToken
-                } 
+                }
 
                 view.json(jsonResponse)
             }
@@ -174,7 +174,7 @@ class AuthRoutes {
 
 
 
-        // public route 
+        // public route
         expressApp.post('/api/v1/auth/login', async (request, response) => {
             const view = new View(request, response)
             try {
@@ -183,8 +183,8 @@ class AuthRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'email'})
                 if (typeof(email) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'})
-                const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email) 
-                if (errorMsg1) 
+                const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email)
+                if (errorMsg1)
                     throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1)
 
                 let password = request.body.password
@@ -195,13 +195,13 @@ class AuthRoutes {
                 // FIXME strange error «Cannot set properties of undefined (setting 'undefined')»
                 // let errorMsg, errorParam
                 // First call :
-                //      [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'password', password) 
+                //      [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'password', password)
                 //      => no error
                 // Second call :
-                //      [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'password', password) 
+                //      [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'password', password)
                 //      => Error «Cannot set properties of undefined (setting 'undefined')»
-                const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', password) 
-                if (errorMsg2) 
+                const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', password)
+                if (errorMsg2)
                     throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
             }
             catch(error) {
@@ -212,16 +212,21 @@ class AuthRoutes {
         expressApp.post('/api/v1/auth/logout', async (request, response) => {
             const view = new View(request, response)
             try {
-                const userId = request.userId
-                //const validated = await authModel.logout(userId)
+                const userId = request.userId // HTTP token header
+                if (userId === null)
+                    throw new ComaintTranslatedError(user_not_logged_in)
+                const refreshTokenId = request.refreshTokenId // HTTP token header
+                assert(refreshTokenId !== null)
+                await authModel.logout(userId, refreshTokenId)
                 const jsonResponse = {
-                    'userId': null,
+                    userId: null,
                     'access-token': null,
                     'refresh-token': null
-                } 
+                }
                 view.json(jsonResponse)
             }
             catch(error) {
+                console.log(error)
                 view.error(error)
             }
         })
@@ -231,7 +236,7 @@ class AuthRoutes {
             const view = new View(request, response)
             try {
                 const userId = request.userId
-                const user = await authModel.getUserProfile(userId) 
+                const user = await authModel.getUserProfile(userId)
                 view.json({ user })
             }
             catch(error) {
@@ -268,4 +273,4 @@ const requireUserAuth = (request, response, next) => {
 }
 
 export { requireUserAuth }
-export default AuthRoutesSingleton 
+export default AuthRoutesSingleton

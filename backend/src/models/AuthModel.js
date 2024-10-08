@@ -51,6 +51,7 @@ class AuthModel {
         return parseInt(Math.random() * (maximum - minimum) + minimum)
     }
 
+
     async register(email, password, validationCode) {
         const user = await this.#userModel.createUser({email, password, validationCode})
         return { user }
@@ -214,6 +215,15 @@ class AuthModel {
 
     async getUserProfile(userId) {
         return await this.#userModel.getUserById(userId)
+    }
+
+
+    async logout(userId, refreshTokenId) {
+        assert(userId !== undefined)
+        assert(refreshTokenId !== undefined)
+        // userId is not used
+        // let user = await this.#userModel.getUserById(userId)
+        await this.#tokenModel.deleteTokenById(refreshTokenId)
     }
 
 }
