@@ -2,11 +2,13 @@
 import { expect } from 'chai'
 import assert from 'assert'
 
-import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb } from './util.js'
+import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
 import { createUserAccount, deleteUserAccount } from './helpers.js'
 
 
 const ROUTE_LOGIN= 'api/v1/auth/login'
+const ROUTE_LOGOUT   = 'api/v1/auth/logout'
+const ROUTE_PROFILE  = 'api/v1/profile'
 
 describe('Test user login', () => {
 
@@ -148,6 +150,18 @@ describe('Test user login', () => {
 
     describe(`Call route /${ROUTE_LOGIN} with valid data`, () => {
 
+        it('Try to access profile without being logged in', async () => {
+            try {
+                const json = await jsonGet(ROUTE_PROFILE)
+                expect.fail('Profile access without being connected was not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+            }
+        })
+
+
         it('Try to login with incorrect password', async () => {
             try {
                 let json = await jsonPost(ROUTE_LOGIN, {
@@ -172,6 +186,29 @@ describe('Test user login', () => {
             expect(json['access-token']).to.be.a('string')
             expect(json).to.have.property('refresh-token')
             expect(json['refresh-token']).to.be.a('string')
+            // check token in util.js
+            expect(accessToken).not.to.equal(null)
+            expect(refreshToken).not.to.equal(null)
+        })
+
+        it('Get user profile', async () => {
+            const json = await jsonGet(ROUTE_PROFILE)
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('user')
+            const user = json.user
+            expect(user).to.be.instanceOf(Object)
+            expect(user).to.have.property('id')
+            expect(user.id).to.equal(user.id)
+            expect(user).to.have.property('email')
+            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            expect(user).to.have.property('accountLocked')
+            expect(user.accountLocked).to.be.a('boolean').and.to.equal(false)
+            expect(user).to.have.property('active')
+            expect(user.active).to.be.a('boolean').and.to.equal(true)
+            expect(user).to.have.property('administrator')
+            expect(user.administrator).to.be.a('boolean').and.to.equal(false)
+            expect(user).to.have.property('companyId')
+            expect(user.companyId).to.equal(null)
         })
 
         it('Try to login when already logged', async () => {
@@ -187,6 +224,67 @@ describe('Test user login', () => {
                 expect(error.message).to.equal('Server status 401 (User already connected)')
             }
         })
+
+        it('Call logout route being connected', async () => {
+            const json = await jsonPost(ROUTE_LOGOUT, {})
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('userId')
+            expect(json.userId).to.equal(null)
+            expect(json).to.have.property('access-token')
+            expect(json['access-token']).to.equal(null)
+            expect(json).to.have.property('refresh-token')
+            expect(json['refresh-token']).to.equal(null)
+            // check token in util.js
+            expect(accessToken).to.equal(null)
+            expect(refreshToken).to.equal(null)
+        })
+
+        it('Try to access profile when logged out', async () => {
+            try {
+                const json = await jsonGet(ROUTE_PROFILE)
+                expect.fail('Getting profile when logged out not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+            }
+        })
+
+         it('Second login with valid password', async () => {
+            let json = await jsonPost(ROUTE_LOGIN, {
+                    email:user.email,
+                    password: PASSWORD
+                })
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('access-token')
+            expect(json['access-token']).to.be.a('string')
+            expect(json).to.have.property('refresh-token')
+            expect(json['refresh-token']).to.be.a('string')
+            // check token in util.js
+            expect(accessToken).not.to.equal(null)
+            expect(refreshToken).not.to.equal(null)
+        })
+
+        it('Get user profile', async () => {
+            const json = await jsonGet(ROUTE_PROFILE)
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('user')
+            const user = json.user
+            expect(user).to.be.instanceOf(Object)
+            expect(user).to.have.property('id')
+            expect(user.id).to.equal(user.id)
+            expect(user).to.have.property('email')
+            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            expect(user).to.have.property('accountLocked')
+            expect(user.accountLocked).to.be.a('boolean').and.to.equal(false)
+            expect(user).to.have.property('active')
+            expect(user.active).to.be.a('boolean').and.to.equal(true)
+            expect(user).to.have.property('administrator')
+            expect(user.administrator).to.be.a('boolean').and.to.equal(false)
+            expect(user).to.have.property('companyId')
+            expect(user.companyId).to.equal(null)
+        })
+
 
 
     })

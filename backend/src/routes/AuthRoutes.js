@@ -211,7 +211,7 @@ class AuthRoutes {
                 const userId = user.id
                 const companyId = user.companyId
                 const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId)
-                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , false)
+                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
 
                 view.json({
                     'refresh-token': newRefreshToken,
@@ -253,6 +253,7 @@ class AuthRoutes {
                 view.json({ user })
             }
             catch(error) {
+                console.log(error)
                 view.error(error)
             }
         })
@@ -281,7 +282,7 @@ const requireUserAuth = (request, response, next) => {
     assert(connected !== undefined)
     console.log(`require user auth, userId:${userId}, connected:${connected}`)
     if (userId === null || connected !== true)
-        return response.status(401).json({ error: 'Unauthorized' })
+        return response.status(401).json({ error: 'Unauthorized' }) // FIXME translation
     next()
 }
 
