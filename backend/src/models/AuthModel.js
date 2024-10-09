@@ -117,12 +117,17 @@ class AuthModel {
     }
 
 
-    checkAccessToken(token) {
+    checkAccessToken(token, expiredAccessTokenEmulation) {
+        const expiredTokenErrorMessage = "Expired access token"
         const decodeTokenPromise = new Promise( (resolve, reject) => {
+            if (expiredAccessTokenEmulation){
+                reject(expiredTokenErrorMessage )
+                return
+            }
             jwt.verify(token, this.#tokenSecret, (err, payload) => {
                 if (err !== null)  {
                     if (err.constructor.name === 'TokenExpiredError')
-                        reject('Expired token') // DO NOT translate (used by API lib)
+                        reject(expiredTokenErrorMessage)
                     else
                         reject('Invalid token')
                     return

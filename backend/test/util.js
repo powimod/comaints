@@ -33,13 +33,13 @@ const loadConfig = () => {
         throw new Error(`Parameter «DB_PASSWORD» not found in «${CONF_FILE}»`)
 }
 
-const jsonFull = async (routeUrl, httpMethod, options, requestBody) => {
+const jsonFull = async (routeUrl, httpMethod, options = {}, requestParams = {}) => {
     if (! backendUrl)
         throw new Error('Config not loaded')
 
     if (routeUrl.startsWith('/'))
         routeUrl = routeUrl.substr(1)
-    let url=`${backendUrl}/${routeUrl}`
+    let url = new URL(`${backendUrl}/${routeUrl}`)
     //console.log("Request URL", url)
 
     const lang = options.lang ?? 'en'
@@ -57,17 +57,29 @@ const jsonFull = async (routeUrl, httpMethod, options, requestBody) => {
         fetchParam.headers['x-access-token'] = accessToken
 
     const methodsWithBody = ['POST', 'PUT', 'PATCH']
-    if (methodsWithBody.includes(httpMethod))
-        fetchParam.body = JSON.stringify(requestBody)
-
+    if (methodsWithBody.includes(httpMethod)) {
+        fetchParam.body = JSON.stringify(requestParams)
+    }
+    else {
+        for (const [ paramName, paramValue ] of Object.entries(requestParams))
+           url.searchParams.append(paramName, paramValue)
+    }
     const response = await fetch(url, fetchParam)
     if (! response.ok) {
-        //console.log(response)
-        const message = await response.text()
-        //console.log("Erreur : ", message)
-        throw new Error(`Server status ${response.status} (${message})`)
+        /*
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            const jsonResponse = await response.json()
+            const textResponse = JSON.stringify(jsonResponse)
+            throw new Error(`Server status ${response.status} (${textResponse})`)
+        } else {
+            const textResponse = await response.text()
+            throw new Error(`Server status ${response.status} (${textResponse})`)
+        }
+        */
+        const textResponse = await response.text()
+        throw new Error(`Server status ${response.status} (${textResponse})`)
     }
-
 
     const json = await response.json()
 
@@ -82,23 +94,23 @@ const jsonFull = async (routeUrl, httpMethod, options, requestBody) => {
 }
 
 
-const jsonGet = async (routeUrl, options = {}) => {
-    return await jsonFull(routeUrl, 'GET', options)
+const jsonGet = async (routeUrl, params, options) => {
+    return await jsonFull(routeUrl, 'GET', options, params)
 }
 
-const jsonPost = async (routeUrl, body, options = {}) => {
-    return await jsonFull(routeUrl, 'POST', options, body)
+const jsonPost = async (routeUrl, params, options) => {
+    return await jsonFull(routeUrl, 'POST', options, params)
 }
 
-const jsonPut = async (routeUrl, body, options = {}) => {
-    return await jsonFull(routeUrl, 'PUT', options, body)
+const jsonPut = async (routeUrl, params, options) => {
+    return await jsonFull(routeUrl, 'PUT', options, params)
 }
 
-const jsonPatch = async (routeUrl, body, options = {}) => {
-    return await jsonFull(routeUrl, 'PATCH', options, body)
+const jsonPatch = async (routeUrl, params, options) => {
+    return await jsonFull(routeUrl, 'PATCH', options, params)
 }
 
-const jsonDelete = async (routeUrl, options = {}) => {
+const jsonDelete = async (routeUrl, options) => {
     return await jsonFull(routeUrl, 'DELETE', options)
 }
 

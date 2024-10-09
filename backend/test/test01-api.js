@@ -30,12 +30,12 @@ describe('Check API version', () => {
 
         const API_WELCOME_ROUTE = '/api/welcome'
 		it(`Control route ${API_WELCOME_ROUTE} (lang=en)`, async () => {
-			let json = await jsonGet(API_WELCOME_ROUTE, {lang: 'en'})
+			let json = await jsonGet(API_WELCOME_ROUTE, {}, {lang: 'en'})
 			expect(json).to.have.property('response')
 			expect(json.response).to.be.a('string').to.equal('Welcome')
 		})
 		it(`Control route ${API_WELCOME_ROUTE} (lang=fr)`, async () => {
-			let json = await jsonGet(API_WELCOME_ROUTE, {lang: 'fr'})
+			let json = await jsonGet(API_WELCOME_ROUTE, {}, {lang: 'fr'})
 			expect(json).to.have.property('response')
 			expect(json.response).to.be.a('string').to.equal('Bienvenue')
 		})

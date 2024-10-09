@@ -26,23 +26,32 @@ class AuthRoutes {
             let companyId = null
             let refreshTokenId = null
             let connected = false
+
+            // parameter «expiredToken» to emulate expired access Token (in GET or POST request)
+            let expiredAccessTokenEmulation = false
+            if (request.query.expiredAccessTokenEmulation  === 'true') // value is a string not a boolean
+                expiredAccessTokenEmulation = true
+            if (request.body.expiredAccessTokenEmulation === true)
+                expiredAccessTokenEmulation = true
+
             const token = request.headers['x-access-token']
             if (token === undefined) {
                 console.log(`Token middleware -> access token absent (anonymous request)`)
             }
             else {
                 try {
-                    [userId, companyId, refreshTokenId, connected] = await authModel.checkAccessToken(token)
+                    [userId, companyId, refreshTokenId, connected] = await authModel.checkAccessToken(token, expiredAccessTokenEmulation)
                     console.log(`Token middleware -> userId = ${userId}`)
                     console.log(`Token middleware -> companyId = ${companyId}`)
                     console.log(`Token middleware -> refreshTokenId = ${refreshTokenId}`)
                     console.log(`Token middleware -> connected = ${connected}`)
                 }
                 catch (error) {
-                    console.log(`Token middleware -> error : ${ error.message ? error.message : error }`)
+                    const errorMessage = error.message ? error.message : error
+                    console.log(`Token middleware -> error : ${errorMessage}`)
                     // TODO View.sendJsonError(response, error)
                     // TODO add selftest to check invalid token 
-                    throw new Error("Invalid token!")
+                    return response.status(401).json({ error: errorMessage }) // FIXME translation
                 }
             }
             console.log(`Token middleware : userId=${userId}, companyId=${companyId}, connected=${connected}`)
