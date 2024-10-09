@@ -8,7 +8,7 @@ import { createUserAccount, deleteUserAccount } from './helpers.js'
 
 const ROUTE_LOGIN= 'api/v1/auth/login'
 
-describe('Test user registration', () => {
+describe('Test user login', () => {
 
     const PASSWORD = '4BC+d3f-6H1.lMn!'
     let user = null
@@ -146,11 +146,50 @@ describe('Test user registration', () => {
 
     })
 
-    /*
     describe(`Call route /${ROUTE_LOGIN} with valid data`, () => {
-        //TODO check incorrect password
+
+        it('Try to login with incorrect password', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, {
+                        email:user.email,
+                        password: `${PASSWORD}+X`
+                    })
+                expect.fail('Incorrect «password» parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 401 (Invalid EMail or password)')
+            }
+        })
+
+        it('Login with valid password', async () => {
+            let json = await jsonPost(ROUTE_LOGIN, {
+                    email:user.email,
+                    password: PASSWORD
+                })
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('access-token')
+            expect(json['access-token']).to.be.a('string')
+            expect(json).to.have.property('refresh-token')
+            expect(json['refresh-token']).to.be.a('string')
+        })
+
+        it('Try to login when already logged', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, {
+                        email:user.email,
+                        password: PASSWORD
+                    })
+                expect.fail('Second loggin not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 401 (User already connected)')
+            }
+        })
+
+
     })
-    */
 
 })
 

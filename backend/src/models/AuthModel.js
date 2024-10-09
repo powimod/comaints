@@ -2,7 +2,7 @@
 
 import assert from 'assert'
 import ModelSingleton from '../model.js'
-import { ComaintTranslatedError } from '../../../common/src/error.mjs'
+import { ComaintApiError, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs'
 import jwt from 'jsonwebtoken'
 
 import { sendMail } from '../util.js'
@@ -64,12 +64,11 @@ class AuthModel {
         if (! validated)
             return false
 
-        // filter fields
         let user = await this.#userModel.getUserById(userId)
         if (user === null)
             throw new Error('User not found')
         if (! user.accountLocked)
-            throw new ComaintTranslatedError('error.account_not_locked')
+            throw new ComaintApiError('error.account_not_locked')
 
         // unlock User account and reset validation code
         user.accountLocked = false
@@ -217,6 +216,18 @@ class AuthModel {
         return await this.#userModel.getUserById(userId)
     }
 
+    async login(email, password) {
+        const user = await this.#userModel.getUserByEmail(email)
+        if (user === null)
+            throw new ComaintApiErrorUnauthorized('error.invalid_email_or_password')
+        const isPasswordValid = await this.#userModel.checkPassword(user.id, password)
+        if (! isPasswordValid)
+            throw new ComaintApiErrorUnauthorized('error.invalid_email_or_password')
+        // TODO check account is not locked
+        if (! user.active ) // FIXME active ou locked ?
+            throw new Error("Your account is locked") // FIXME translation
+        return user
+    }
 
     async logout(userId, refreshTokenId) {
         assert(userId !== undefined)

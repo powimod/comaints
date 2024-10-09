@@ -14,6 +14,9 @@
 		"account_not_locked": "Le compte n'est pas verrouillé",
 		"account_not_found": "Ce compte n'existe pas",
         "user_not_logged_in": "L'utilisateur n'est pas connecté",
+        "unauthorized_error": "Accès non autorisé",
+        "invalid_email_or_password": "Adresse EMail ou mot de passe invalide",
+        "already_logged_in": "Utilisateur déjà connecté",
 		"prop": {
 			"is_not_defined": "La propriété «{{property}}» n'est pas définie",
 			"has_no_value": "La propriété«{{property}}» n'a pas de valeur",

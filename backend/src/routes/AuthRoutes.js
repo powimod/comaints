@@ -5,7 +5,7 @@ import assert from 'assert'
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import ControllerSingleton from '../controller.js'
-import { ComaintApiErrorInvalidRequest, ComaintTranslatedError } from '../../../common/src/error.mjs'
+import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs'
 import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 
@@ -41,8 +41,8 @@ class AuthRoutes {
                 catch (error) {
                     console.log(`Token middleware -> error : ${ error.message ? error.message : error }`)
                     // TODO View.sendJsonError(response, error)
-                    throw new Error("renvoyer une erreur via view!")
-                    return
+                    // TODO add selftest to check invalid token 
+                    throw new Error("Invalid token!")
                 }
             }
             console.log(`Token middleware : userId=${userId}, companyId=${companyId}, connected=${connected}`)
@@ -178,6 +178,9 @@ class AuthRoutes {
         expressApp.post('/api/v1/auth/login', async (request, response) => {
             const view = new View(request, response)
             try {
+                if (request.userId !== null)
+                    throw new ComaintApiErrorUnauthorized('error.already_logged_in')
+
                 let email = request.body.email
                 if (email === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'email'})
@@ -203,6 +206,17 @@ class AuthRoutes {
                 const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', password)
                 if (errorMsg2)
                     throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
+
+                const user = await authModel.login(email, password)
+                const userId = user.id
+                const companyId = user.companyId
+                const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId)
+                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , false)
+
+                view.json({
+                    'refresh-token': newRefreshToken,
+                    'access-token': newAccessToken
+                })
             }
             catch(error) {
                 view.error(error)
@@ -214,7 +228,7 @@ class AuthRoutes {
             try {
                 const userId = request.userId // HTTP token header
                 if (userId === null)
-                    throw new ComaintTranslatedError(user_not_logged_in)
+                    throw new ComaintApiErrorUnauthorized('error.user_not_logged_in')
                 const refreshTokenId = request.refreshTokenId // HTTP token header
                 assert(refreshTokenId !== null)
                 await authModel.logout(userId, refreshTokenId)
@@ -226,7 +240,6 @@ class AuthRoutes {
                 view.json(jsonResponse)
             }
             catch(error) {
-                console.log(error)
                 view.error(error)
             }
         })

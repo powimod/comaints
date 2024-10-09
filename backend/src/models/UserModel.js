@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 
 import { buildFieldArrays, controlObject, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
-import { comaintErrors, buildComaintError, ComaintTranslatedError } from '../../../common/src/error.mjs'
+import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs'
 
 class UserModel {
     #db = null
@@ -44,6 +44,20 @@ class UserModel {
         // TODO filter properties
         return user
     }
+
+    async getUserByEmail(email) {
+        if (email === undefined)
+            throw new Error('Argument <email> required')
+        let sql = `SELECT * FROM users WHERE email = ?`
+        const result = await this.#db.query(sql, [email])
+        if (result.length === 0)
+            return null
+        const userRecord = result[0]
+        const user = convertObjectFromDb(userObjectDef, userRecord)
+        // TODO filter properties
+        return user
+    }
+
 
 
     async createUser(user) {
@@ -100,6 +114,26 @@ class UserModel {
 		user.password = await bcrypt.hash(user.password, this.#hashSalt)
 	}
 
+
+
+    async checkPassword(userId, password) {
+        if (userId === undefined)
+            throw new Error('Argument <password> required')
+        if (typeof(userId) !== 'number')
+            throw new Error('Argument <userId> is not a number')
+        if (password === undefined)
+            throw new Error('Argument <password> required')
+        if (typeof(password) !== 'string')
+            throw new Error('Argument <password> is not a string')
+        let sql = `SELECT password FROM users WHERE id = ?`
+        const result = await this.#db.query(sql, [userId])
+        if (result.length === 0)
+            throw new Error('User not found')
+        const hashedPassword = result[0].password
+		const isValid = await bcrypt.compare(password, hashedPassword)
+        return isValid
+
+    }
 
     async checkValidationCode(userId, validationCode) {
         if (userId === undefined)

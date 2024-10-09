@@ -337,7 +337,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 500 (user_not_logged_in is not defined)`)
+                expect(error.message).to.equal(`Server status 401 (User is not logged in)`)
             }
         })
 

@@ -2,7 +2,7 @@
 
 import assert from 'assert'
 
-import { ComaintApiError } from '../../common/src/error.mjs'
+import { ComaintTranslatedError } from '../../common/src/error.mjs'
 
 class View {
 
@@ -52,7 +52,7 @@ class View {
 
     error(error) {
         let errorMessage
-        if (error instanceof ComaintApiError)
+        if (error instanceof ComaintTranslatedError)
             errorMessage = error.translate(this.request.t)
         else
             errorMessage = error.message ? error.message : error

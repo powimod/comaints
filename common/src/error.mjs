@@ -3,22 +3,24 @@
 const comaintErrors = {
     NOT_FOUND_ERROR: 'NotFoundError',
     INVALID_REQUEST_ERROR: 'InvalidRequestError',
+    UNAUTHORIZED_ERROR: 'UnauthorizedError',
+    INVALID_EMAIL_OR_PASSWORD: 'InvalidEmailOrPassword',
     CONFLICT_ERROR: 'ConflictError',
     INTERNAL_ERROR: 'InternalError'
 }
 
 class ComaintTranslatedError extends Error {
 
-  constructor(msgId, msgParams = {}, i18nFunction = null) {
-    super()
-    this.msgId = msgId
-    this.msgParams = msgParams
-    this.message = i18nFunction ? i18nFunction(msgId, msgParams) : `Error ${msgId}`
-  }
+    constructor(msgId, msgParams = {}, i18nFunction = null) {
+        super()
+        this.msgId = msgId
+        this.msgParams = msgParams
+        this.message = i18nFunction ? i18nFunction(msgId, msgParams) : `Error ${msgId}`
+    }
 
-  translate(i18nFunction) {
-    return i18nFunction(this.msgId, this.msgParams)
-  }
+    translate(i18nFunction) {
+        return i18nFunction(this.msgId, this.msgParams)
+    }
 }
 
 
@@ -42,6 +44,11 @@ class ComaintApiErrorInvalidRequest extends ComaintApiError {
     }
 }
 
+class ComaintApiErrorUnauthorized extends ComaintApiError {
+    constructor(msgId, msgParams) {
+        super(msgId, msgParams, comaintErrors.INVALID_REQUEST_ERROR, 401)
+    }
+}
 
 class ComaintApiErrorConflict extends ComaintApiError {
     constructor(msgId, msgParams) {
@@ -65,6 +72,8 @@ const buildComaintError = (comaintErrorCode, params = {}) => {
             return new ComaintApiErrorNotFound('error.not_found_error', params)
         case comaintErrors.INVALID_REQUEST_ERROR:
             return new ComaintApiErrorInvalidRequest('error.invalid_request_error', params)
+        case comaintErrors.UNAUTHORIZED_ERROR:
+            return new ComaintApiErrorUnauthorized('error.unauthorized_error', params)
         case comaintErrors.CONFLICT_ERROR:
             return new ComaintApiErrorConflict('error.confict_error', params)
         case comaintErrors.INTERNAL_ERROR:
@@ -80,6 +89,7 @@ export {
     ComaintApiError,
     ComaintApiErrorNotFound,
     ComaintApiErrorInvalidRequest,
+    ComaintApiErrorUnauthorized,
     ComaintApiErrorConflict,
     ComaintApiErrorInternalError,
     buildComaintError
