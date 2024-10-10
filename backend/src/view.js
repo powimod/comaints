@@ -47,6 +47,7 @@ class View {
 
     json(jsonContent) {
         // use «response.send()» instead of «response.json()» to add a CR at the end
+        this.response.set('Content-Type', 'application/json')
         this.response.send(JSON.stringify(jsonContent) + '\n')
     }
 
@@ -60,13 +61,14 @@ class View {
             errorMessage = error.translate(this.request.t)
         else if (error instanceof Error)
             errorMessage = error.message
-        else if (typeof(errorMessage) === 'string')
+        else if (typeof(error) === 'string')
             errorMessage = error
         else if (error instanceof Object)
             throw new Error(`Invalid error parameter (${error.constructor.name})`)
         else
             throw new Error(`Invalid error parameter`)
-        this.response.status(error.httpStatus || 500).send(errorMessage)
+        this.response.set('Content-Type', 'application/json')
+        this.response.status(error.httpStatus || 500).send({error: errorMessage})
     }
 }
 

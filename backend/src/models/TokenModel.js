@@ -56,6 +56,7 @@ class TokenModel {
 		const result = await this.#db.query(sql, [tokenId]);
 		return (result.affectedRows !== 0)
     }
+
 }
 
 

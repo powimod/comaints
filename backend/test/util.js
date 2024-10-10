@@ -65,32 +65,35 @@ const jsonFull = async (routeUrl, httpMethod, options = {}, requestParams = {}) 
            url.searchParams.append(paramName, paramValue)
     }
     const response = await fetch(url, fetchParam)
-    if (! response.ok) {
-        /*
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-            const jsonResponse = await response.json()
-            const textResponse = JSON.stringify(jsonResponse)
-            throw new Error(`Server status ${response.status} (${textResponse})`)
-        } else {
-            const textResponse = await response.text()
-            throw new Error(`Server status ${response.status} (${textResponse})`)
-        }
-        */
+   
+    // Interpret response before HTTP status
+    const contentType = response.headers.get('content-type');
+    if (! contentType)
+        throw new Error('API response content type not found')
+
+    if (contentType.includes('text/html')) {
         const textResponse = await response.text()
         throw new Error(`Server status ${response.status} (${textResponse})`)
     }
 
-    const json = await response.json()
+    if (! contentType.includes('application/json')) 
+        throw new Error(`API response content type is not JSON (${contentType}`)
 
-    // detect access/refresh token parameters in JSON response
+    const jsonResponse = await response.json()
+
+    // Detect access/refresh token parameters
     // (they are null to unset them when logout route is called)
-    if (json['access-token'] !== undefined)
-        accessToken = json['access-token']
-    if (json['refresh-token'] !== undefined)
-        refreshToken = json['refresh-token']
+    if (jsonResponse['access-token'] !== undefined)
+        accessToken = jsonResponse['access-token']
+    if (jsonResponse['refresh-token'] !== undefined)
+        refreshToken = jsonResponse['refresh-token']
 
-    return json
+    if (! response.ok) {
+        const textResponse = jsonResponse.message ? jsonReponse.message : JSON.stringify(jsonResponse)
+        throw new Error(`Server status ${response.status} (${textResponse})`)
+    }
+
+    return jsonResponse
 }
 
 

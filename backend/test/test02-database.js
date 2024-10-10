@@ -41,7 +41,7 @@ describe('Check database', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Parameter «company» not found in request body)`)
+                expect(error.message).to.equal(`Server status 400 ({"error":"Parameter «company» not found in request body"})`)
             }
             expect(success, 'Should generate an error').to.equal(false)
 		})
@@ -54,7 +54,7 @@ describe('Check database', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Parameter «company» invalid in request body)`)
+                expect(error.message).to.equal(`Server status 400 ({"error":"Invalid value for «company» parameter in request body"})`)
             }
             expect(success, 'Should generate an error').to.equal(false)
 		})
@@ -67,7 +67,7 @@ describe('Check database', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Property «name» is not defined)`)
+                expect(error.message).to.equal(`Server status 400 ({"error":"Property «name» is not defined"})`)
             }
             expect(success, 'Should generate an error').to.equal(false)
 		})

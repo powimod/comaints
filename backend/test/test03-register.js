@@ -39,7 +39,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Parameter «email» not found in request body)`)
+                expect(error.message).to.equal(`Server status 400 ({"error":"Parameter «email» not found in request body"})`)
             }
         })
 
@@ -55,7 +55,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Property «email» is too short)`)
+                expect(error.message).to.equal(`Server status 400 ({"error":"Property «email» is too short"})`)
             }
         })
 
@@ -70,7 +70,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Property «email» is not a valid email)`)
+                expect(error.message).to.equal(`Server status 400 ({"error":"Property «email» is not a valid email"})`)
             }
         })
 
@@ -86,7 +86,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 (Parameter «password» not found in request body)')
+                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «password» not found in request body"})')
             }
         })
 
@@ -101,7 +101,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 (Password is too small)')
+                expect(error.message).to.equal('Server status 400 ({"error":"Password is too small"})')
             }
         })
 
@@ -116,7 +116,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 (Password does not contain uppercase letter)')
+                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain uppercase letter"})')
             }
         })
 
@@ -131,7 +131,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 (Password does not contain digit character)')
+                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain digit character"})')
             }
         })
 
@@ -146,7 +146,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 (Password does not contain special character)')
+                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain special character"})')
             }
         })
     })
@@ -177,7 +177,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 409 (Duplicated «email» field for object «user»)')
+                expect(error.message).to.equal('Server status 409 ({"error":"Duplicated «email» field for object «user»"})')
             }
         })
 
@@ -224,7 +224,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Parameter «code» not found in request body)`)
+                expect(error.message).to.equal(`Server status 400 ({"error":"Parameter «code» not found in request body"})`)
             }
         })
 
@@ -235,7 +235,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Parameter «code» invalid in request body)`)
+                expect(error.message).to.equal(`Server status 400 ({"error":"Invalid value for «code» parameter in request body"})`)
             }
         })
 
@@ -246,7 +246,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 (Property «validationCode» is too large)`)
+                expect(error.message).to.equal(`Server status 400 ({"error":"Property «validationCode» is too large"})`)
             }
         })
 
@@ -337,7 +337,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 401 (User is not logged in)`)
+                expect(error.message).to.equal(`Server status 401 ({"error":"User is not logged in"})`)
             }
         })
 

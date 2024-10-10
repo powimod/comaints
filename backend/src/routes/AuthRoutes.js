@@ -51,7 +51,11 @@ class AuthRoutes {
                     console.log(`Token middleware -> error : ${errorMessage}`)
                     // TODO View.sendJsonError(response, error)
                     // TODO add selftest to check invalid token 
-                    return response.status(401).json({ error: errorMessage }) // FIXME translation
+                    return response.status(401).json({
+                        error: errorMessage, // FIXME translation
+                        'refresh-token': null,
+                        'access-token': null
+                    })
                 }
             }
             console.log(`Token middleware : userId=${userId}, companyId=${companyId}, connected=${connected}`)
@@ -249,6 +253,56 @@ class AuthRoutes {
                 view.json(jsonResponse)
             }
             catch(error) {
+                view.error(error)
+            }
+        })
+
+        expressApp.post('/api/v1/auth/refresh', async (request, response) => {
+            // do not control HTTP header access/refresh tokens : they may be null
+            const view = new View(request, response)
+            try {
+                const refreshToken = request.body.token
+                if (refreshToken === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'token'})
+                if (typeof(refreshToken) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'token'})
+
+                const [tokenFound, tokenId, userId, companyId] = await authModel.checkRefreshToken(refreshToken)
+                if (! tokenFound) {
+                    // if a token is not found, it should be an attempt to usurp token :
+                    // since a refresh token is deleted when used, it will not be found with a second attempt to use it.
+                    console.log(`auth/refresh - detect an attempt to reuse a token : lock account userId = ${userId}`)
+                    await authModel.lockAccount(userId)
+                    throw new Error('Attempt to reuse a token')
+                }
+
+                await authModel.deleteRefreshToken(tokenId)
+
+                const isLocked = await authModel.isAccountLocked(userId)
+                if (await authModel.isAccountLocked(userId)) {
+                    console.log(`auth/refresh - account locked userId = ${userId}`)
+                    throw new Error('Account locked')
+                }
+
+                const user = await authModel.getUserProfile(userId)
+                if (user === null)
+                    throw new Error('User account does not exist')
+                if (companyId !== user.companyId)
+                    throw new Error('Invalid company ID in refresh token')
+
+                const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId)
+                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
+
+                console.log(`auth/refresh - send new tokens userId ${userId}`)
+                view.json({
+                    'userId' : userId,
+                    'access-token': newAccessToken,
+                    'refresh-token': newRefreshToken
+                })
+            }
+            catch (error) {
+                console.error("auth/refresh - error:", (error.message) ? error.message : error)
+                console.log(error)
                 view.error(error)
             }
         })

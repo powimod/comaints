@@ -117,11 +117,11 @@ class AuthModel {
     }
 
 
-    checkAccessToken(token, expiredAccessTokenEmulation) {
+    checkAccessToken(token, expiredAccessTokenEmulation = false) {
         const expiredTokenErrorMessage = "Expired access token"
-        const decodeTokenPromise = new Promise( (resolve, reject) => {
+        const decodeAccessTokenPromise = new Promise( (resolve, reject) => {
             if (expiredAccessTokenEmulation){
-                reject(expiredTokenErrorMessage )
+                reject(expiredTokenErrorMessage)
                 return
             }
             jwt.verify(token, this.#tokenSecret, (err, payload) => {
@@ -159,7 +159,7 @@ class AuthModel {
                 resolve([userId, companyId, refreshTokenId, connected ])
             })
         })
-        return decodeTokenPromise
+        return decodeAccessTokenPromise
     }
 
 
@@ -183,12 +183,17 @@ class AuthModel {
         return [ jwtToken, tokenId ]
     }
 
-    async checkRefreshToken(token) {
-        const decodeTokenPromise = new Promise( (resolve, reject) => {
+    async checkRefreshToken(token, expiredRefreshTokenEmulation = false) {
+        const expiredTokenErrorMessage = "Expired refresh token"
+        const decodeRefreshTokenPromise = new Promise( (resolve, reject) => {
+            if (expiredRefreshTokenEmulation){
+                reject(expiredTokenErrorMessage)
+                return
+            }
             jwt.verify(token, this.#tokenSecret, (err, payload) => {
                 if (err !== null)  {
                     if (err.constructor.name === 'TokenExpiredError')
-                        reject('Expired token') // DO NOT translate (used by API lib)
+                        reject(expiredTokenErrorMessage)
                     else
                         reject('Invalid token')
                     return
@@ -204,18 +209,40 @@ class AuthModel {
                 resolve([payload.token_id, payload.user_id, payload.company_id])
             })
         })
-        const [tokenId, userId, companyId] = await decodeTokenPromise
+        const [tokenId, userId, companyId] = await decodeRefreshTokenPromise
 
         assert(tokenId !== undefined)
         assert(userId !== undefined)
         assert(companyId !== undefined)
 
-        token = await this.#tokenModel.getTokenById(userId)
+        // token must be present in database to be valid (detect token usurpation)
+        token = await this.#tokenModel.getTokenById(tokenId)
         const tokenFound = (token !== null)
 
-        //TODO return extra field
         return [tokenFound, tokenId, userId, companyId]
     }
+
+
+	async lockAccount(userId) {
+		assert(this.#userModel !== null)
+        await this.#userModel.editUser({
+            id: userId,
+            accountLocked: true
+        })
+	}
+
+    async isAccountLocked(userId) {
+		assert(this.#userModel !== null)
+        const user = await this.#userModel.getUserById(userId)
+        return user.accountLocked
+    }
+    
+
+	async deleteRefreshToken(tokenId) {
+		assert(this.#tokenModel !== null)
+        await this.#tokenModel.deleteTokenById(tokenId)
+	}
+
 
     async getUserProfile(userId) {
         return await this.#userModel.getUserById(userId)
