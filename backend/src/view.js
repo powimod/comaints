@@ -51,11 +51,21 @@ class View {
     }
 
     error(error) {
+        if (error === undefined)
+            throw new Error('Error parameter is not defined')
+        if (error === null)
+            throw new Error('Error parameter is null')
         let errorMessage
         if (error instanceof ComaintTranslatedError)
             errorMessage = error.translate(this.request.t)
+        else if (error instanceof Error)
+            errorMessage = error.message
+        else if (typeof(errorMessage) === 'string')
+            errorMessage = error
+        else if (error instanceof Object)
+            throw new Error(`Invalid error parameter (${error.constructor.name})`)
         else
-            errorMessage = error.message ? error.message : error
+            throw new Error(`Invalid error parameter`)
         this.response.status(error.httpStatus || 500).send(errorMessage)
     }
 }
