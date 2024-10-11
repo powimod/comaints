@@ -7,6 +7,7 @@ import Backend from 'i18next-fs-backend'
 import middleware from 'i18next-http-middleware'
 import dotenv from 'dotenv'
 
+import MailManagerModel from './MailManager.js'
 import ModelSingleton from './model.js'
 import ControllerSingleton from './controller.js'
 
@@ -72,6 +73,9 @@ const main = async () => {
             from: mailServerFrom,
         }
     }
+
+    const mailManager = MailManagerModel.getInstance()
+    mailManager.initialize(config.mail)
 
 	const model = ModelSingleton.getInstance()
 	await model.initialize(config)

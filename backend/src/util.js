@@ -1,6 +1,6 @@
 'use strict'
 import assert from 'assert'
-import nodeMailer from 'nodemailer'
+import nodeMailer from 'nodemailer' //  TODO remove this
 
 const sleep = (tempo) => {
     return new Promise( (resolve) => {
@@ -8,6 +8,7 @@ const sleep = (tempo) => {
     })
 }
 
+// TODO remove this function (moved in MailManager)
 const sendMail = (mailTo, subject, textBody, htmlBody, conf) => {
     assert(conf !== undefined)
     assert(conf.host !== undefined)
