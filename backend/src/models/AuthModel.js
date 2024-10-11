@@ -2,7 +2,7 @@
 
 import assert from 'assert'
 import ModelSingleton from '../model.js'
-import { ComaintApiError, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs'
+import { ComaintApiError, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken } from '../../../common/src/error.mjs'
 import jwt from 'jsonwebtoken'
 
 import { sendMail } from '../util.js'
@@ -195,7 +195,7 @@ class AuthModel {
                     if (err.constructor.name === 'TokenExpiredError')
                         reject(expiredTokenErrorMessage)
                     else
-                        reject('Invalid token')
+                        reject('Invalid tOken')
                     return
                 }
                 if (payload.type !== 'refresh') {
@@ -209,7 +209,14 @@ class AuthModel {
                 resolve([payload.token_id, payload.user_id, payload.company_id])
             })
         })
-        const [tokenId, userId, companyId] = await decodeRefreshTokenPromise
+
+        let tokenId, userId, companyId
+        try {
+            [tokenId, userId, companyId] = await decodeRefreshTokenPromise
+        }
+        catch(error) {
+            throw new ComaintApiErrorInvalidToken()
+        }
 
         assert(tokenId !== undefined)
         assert(userId !== undefined)

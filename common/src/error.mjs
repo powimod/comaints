@@ -6,7 +6,8 @@ const comaintErrors = {
     UNAUTHORIZED_ERROR: 'UnauthorizedError',
     INVALID_EMAIL_OR_PASSWORD: 'InvalidEmailOrPassword',
     CONFLICT_ERROR: 'ConflictError',
-    INTERNAL_ERROR: 'InternalError'
+    INTERNAL_ERROR: 'InternalError',
+    INVALID_TOKEN: 'InvalidToken'
 }
 
 class ComaintTranslatedError extends Error {
@@ -63,6 +64,13 @@ class ComaintApiErrorInternalError extends ComaintApiError {
     }
 }
 
+class ComaintApiErrorInvalidToken extends ComaintApiError {
+    constructor() {
+        super('error.invalid_token', {}, comaintErrors.INVALID_TOKEN, 401)
+    }
+}
+
+
 
 const buildComaintError = (comaintErrorCode, params = {}) => {
     // FIXME replace switch with a «errorClass» property in comaintErrors 
@@ -78,6 +86,8 @@ const buildComaintError = (comaintErrorCode, params = {}) => {
             return new ComaintApiErrorConflict('error.confict_error', params)
         case comaintErrors.INTERNAL_ERROR:
             return new ComaintApiErrorInternalError('error.internal_error', params)
+        case comaintErrors.INVALID_TOKEN:
+            return new ComaintApiErrorInvalidToken()
         default:
             throw new Error(`Invalid comaint error code «${comaintErrorCode}»`)
     }
@@ -92,5 +102,6 @@ export {
     ComaintApiErrorUnauthorized,
     ComaintApiErrorConflict,
     ComaintApiErrorInternalError,
+    ComaintApiErrorInvalidToken,
     buildComaintError
 }

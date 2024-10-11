@@ -15,8 +15,8 @@ describe('Test user login', () => {
 
     const PASSWORD = '4BC+d3f-6H1.lMn!'
     let user = null
-    let oldAccessToken
-    let oldRefreshToken
+    let cpyAccessToken
+    let cpyRefreshToken
 
     before( async () =>  {
         loadConfig()
@@ -39,8 +39,8 @@ describe('Test user login', () => {
             expect(user).to.be.instanceOf(Object)
             expect(user).to.have.property('email')
             expect(user.email).to.be.a('string').and.to.equal(user.email)
-            oldAccessToken = accessToken
-            oldRefreshToken = refreshToken
+            cpyAccessToken = accessToken
+            cpyRefreshToken = refreshToken
         })
 
 
@@ -52,33 +52,89 @@ describe('Test user login', () => {
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
                 expect(error.message).to.equal('Server status 401 ({"error":"Expired access token","refresh-token":null,"access-token":null})')
-                console.log("tokens", accessToken, refreshToken)
                 expect(accessToken).to.equal(null)
                 expect(refreshToken).to.equal(null)
             }
         })
 
+
+        it('Try to call refresh route without token', async () => {
+            try {
+                const json = await jsonPost(ROUTE_REFRESH, {})
+                expect.fail('Refresh token absence not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «token» not found in request body"})')
+            }
+        })
+
+        it('Try to call refresh route with invalid token', async () => {
+            try {
+                const json = await jsonPost(ROUTE_REFRESH, {token:123})
+                expect.fail('Invalid refresh token not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 400 ({"error":"Invalid value for «token» parameter in request body"})')
+            }
+        })
+
+        it('Try to call refresh route with invalid token', async () => {
+            const badToken = "EYjhbGciOiJIUzI1NiIsZXhwIjoxNzYwMTE4MjI2fQ.W_p6K5kHiDO_TU4WGmq3955wrmtYTNLUyF2Vol--Ryk"
+            try {
+                const json = await jsonPost(ROUTE_REFRESH, {token:badToken})
+                expect.fail('Invalid refresh token not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 401 ({"error":"Invalid token"})')
+            }
+        })
+
+
+
         it('Refresh access token', async () => {
-            const json = await jsonPost(ROUTE_REFRESH, {token: oldRefreshToken})
+            const json = await jsonPost(ROUTE_REFRESH, {token: cpyRefreshToken})
             expect(json).to.be.instanceOf(Object)
 
             expect(json).to.have.property('access-token')
             const newAccessToken = json['access-token']
             expect(newAccessToken).to.be.a('string')
-            expect(newAccessToken !== oldAccessToken)
+            expect(newAccessToken !== cpyAccessToken)
 
             expect(json).to.have.property('refresh-token')
             const newRefreshToken = json['refresh-token']
             expect(newRefreshToken).to.be.a('string')
-            expect(newRefreshToken !== oldRefreshToken)
+            expect(newRefreshToken !== cpyRefreshToken)
 
             // check HTTP header tokens
             expect(accessToken === newAccessToken)
             expect(refreshToken === newRefreshToken)
+
         })
 
-        // TODO call refresh without data
-        // TODO call refresh with invalid data
+        it('Check profile access', async () => {
+            const json = await jsonGet(ROUTE_PROFILE)
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('user')
+            const user = json.user
+            expect(user).to.be.instanceOf(Object)
+            expect(user).to.have.property('email')
+            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            cpyAccessToken = accessToken
+            cpyRefreshToken = refreshToken
+        })
+
+        it('Check profile access with new token', async () => {
+            const json = await jsonGet(ROUTE_PROFILE)
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('user')
+            const user = json.user
+            expect(user).to.be.instanceOf(Object)
+            expect(user).to.have.property('email')
+            expect(user.email).to.be.a('string').and.to.equal(user.email)
+        })
 
 
     })

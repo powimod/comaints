@@ -302,7 +302,6 @@ class AuthRoutes {
             }
             catch (error) {
                 console.error("auth/refresh - error:", (error.message) ? error.message : error)
-                console.log(error)
                 view.error(error)
             }
         })

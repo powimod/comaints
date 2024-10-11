@@ -15,6 +15,7 @@
 		"account_not_found": "This account does not exist",
         "user_not_logged_in": "User is not logged in",
         "unauthorized_error": "Unauthorized error",
+        "invalid_token": "Invalid token",
         "invalid_email_or_password": "Invalid EMail or password",
         "already_logged_in": "User already connected",
 		"prop": {
