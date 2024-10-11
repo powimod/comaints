@@ -7,7 +7,7 @@ import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refr
 const ROUTE_REGISTER = 'api/v1/auth/register'
 const ROUTE_VALIDATE = 'api/v1/auth/validateRegistration'
 const ROUTE_LOGOUT   = 'api/v1/auth/logout'
-const ROUTE_PROFILE  = 'api/v1/profile'
+const ROUTE_PROFILE  = 'api/v1/account/profile'
 
 describe('Test user registration', () => {
 

@@ -306,20 +306,6 @@ class AuthRoutes {
             }
         })
 
-
-        expressApp.get('/api/v1/profile', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
-            try {
-                const userId = request.userId
-                const user = await authModel.getUserProfile(userId)
-                view.json({ user })
-            }
-            catch(error) {
-                console.log(error)
-                view.error(error)
-            }
-        })
-
     }
 }
 

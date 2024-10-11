@@ -5,6 +5,7 @@ import View from './view.js'
 import { ComaintApiErrorInvalidRequest } from '../../common/src/error.mjs'
 
 import AuthRoutesSingleton    from './routes/AuthRoutes.js'
+import AccountRoutesSingleton from './routes/AccountRoutes.js'
 import CompanyRoutesSingleton from './routes/CompanyRoutes.js'
 import UserRoutesSingleton    from './routes/UserRoutes.js'
 import TokenRoutesSingleton   from './routes/TokenRoutes.js'
@@ -14,6 +15,7 @@ const API_VERSION = 'v1'
 class Controller {
 
 	#authRoutes = null;
+	#accountRoutes = null;
 	#companyRoutes = null;
 	#userRoutes = null;
 	#tokenRoutes = null;
@@ -25,6 +27,9 @@ class Controller {
         this.#authRoutes = AuthRoutesSingleton.getInstance()
         this.#authRoutes.initialize(config, expressApp)
 
+        this.#accountRoutes = AccountRoutesSingleton.getInstance()
+        this.#accountRoutes.initialize(config, expressApp)
+
         this.#companyRoutes = CompanyRoutesSingleton.getInstance()
         this.#companyRoutes.initialize(config, expressApp)
 
@@ -34,13 +39,14 @@ class Controller {
         this.#tokenRoutes = TokenRoutesSingleton.getInstance()
         this.#tokenRoutes.initialize(config, expressApp)
 
-        // special API route to check i18n support
+        // special API routes to check i18n support
         expressApp.get(`/api/welcome`, (request, response) => {
             const view = new View(request, response)
             view.json({
                 response: view.translation('general.welcome')
             })
         })
+
         expressApp.post(`/api/welcome`, (request, response) => {
             const view = new View(request, response)
             try {

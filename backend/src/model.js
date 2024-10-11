@@ -5,6 +5,7 @@ import mysql from 'promise-mysql'
 import { sleep } from './util.js'
 import CompanyModelSingleton  from './models/CompanyModel.js'
 import UserModelSingleton     from './models/UserModel.js'
+import AccountModelSingleton  from './models/AccountModel.js'
 import TokenModelSingleton    from './models/TokenModel.js'
 import AuthModelSingleton     from './models/AuthModel.js'
 
@@ -12,6 +13,7 @@ class Model {
     #config = null
     #dbConnection = null
     #authModel = null
+    #accountModel = null
     #companyModel = null
     #userModel = null
     #tokenModel = null
@@ -72,6 +74,9 @@ class Model {
         this.#userModel = UserModelSingleton.getInstance()
         this.#userModel.initialize(dbConnection, config.security.hashSalt)
 
+        this.#accountModel = AccountModelSingleton.getInstance()
+        this.#accountModel.initialize(dbConnection)
+
         this.#tokenModel = TokenModelSingleton.getInstance()
         this.#tokenModel.initialize(dbConnection)
 
@@ -107,6 +112,10 @@ class Model {
 
     getUserModel() {
         return this.#userModel
+    }
+
+    getAccountModel() {
+        return this.#accountModel
     }
 
     getTokenModel() {
