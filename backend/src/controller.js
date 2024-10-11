@@ -25,19 +25,19 @@ class Controller {
 
         // IMPORTANT :authRoutes must be initialized first because it has a middleware to handle session cookies
         this.#authRoutes = AuthRoutesSingleton.getInstance()
-        this.#authRoutes.initialize(config, expressApp)
+        this.#authRoutes.initialize(expressApp)
 
         this.#accountRoutes = AccountRoutesSingleton.getInstance()
-        this.#accountRoutes.initialize(config, expressApp)
+        this.#accountRoutes.initialize(expressApp)
 
         this.#companyRoutes = CompanyRoutesSingleton.getInstance()
-        this.#companyRoutes.initialize(config, expressApp)
+        this.#companyRoutes.initialize(expressApp)
 
         this.#userRoutes = UserRoutesSingleton.getInstance()
-        this.#userRoutes.initialize(config, expressApp)
+        this.#userRoutes.initialize(expressApp)
 
         this.#tokenRoutes = TokenRoutesSingleton.getInstance()
-        this.#tokenRoutes.initialize(config, expressApp)
+        this.#tokenRoutes.initialize(expressApp)
 
         // special API routes to check i18n support
         expressApp.get(`/api/welcome`, (request, response) => {

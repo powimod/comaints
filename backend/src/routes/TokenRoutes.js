@@ -10,7 +10,7 @@ import tokenObjectDef from '../../../common/src/objects/token-object-def.mjs'
 
 class TokenRoutes {
 
-    initialize(config, expressApp) {
+    initialize(expressApp) {
         const controller = ControllerSingleton.getInstance()
 	    const model  = ModelSingleton.getInstance()
         

@@ -10,7 +10,7 @@ import companyObjectDef from '../../../common/src/objects/company-object-def.mjs
 
 class CompanyRoutes {
 
-    initialize(config, expressApp) {
+    initialize(expressApp) {
         const controller = ControllerSingleton.getInstance()
 	    const model  = ModelSingleton.getInstance()
         

@@ -10,7 +10,7 @@ import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 
 class UserRoutes {
 
-    initialize(config, expressApp) {
+    initialize(expressApp) {
         const controller = ControllerSingleton.getInstance()
 	    const model  = ModelSingleton.getInstance()
         
