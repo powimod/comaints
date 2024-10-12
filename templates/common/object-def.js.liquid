@@ -23,6 +23,7 @@ const {{object.name|camelCase}}ObjectDef = {
         {%- if property.secret == true %}
         "secret": "{{ property.secret }}",
         {%- endif %}
+        "scope": "{{ property.scope }}"
     },
 {%- endfor %}
 {%- for link in object.links %} 
