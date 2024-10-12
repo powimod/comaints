@@ -13,6 +13,8 @@ class AuthModel {
     #tokenModel = null
     #tokenSecret = null
     #tokenHashSalt = null
+    #codeValidityPeriod = null
+    #maxAuthAttempts = null
     #refreshTokenLifespan = null
     #accessTokenLifespan = null
 
@@ -29,6 +31,8 @@ class AuthModel {
 
         this.#tokenSecret = securityConfig.tokenSecret
         this.#tokenHashSalt =  securityConfig.tokenHashSalt
+        this.#codeValidityPeriod  = securityConfig.codeValidityPeriod
+        this.#maxAuthAttempts = securityConfig.maxAuthAttempts
         this.#refreshTokenLifespan = securityConfig.refreshTokenLifespan
         this.#accessTokenLifespan = securityConfig.accessTokenLifespan
 
@@ -46,7 +50,16 @@ class AuthModel {
 
 
     async register(email, password, authCode) {
-        const user = await this.#userModel.createUser({email, password, authCode})
+        const authAction = 'register'
+        const codeValidityPeriod = this.#codeValidityPeriod
+        const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
+        const user = await this.#userModel.createUser({
+            email,
+            password,
+            authCode,
+            authAction,
+            authExpiration
+        })
         return { user }
     }
 
@@ -66,6 +79,9 @@ class AuthModel {
         // unlock User account and reset validation code
         user.accountLocked = false
         user.authCode = 0
+        user.authAction = null
+        user.authExpiration = null
+        user.authAttempts = null
         delete user.password // do not re-encrypt already encrypted password !
         await this.#userModel.editUser(user)
         return true
@@ -236,7 +252,7 @@ class AuthModel {
         const user = await this.#userModel.getUserById(userId)
         return user.accountLocked
     }
-    
+
 
 	async deleteRefreshToken(tokenId) {
 		assert(this.#tokenModel !== null)

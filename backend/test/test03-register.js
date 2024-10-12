@@ -201,9 +201,20 @@ describe('Test user registration', () => {
             expect(user).to.have.property('administrator')
             expect(user.administrator).to.a('number').and.to.equal(0) // false
 
+            // control auth_code first to initialize authCode
             expect(user).to.have.property('auth_code')
             authCode = user.auth_code
             expect(authCode).to.be.a('number').and.to.be.above(0)
+
+            expect(user).to.have.property('auth_action')
+            expect(user.auth_action).to.be.a('string').and.to.equal('register')
+            expect(user).to.have.property('auth_attempts')
+            expect(user.auth_attempts).to.be.a('number').and.to.be.equal(0)
+            expect(user).to.have.property('auth_expiration')
+            expect(user.auth_expiration).not.to.be.equal(null)
+            expect(user.auth_expiration).to.be.a('Date')
+            expect(user).to.have.property('auth_data')
+            expect(user.auth_data).to.be.equal(null)
         })
 
         it('Try to access profile without being logged in', async () => {
@@ -293,7 +304,17 @@ describe('Test user registration', () => {
 
             expect(user).to.have.property('auth_code')
             expect(user.auth_code).to.be.a('number').and.to.equal(0) // false
+
+            expect(user).to.have.property('auth_action')
+            expect(user.auth_action).to.be.to.equal(null)
+            expect(user).to.have.property('auth_attempts')
+            expect(user.auth_attempts).to.be.equal(null)
+            expect(user).to.have.property('auth_expiration')
+            expect(user.auth_expiration).to.be.equal(null)
+            expect(user).to.have.property('auth_data')
+            expect(user.auth_data).to.be.equal(null)
         })
+
 
         it('Check profile access when connected', async () => {
             const json = await jsonGet(ROUTE_PROFILE)

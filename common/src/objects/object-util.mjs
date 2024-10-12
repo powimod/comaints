@@ -260,7 +260,7 @@ const convertObjectFromDb = (objDef, dbRecord) => {
 			if (propDef.type === 'date' || propDef.type === 'datetime') {
 				if (typeof(fieldValue) !== 'object')
 					throw new Error(`Property [${propName}] it not an object`)
-				if (fieldValue.constructor.name !== 'date')
+				if (fieldValue.constructor.name !== 'Date')
 					throw new Error(`Property [${propName}] it not a date`)
 			}
 		}

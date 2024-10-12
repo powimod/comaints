@@ -45,6 +45,7 @@ const main = async () => {
     if (! mailServerFrom)
         throw new Error('MAIL_SERVER_FROM not defined')
 
+    // FIXME env variable values are not checked
     let config = {
         version: BACKEND_VERSION,
         server: {
@@ -61,18 +62,20 @@ const main = async () => {
         },
         security: {
             tokenSecret: tokenSecret,
-            hashSalt: env.HASH_SALT || 10,
-            refreshTokenLifespan: env.REFRESH_TOKEN_LIFESPAN || 365, // days
-            accessTokenLifespan: env.ACCESS_TOKEN_LIFESPAN  || 120 // seconds
+            hashSalt: parseInt(env.HASH_SALT) || 10,
+            refreshTokenLifespan: parseInt(env.REFRESH_TOKEN_LIFESPAN) || 365, // days
+            accessTokenLifespan: parseInt(env.ACCESS_TOKEN_LIFESPAN) || 120, // seconds
+            codeValidityPeriod: parseInt(env.CODE_VALIDITY_PERIOD) || 600, // seconds
+            maxAuthAttempts: parseInt(env.MAX_AUTH_ATTEMPTS ) || 5
         }
     }
     const mailConfig = {
-            host: env.MAIL_SERVER_HOST || 'localhost',
-            port: env.MAIL_SERVER_PORT || 25,
-            user: env.MAIL_SERVER_USER || 'comaint',
-            password: mailServerPassword,
-            from: mailServerFrom,
-        }
+        host: env.MAIL_SERVER_HOST || 'localhost',
+        port: env.MAIL_SERVER_PORT || 25,
+        user: env.MAIL_SERVER_USER || 'comaint',
+        password: mailServerPassword,
+        from: mailServerFrom,
+    }
 
     const mailManager = MailManagerModel.getInstance()
     mailManager.initialize(mailConfig)
