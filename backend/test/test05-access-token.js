@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import assert from 'assert'
 
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
-import { createUserAccount, deleteUserAccount } from './helpers.js'
+import { createUserAccount, deleteUserAccount, userPublicProperties } from './helpers.js'
 
 
 const ROUTE_LOGIN    = 'api/v1/auth/login'
@@ -37,7 +37,7 @@ describe('Test user login', () => {
             expect(json).to.have.property('user')
             const user = json.user
             expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.property('email')
+            expect(user).to.have.keys(userPublicProperties)
             expect(user.email).to.be.a('string').and.to.equal(user.email)
             cpyAccessToken = accessToken
             cpyRefreshToken = refreshToken
@@ -120,7 +120,7 @@ describe('Test user login', () => {
             expect(json).to.have.property('user')
             const user = json.user
             expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.property('email')
+            expect(user).to.have.keys(userPublicProperties)
             expect(user.email).to.be.a('string').and.to.equal(user.email)
             cpyAccessToken = accessToken
             cpyRefreshToken = refreshToken
@@ -132,7 +132,7 @@ describe('Test user login', () => {
             expect(json).to.have.property('user')
             const user = json.user
             expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.property('email')
+            expect(user).to.have.keys(userPublicProperties)
             expect(user.email).to.be.a('string').and.to.equal(user.email)
         })
 

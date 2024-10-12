@@ -51,7 +51,13 @@ const deleteUserAccount = async (user) => {
     await requestDb('DELETE FROM users WHERE id=?', user.id)
 }
 
+const userPublicProperties = [
+    'id', 'email', 'firstname', 'lastname', 'accountLocked', 
+    'active', 'lastUse', 'administrator', 'companyId'
+]
+
 export {
     createUserAccount,
-    deleteUserAccount
+    deleteUserAccount,
+    userPublicProperties 
 }

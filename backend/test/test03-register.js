@@ -3,6 +3,7 @@ import { expect } from 'chai'
 import assert from 'assert'
 
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
+import { userPublicProperties } from './helpers.js'
 
 const ROUTE_REGISTER = 'api/v1/auth/register'
 const ROUTE_VALIDATE = 'api/v1/auth/validateRegistration'
@@ -300,10 +301,7 @@ describe('Test user registration', () => {
             expect(json).to.have.property('user')
             const user = json.user
             expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys([
-                'id', 'email', 'firstname', 'lastname', 'accountLocked', 
-                'active', 'lastUse', 'administrator', 'companyId'
-            ])
+            expect(user).to.have.keys(userPublicProperties)
             expect(user.id).to.be.a('number')
             expect(user.email).to.be.a('string').and.to.equal(userEmail)
             expect(user.accountLocked).to.be.a('boolean').and.to.equal(false)

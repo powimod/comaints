@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import assert from 'assert'
 
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
-import { createUserAccount, deleteUserAccount } from './helpers.js'
+import { createUserAccount, deleteUserAccount, userPublicProperties } from './helpers.js'
 
 
 const ROUTE_LOGIN= 'api/v1/auth/login'
@@ -196,18 +196,14 @@ describe('Test user login', () => {
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('user')
             const user = json.user
+            expect(user).to.have.keys(userPublicProperties)
             expect(user).to.be.instanceOf(Object)
             expect(user).to.have.property('id')
             expect(user.id).to.equal(user.id)
-            expect(user).to.have.property('email')
             expect(user.email).to.be.a('string').and.to.equal(user.email)
-            expect(user).to.have.property('accountLocked')
             expect(user.accountLocked).to.be.a('boolean').and.to.equal(false)
-            expect(user).to.have.property('active')
             expect(user.active).to.be.a('boolean').and.to.equal(true)
-            expect(user).to.have.property('administrator')
             expect(user.administrator).to.be.a('boolean').and.to.equal(false)
-            expect(user).to.have.property('companyId')
             expect(user.companyId).to.equal(null)
         })
 
@@ -271,17 +267,12 @@ describe('Test user login', () => {
             expect(json).to.have.property('user')
             const user = json.user
             expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.property('id')
+            expect(user).to.have.keys(userPublicProperties)
             expect(user.id).to.equal(user.id)
-            expect(user).to.have.property('email')
             expect(user.email).to.be.a('string').and.to.equal(user.email)
-            expect(user).to.have.property('accountLocked')
             expect(user.accountLocked).to.be.a('boolean').and.to.equal(false)
-            expect(user).to.have.property('active')
             expect(user.active).to.be.a('boolean').and.to.equal(true)
-            expect(user).to.have.property('administrator')
             expect(user.administrator).to.be.a('boolean').and.to.equal(false)
-            expect(user).to.have.property('companyId')
             expect(user.companyId).to.equal(null)
         })
 
