@@ -81,7 +81,7 @@ class Model {
         this.#tokenModel.initialize(dbConnection)
 
         this.#authModel = AuthModelSingleton.getInstance()
-        this.#authModel.initialize(dbConnection, config.security, config.mail)
+        this.#authModel.initialize(dbConnection, config.security)
 
         this.#dbConnection = dbConnection
         this.#config = config

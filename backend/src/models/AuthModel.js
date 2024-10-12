@@ -1,11 +1,11 @@
 'use strict'
 
 import assert from 'assert'
-import ModelSingleton from '../model.js'
-import { ComaintApiError, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken } from '../../../common/src/error.mjs'
 import jwt from 'jsonwebtoken'
 
-import { sendMail } from '../util.js'
+import ModelSingleton from '../model.js'
+import { ComaintApiError, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken } from '../../../common/src/error.mjs'
+import MailManagerSingleton from '../MailManager.js'
 
 class AuthModel {
     #db = null
@@ -15,9 +15,10 @@ class AuthModel {
     #tokenHashSalt = null
     #refreshTokenLifespan = null
     #accessTokenLifespan = null
-    #mailServerConfig = null
 
-    initialize (db, securityConfig, mailServerConfig) {
+    initialize (db, securityConfig) {
+        assert(db !== undefined)
+        assert(securityConfig !== undefined)
 
         // check «security» configuration section
         const securityParameterNames = [ 'tokenSecret', 'refreshTokenLifespan' , 'accessTokenLifespan']
@@ -30,14 +31,6 @@ class AuthModel {
         this.#tokenHashSalt =  securityConfig.tokenHashSalt
         this.#refreshTokenLifespan = securityConfig.refreshTokenLifespan
         this.#accessTokenLifespan = securityConfig.accessTokenLifespan
-
-        // check «mailServer» configuration section
-        const mailServerParameterNames = [ 'host', 'port', 'user', 'password', 'from']
-        for (const parameterName of mailServerParameterNames ) {
-            if (mailServerConfig[parameterName] === undefined)
-                throw new Error(`Parameter «${parameterName}» not defined in mail server configuration`)
-        }
-        this.#mailServerConfig = mailServerConfig
 
         this.#db = db
         const model  = ModelSingleton.getInstance()
@@ -88,12 +81,12 @@ class AuthModel {
         const subject = i18n_t('register.mail_title')
         const textBody = i18n_t('register.mail_body', { 'code' : code })
         const htmlBody = i18n_t('register.mail_body', { 'code' : `<b>${code}</b>code` })
-        return await sendMail(
+        const mailManger = MailManagerSingleton.getInstance()
+        return await mailManager.sendMail(
                 email,
                 subject,
                 textBody,
-                htmlBody,
-                this.#mailServerConfig
+                htmlBody
         )
     }
 

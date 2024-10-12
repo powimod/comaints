@@ -64,18 +64,18 @@ const main = async () => {
             hashSalt: env.HASH_SALT || 10,
             refreshTokenLifespan: env.REFRESH_TOKEN_LIFESPAN || 365, // days
             accessTokenLifespan: env.ACCESS_TOKEN_LIFESPAN  || 120 // seconds
-        },
-        mail: {
+        }
+    }
+    const mailConfig = {
             host: env.MAIL_SERVER_HOST || 'localhost',
             port: env.MAIL_SERVER_PORT || 25,
             user: env.MAIL_SERVER_USER || 'comaint',
             password: mailServerPassword,
             from: mailServerFrom,
         }
-    }
 
     const mailManager = MailManagerModel.getInstance()
-    mailManager.initialize(config.mail)
+    mailManager.initialize(mailConfig)
 
 	const model = ModelSingleton.getInstance()
 	await model.initialize(config)

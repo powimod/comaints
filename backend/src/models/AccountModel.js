@@ -5,13 +5,11 @@ import ModelSingleton from '../model.js'
 import { ComaintApiError, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken } from '../../../common/src/error.mjs'
 import jwt from 'jsonwebtoken'
 
-import { sendMail } from '../util.js'
-
 class AccountModel {
     #db = null
     #userModel = null
 
-    initialize (db, securityConfig, mailServerConfig) {
+    initialize (db) {
         this.#db = db
         const model  = ModelSingleton.getInstance()
         this.#userModel = model.getUserModel()

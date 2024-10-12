@@ -98,7 +98,7 @@ class AuthRoutes {
                 if (errorMsg2)
                     throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
 
-                // self-tests does not send validation code by email
+                // self-test does not send validation code by email
                 let sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ? request.body.sendCodeByEmail : true
 
                 // make a random validation code which will be sent by email to unlock account

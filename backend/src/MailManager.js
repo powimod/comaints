@@ -23,7 +23,7 @@ class MailManager {
         this.#from = mailConfig.from
     }
 
-    sendMail(mailTo, subject, textBody, htmlBody, conf) {
+    sendMail(mailTo, subject, textBody, htmlBody) {
         assert(this.#host !== null)
 
         return new Promise( (resolve, reject) => {
