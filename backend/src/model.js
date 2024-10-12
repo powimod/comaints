@@ -68,20 +68,23 @@ class Model {
         if (dbConnection === null)
             throw new Error(`Can not connect database`)
 
-        this.#companyModel = CompanyModelSingleton.getInstance()
-        this.#companyModel.initialize(dbConnection)
-
+        // IMPORTANT : do not change modele declaration order because of module dependencies
         this.#userModel = UserModelSingleton.getInstance()
         this.#userModel.initialize(dbConnection, config.security.hashSalt)
-
-        this.#accountModel = AccountModelSingleton.getInstance()
-        this.#accountModel.initialize(dbConnection)
 
         this.#tokenModel = TokenModelSingleton.getInstance()
         this.#tokenModel.initialize(dbConnection)
 
+        // authModel depends on userModel and tokenModel
         this.#authModel = AuthModelSingleton.getInstance()
         this.#authModel.initialize(dbConnection, config.security)
+
+        // authModel depends on authModel
+        this.#accountModel = AccountModelSingleton.getInstance()
+        this.#accountModel.initialize(dbConnection)
+
+        this.#companyModel = CompanyModelSingleton.getInstance()
+        this.#companyModel.initialize(dbConnection)
 
         this.#dbConnection = dbConnection
         this.#config = config

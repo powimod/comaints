@@ -17,6 +17,7 @@
         "unauthorized_error": "Unauthorized error",
         "invalid_token": "Invalid token",
         "invalid_email_or_password": "Invalid EMail or password",
+        "invalid_password": "Invalid password",
         "already_logged_in": "User already connected",
 		"prop": {
 			"is_not_defined": "Property «{{property}}» is not defined",

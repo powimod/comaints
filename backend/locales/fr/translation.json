@@ -17,6 +17,7 @@
         "unauthorized_error": "Accès non autorisé",
         "invalid_token": "Jeton invalide",
         "invalid_email_or_password": "Adresse EMail ou mot de passe invalide",
+        "invalid_password": "Mot de passe invalide",
         "already_logged_in": "Utilisateur déjà connecté",
 		"prop": {
 			"is_not_defined": "La propriété «{{property}}» n'est pas définie",

@@ -8,15 +8,29 @@ import jwt from 'jsonwebtoken'
 class AccountModel {
     #db = null
     #userModel = null
+    #authModel = null
 
     initialize (db) {
         this.#db = db
         const model  = ModelSingleton.getInstance()
         this.#userModel = model.getUserModel()
+        this.#authModel = model.getAuthModel()
     }
 
     async getUserProfile(userId) {
         return await this.#userModel.getUserById(userId)
+    }
+
+    generateValidationCode() {
+        return this.#authModel.generateValidationCode()
+    }
+
+    async checkPassword(userId, password) {
+        return await this.#userModel.checkPassword(userId, password)
+    }
+
+    async changePassword(userId, password) {
+        return await this.#userModel.editUser({ id: userId, password })
     }
 
 }
