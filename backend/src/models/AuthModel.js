@@ -38,22 +38,22 @@ class AuthModel {
         this.#tokenModel = model.getTokenModel()
     }
 
-    generateValidationCode() {
+    generateAuthCode() {
         const minimum = 10000
         const maximum = 99999
         return parseInt(Math.random() * (maximum - minimum) + minimum)
     }
 
 
-    async register(email, password, validationCode) {
-        const user = await this.#userModel.createUser({email, password, validationCode})
+    async register(email, password, authCode) {
+        const user = await this.#userModel.createUser({email, password, authCode})
         return { user }
     }
 
 
-    async validateRegistration(userId, validationCode) {
+    async validateRegistration(userId, authCode) {
 
-        const validated = await this.#userModel.checkValidationCode(userId, validationCode)
+        const validated = await this.#userModel.checkAuthCode(userId, authCode)
         if (! validated)
             return false
 
@@ -65,13 +65,13 @@ class AuthModel {
 
         // unlock User account and reset validation code
         user.accountLocked = false
-        user.validationCode = 0
+        user.authCode = 0
         delete user.password // do not re-encrypt already encrypted password !
         await this.#userModel.editUser(user)
         return true
     }
 
-    async sendRegisterValidationCode(code, email, i18n_t) {
+    async sendRegisterAuthCode(code, email, i18n_t) {
         assert(code !== undefined)
         assert(typeof(code) === 'number')
         assert(email !== undefined)

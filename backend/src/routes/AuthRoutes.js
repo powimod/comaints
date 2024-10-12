@@ -80,7 +80,6 @@ class AuthRoutes {
                 if (errorMsg1)
                     throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1)
 
-
                 let password = request.body.password
                 if (password === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'password'})
@@ -102,21 +101,18 @@ class AuthRoutes {
                 let sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ? request.body.sendCodeByEmail : true
 
                 // make a random validation code which will be sent by email to unlock account
-                const validationCode = authModel.generateValidationCode()
-                console.log(`Validation code is ${ validationCode }`) // TODO remove this
+                const authCode = authModel.generateAuthCode()
+                console.log(`Validation code is ${ authCode }`) // TODO remove this
 
-                const result = await authModel.register(email, password, validationCode)
+                const result = await authModel.register(email, password, authCode)
 
                 const user = result.user
                 if (! user)
                     throw new Error('User not found in result')
+                console.log("dOm user", user)
 
-                if (user.validationCode !== undefined)
-                    throw new Error('User object should not have a validation code property')
                 if (user.password !== undefined)
                     throw new Error('User object should not have a password property')
-                if (user.administrator === true)
-                    throw new Error('User object should not be administrator')
 
                 const userId = user.id
                 if (! userId)
@@ -130,7 +126,7 @@ class AuthRoutes {
 
 
                 if (sendCodeByEmail)
-                    await authModel.sendRegisterValidationCode(validationCode, email, view.translation)
+                    await authModel.sendRegisterAuthCode(authCode, email, view.translation)
 
                 // access token with userConnected = false
                 const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId)
@@ -166,7 +162,7 @@ class AuthRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'code'})
                 if (typeof(code) !== 'number')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'code'})
-                const [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'validationCode',code)
+                const [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'authCode',code)
                 if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
                 const validated = await authModel.validateRegistration(userId, code)

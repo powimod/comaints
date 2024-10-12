@@ -135,22 +135,22 @@ class UserModel {
 
     }
 
-    async checkValidationCode(userId, validationCode) {
+    async checkAuthCode(userId, authCode) {
         if (userId === undefined)
             throw new Error('Argument <userId> required')
         if (typeof(userId) !== 'number')
             throw new Error('Argument <userId> is not a number')
-        if (validationCode === undefined)
-            throw new Error('Argument <validationCode> required')
-        if (typeof(validationCode) !== 'number')
-            throw new Error('Argument <validationCode> is not a number')
+        if (authCode === undefined)
+            throw new Error('Argument <authCode> required')
+        if (typeof(authCode) !== 'number')
+            throw new Error('Argument <authCode> is not a number')
 
-        let sql = `SELECT validation_code FROM users WHERE id = ?`
+        let sql = `SELECT auth_code FROM users WHERE id = ?`
         const result = await this.#db.query(sql, [userId])
         if (result.length === 0)
             throw new Error('User not found')
         const userRecord = result[0]
-        const validated = (userRecord.validation_code === validationCode)
+        const validated = (userRecord.auth_code === authCode)
         return validated
     }
 

@@ -13,7 +13,7 @@ describe('Test user registration', () => {
 
     const dte = new Date()
     const userEmail = `u${dte.getTime()}@x.y`
-    let validationCode  = null
+    let authCode  = null
     let userId = null
 
     before( async () =>  {
@@ -151,6 +151,7 @@ describe('Test user registration', () => {
         })
     })
 
+
     describe(`Test route /${ROUTE_REGISTER} with valid data`, () => {
 
         it('User regisration', async () => {
@@ -159,10 +160,8 @@ describe('Test user registration', () => {
                 password:'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('access-token')
+            expect(json).to.have.keys('access-token', 'refresh-token')
             expect(json['access-token']).to.be.a('string')
-            expect(json).to.have.property('refresh-token')
             expect(json['refresh-token']).to.be.a('string')
         })
 
@@ -201,9 +200,9 @@ describe('Test user registration', () => {
             expect(user).to.have.property('administrator')
             expect(user.administrator).to.a('number').and.to.equal(0) // false
 
-            expect(user).to.have.property('validation_code')
-            validationCode = user.validation_code
-            expect(validationCode).to.be.a('number').and.to.be.above(0)
+            expect(user).to.have.property('auth_code')
+            authCode = user.auth_code
+            expect(authCode).to.be.a('number').and.to.be.above(0)
         })
 
         it('Try to access profile without being logged in', async () => {
@@ -246,13 +245,13 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Property «validationCode» is too large"})`)
+                expect(error.message).to.equal(`Server status 400 ({"error":"Property «authCode» is too large"})`)
             }
         })
 
 
         it('Send incorrect validation code', async () => {
-            const incorrectCode = validationCode + 1
+            const incorrectCode = authCode + 1
             const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('validated')
@@ -263,7 +262,7 @@ describe('Test user registration', () => {
 
 
         it('Send validation code', async () => {
-            const json = await jsonPost(ROUTE_VALIDATE, { code: validationCode})
+            const json = await jsonPost(ROUTE_VALIDATE, { code: authCode})
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(true)
@@ -291,8 +290,8 @@ describe('Test user registration', () => {
             expect(user).to.have.property('administrator')
             expect(user.administrator).to.a('number').and.to.equal(0)
 
-            expect(user).to.have.property('validation_code')
-            expect(user.validation_code).to.be.a('number').and.to.equal(0) // false
+            expect(user).to.have.property('auth_code')
+            expect(user.auth_code).to.be.a('number').and.to.equal(0) // false
         })
 
         it('Check profile access when connected', async () => {
@@ -342,7 +341,6 @@ describe('Test user registration', () => {
         })
 
     })
-
 
     // TODO test registration with an existing email
         

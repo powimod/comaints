@@ -29,9 +29,9 @@ const createUserAccount = async (options = {}) => {
     const user = res[0]
     expect(user).to.be.instanceOf(Object)
     expect(user).to.have.property('id')
-    const validationCode = user.validation_code
+    const authCode = user.auth_code
 
-    json = await jsonPost(ROUTE_VALIDATE, { code: validationCode})
+    json = await jsonPost(ROUTE_VALIDATE, { code: authCode})
     expect(json).to.be.instanceOf(Object)
     expect(json).to.have.property('validated')
     expect(json.validated).to.be.a('boolean').and.to.equal(true)

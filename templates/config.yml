@@ -87,13 +87,6 @@ objects:
       - name: "accountLocked"
         type: "boolean"
         default: false
-      - name : "validationCode"
-        type: "integer"
-        secret: true
-        mandatory: false
-        default: 0
-        minimum: 0 
-        maximum: 99999
       - name: "active"
         type: "boolean"
         default: true
@@ -103,6 +96,33 @@ objects:
       - name: "administrator"
         type: "boolean"
         default: false
+
+      - name : "authAction"
+        scope: "protected"
+        mandatory: false
+        type: "string"
+        maximum: 16
+      - name : "authData"
+        scope: "protected"
+        mandatory: false
+        type: "string"
+      - name : "authCode"
+        scope: "private"
+        mandatory: false
+        type: "integer"
+        default: 0
+        minimum: 0 
+        maximum: 99999
+      - name: "authExpiration"
+        scope: "protected"
+        mandatory: false
+        type: "datetime"
+      - name: "authAttempts"
+        scope: "protected"
+        mandatory: false
+        type: "integer"
+        default: 0
+
     links:
       - name: "company"
         target: "Company"

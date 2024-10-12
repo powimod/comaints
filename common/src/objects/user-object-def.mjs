@@ -39,16 +39,6 @@ const userObjectDef = {
         "mandatory": "true",
         "scope": "public"
     },
-    "validationCode" : {
-        "type": "integer",
-        "field": "validation_code",
-        "minimum": "0",
-        "maximum": "99999",
-        "default": "0",
-        "mandatory": "false",
-        "secret": "true",
-        "scope": "public"
-    },
     "active" : {
         "type": "boolean",
         "default": "true",
@@ -66,6 +56,41 @@ const userObjectDef = {
         "default": "false",
         "mandatory": "true",
         "scope": "public"
+    },
+    "authAction" : {
+        "type": "string",
+        "field": "auth_action",
+        "maximum": "16",
+        "mandatory": "false",
+        "scope": "protected"
+    },
+    "authData" : {
+        "type": "string",
+        "field": "auth_data",
+        "mandatory": "false",
+        "scope": "protected"
+    },
+    "authCode" : {
+        "type": "integer",
+        "field": "auth_code",
+        "minimum": "0",
+        "maximum": "99999",
+        "default": "0",
+        "mandatory": "false",
+        "scope": "private"
+    },
+    "authExpiration" : {
+        "type": "datetime",
+        "field": "auth_expiration",
+        "mandatory": "false",
+        "scope": "protected"
+    },
+    "authAttempts" : {
+        "type": "integer",
+        "field": "auth_attempts",
+        "default": "0",
+        "mandatory": "false",
+        "scope": "protected"
     }, 
     "companyId" : {
         "type": "link",

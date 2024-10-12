@@ -39,10 +39,14 @@ CREATE TABLE users(
 	firstname VARCHAR(30),
 	lastname VARCHAR(30),
 	account_locked BOOLEAN NOT NULL DEFAULT false,
-	validation_code INTEGER DEFAULT '0',
 	active BOOLEAN NOT NULL DEFAULT true,
 	last_use DATETIME,
 	administrator BOOLEAN NOT NULL DEFAULT false,
+	auth_action VARCHAR(16),
+	auth_data VARCHAR(255),
+	auth_code INTEGER DEFAULT '0',
+	auth_expiration DATETIME,
+	auth_attempts INTEGER DEFAULT '0',
 	PRIMARY KEY (id)
 );
 
