@@ -7,8 +7,10 @@ import ModelSingleton from '../model.js'
 import ControllerSingleton from '../controller.js'
 import { requireUserAuth } from './AuthRoutes.js'
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs'
-import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
+import { controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
+
+
 
 
 class AccountRoutes {
@@ -24,7 +26,8 @@ class AccountRoutes {
             try {
                 const userId = request.userId
                 assert(userId !== null)
-                const user = await accountModel.getUserProfile(userId)
+                let user = await accountModel.getUserProfile(userId)
+                user = buildPublicObjectVersion(userObjectDef, user)
                 view.json({ user })
             }
             catch(error) {

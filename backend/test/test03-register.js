@@ -300,13 +300,13 @@ describe('Test user registration', () => {
             expect(json).to.have.property('user')
             const user = json.user
             expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.property('id')
+            expect(user).to.have.keys([
+                'id', 'email', 'firstname', 'lastname', 'accountLocked', 
+                'active', 'lastUse', 'administrator', 'companyId'
+            ])
             expect(user.id).to.be.a('number')
-            expect(user).to.have.property('email')
             expect(user.email).to.be.a('string').and.to.equal(userEmail)
-            expect(user).to.have.property('accountLocked')
             expect(user.accountLocked).to.be.a('boolean').and.to.equal(false)
-            expect(user).to.have.property('active')
             expect(user.active).to.be.a('boolean').and.to.equal(true)
         })
 

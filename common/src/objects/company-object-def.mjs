@@ -17,7 +17,8 @@ const companyObjectDef = {
         "target" : "User",
         "field" : "id_manager",
         "table" : "users",
-        "mandatory": "false"
+        "mandatory": "false",
+        "scope": "public"
     },
 }
 
