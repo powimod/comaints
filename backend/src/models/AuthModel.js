@@ -279,11 +279,32 @@ class AuthModel {
         if (user === null)
             throw new ComaintApiErrorUnauthorized('error.invalid_email_or_password')
         const isPasswordValid = await this.#userModel.checkPassword(user.id, password)
-        if (! isPasswordValid)
+        if (! isPasswordValid) {
+            user.authAction = 'login'
+            if (user.authAttempts === null)
+                user.authAttempts = 0
+            user.authAttempts++
+            user.authExpiration = null
+            user.authCode = 0
+            user.authData = null
+            await this.#userModel.editUser(user)
             throw new ComaintApiErrorUnauthorized('error.invalid_email_or_password')
+        }
+        if (user.authAttempts >= this.#maxAuthAttempts)
+            throw new ComaintApiErrorUnauthorized('error.too_many_attempts')
+
         // TODO check account is not locked
         if (! user.active ) // FIXME active ou locked ?
             throw new Error("Your account is locked") // FIXME translation
+
+        if (user.authAction !== null) {
+            user.authAction = null
+            user.authAttempts = 0
+            user.authExpiration = null
+            user.authCode = 0
+            user.authData = null
+            await this.#userModel.editUser(user)
+        }
         return user
     }
 

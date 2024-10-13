@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import assert from 'assert'
 
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
-import { createUserAccount, deleteUserAccount, userPublicProperties } from './helpers.js'
+import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserByEmail } from './helpers.js'
 
 
 const ROUTE_LOGIN= 'api/v1/auth/login'
@@ -276,10 +276,114 @@ describe('Test user login', () => {
             expect(user.companyId).to.equal(null)
         })
 
+        it('Call logout route', async () => {
+            const json = await jsonPost(ROUTE_LOGOUT, {})
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('userId')
+            expect(json.userId).to.equal(null)
+            expect(json).to.have.property('access-token')
+            expect(json['access-token']).to.equal(null)
+            expect(json).to.have.property('refresh-token')
+            expect(json['refresh-token']).to.equal(null)
+            // check token in util.js
+            expect(accessToken).to.equal(null)
+            expect(refreshToken).to.equal(null)
+        })
+    })
+
+
+    describe(`Check too many login attempts detection`, () => {
+
+        //──────── first attempt to login with invalid password
+        it('First attempt to login with incorrect password', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, {
+                        email:user.email,
+                        password: `${PASSWORD}+X`
+                    })
+                expect.fail('Incorrect «password» parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+            }
+        })
+        it('Check user in database after first login attempt', async () => {
+            const dbUser = await getDatabaseUserByEmail(user.email)
+            expect(dbUser).to.have.property('auth_action')
+            expect(dbUser.auth_action).to.be.a('string').and.to.equal('login')
+            expect(dbUser).to.have.property('auth_attempts')
+            expect(dbUser.auth_attempts).to.be.a('number').and.to.equal(1)
+        })
+
+        //──────── second attempt to login with invalid password
+        it('Second attempt to login with incorrect password', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, {
+                        email:user.email,
+                        password: `${PASSWORD}+X`
+                    })
+                expect.fail('Incorrect «password» parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+            }
+        })
+        it('Check user in database after second login attempt', async () => {
+            const dbUser = await getDatabaseUserByEmail(user.email)
+            expect(dbUser).to.have.property('auth_action')
+            expect(dbUser.auth_action).to.be.a('string').and.to.equal('login')
+            expect(dbUser).to.have.property('auth_attempts')
+            expect(dbUser.auth_attempts).to.be.a('number').and.to.equal(2)
+        })
+
+        //──────── third attempt to login with invalid password
+        it('Third attempt to login with incorrect password', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, {
+                        email:user.email,
+                        password: `${PASSWORD}+X`
+                    })
+                expect.fail('Incorrect «password» parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+            }
+        })
+        it('Check user in database after third login attempt', async () => {
+            const dbUser = await getDatabaseUserByEmail(user.email)
+            expect(dbUser).to.have.property('auth_action')
+            expect(dbUser.auth_action).to.be.a('string').and.to.equal('login')
+            expect(dbUser).to.have.property('auth_attempts')
+            expect(dbUser.auth_attempts).to.be.a('number').and.to.equal(3)
+        })
+
+        //──────── fourth attempt to login with invalid password
+        it('Fourth attempt to login with incorrect password', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, {
+                        email:user.email,
+                        password: PASSWORD
+                    })
+                expect.fail('Too many login failure not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Server status 401 ({"error":"Number of attempts exceeded"})')
+            }
+        })
+        it('Check user in database after fourth login attempt', async () => {
+            const dbUser = await getDatabaseUserByEmail(user.email)
+            expect(dbUser).to.have.property('auth_action')
+            expect(dbUser.auth_action).to.be.a('string').and.to.equal('login')
+            expect(dbUser).to.have.property('auth_attempts')
+            expect(dbUser.auth_attempts).to.be.a('number').and.to.equal(3)
+        })
 
 
     })
-
 })
 
 

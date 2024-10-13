@@ -51,6 +51,28 @@ const deleteUserAccount = async (user) => {
     await requestDb('DELETE FROM users WHERE id=?', user.id)
 }
 
+const getDatabaseUserByEmail = async (email) => {
+    const res = await requestDb('select * from users where email=?', [ email ])
+    expect(res).to.be.instanceOf(Array)
+    const user = res[0]
+    expect(user).to.be.instanceOf(Object)
+    expect(user).to.have.property('email')
+    expect(user.email).to.equal(email)
+    return user
+}
+
+const getDatabaseUserById = async (userId) => {
+    const res = await requestDb('select * from users where id =?', [ userId])
+    expect(res).to.be.instanceOf(Array)
+    const user = res[0]
+    expect(user).to.be.instanceOf(Object)
+    expect(user).to.have.property('id')
+    expect(user.id).to.equal(userId)
+    return user
+}
+
+
+
 const userPublicProperties = [
     'id', 'email', 'firstname', 'lastname', 'accountLocked', 
     'active', 'lastUse', 'administrator', 'companyId'
@@ -59,5 +81,7 @@ const userPublicProperties = [
 export {
     createUserAccount,
     deleteUserAccount,
+    getDatabaseUserByEmail,
+    getDatabaseUserById,
     userPublicProperties 
 }
