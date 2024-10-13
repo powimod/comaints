@@ -66,25 +66,32 @@ class AuthModel {
 
     async validateRegistration(userId, authCode) {
 
-        const validated = await this.#userModel.checkAuthCode(userId, authCode)
-        if (! validated)
-            return false
-
         let user = await this.#userModel.getUserById(userId)
         if (user === null)
             throw new Error('User not found')
         if (! user.accountLocked)
             throw new ComaintApiError('error.account_not_locked')
+        if (user.authAttempts >= this.#maxAuthAttempts)
+            throw new ComaintApiErrorUnauthorized('error.too_many_attempts')
 
-        // unlock User account and reset validation code
-        user.accountLocked = false
-        user.authCode = 0
-        user.authAction = null
-        user.authExpiration = null
-        user.authAttempts = null
-        delete user.password // do not re-encrypt already encrypted password !
-        await this.#userModel.editUser(user)
-        return true
+        const validated = await this.#userModel.checkAuthCode(userId, authCode)
+        if (validated) {
+            // unlock User account and reset validation code
+            user.accountLocked = false
+            user.authCode = 0
+            user.authAction = null
+            user.authExpiration = null
+            user.authAttempts = null
+            delete user.password // do not re-encrypt already encrypted password !
+            await this.#userModel.editUser(user)
+            return true
+        }
+        else {
+            assert(! isNaN(user.authAttempts))
+            user.authAttempts++
+            await this.#userModel.editUser(user)
+            return false
+        }
     }
 
     async sendRegisterAuthCode(code, email, i18n_t) {

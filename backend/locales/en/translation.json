@@ -19,6 +19,7 @@
         "invalid_email_or_password": "Invalid EMail or password",
         "invalid_password": "Invalid password",
         "already_logged_in": "User already connected",
+        "too_many_attempts": "Number of attempts exceeded",
 		"prop": {
 			"is_not_defined": "Property «{{property}}» is not defined",
 			"has_no_value": "Property «{{property}}» has no value",

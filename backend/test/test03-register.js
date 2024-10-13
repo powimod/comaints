@@ -12,10 +12,14 @@ const ROUTE_PROFILE  = 'api/v1/account/profile'
 
 describe('Test user registration', () => {
 
-    const dte = new Date()
-    const userEmail = `u${dte.getTime()}@x.y`
     let authCode  = null
+    const dte = new Date()
+
+    const userEmail = `u${dte.getTime()}@x.y`
     let userId = null
+
+    const userEmail2 = `u${dte.getTime()}2@x.y`
+    let userId2 = null
 
     before( async () =>  {
         loadConfig()
@@ -24,6 +28,7 @@ describe('Test user registration', () => {
 
     after( async () =>  {
         await requestDb('DELETE FROM users WHERE email=?', userEmail)
+        await requestDb('DELETE FROM users WHERE email=?', userEmail2)
         await disconnectDb()
     }),
 
@@ -348,6 +353,20 @@ describe('Test user registration', () => {
             expect(refreshToken).to.equal(null)
         })
 
+        it('Check profile access when disconnected', async () => {
+            const res = await requestDb('select * from users where id=?', [ userId ])
+            const user = res[0]
+            expect(user).to.have.property('auth_action')
+            expect(user.auth_action).to.be.equal(null)
+            expect(user).to.have.property('auth_attempts')
+            expect(user.auth_attempts).to.be.equal(null)
+            expect(user).to.have.property('auth_expiration')
+            expect(user.auth_expiration).to.be.equal(null)
+            expect(user).to.have.property('auth_data')
+            expect(user.auth_data).to.be.equal(null)
+        })
+
+
         it('Call logout without being connected', async () => {
             try {
                 await jsonPost(ROUTE_LOGOUT, {})
@@ -358,9 +377,176 @@ describe('Test user registration', () => {
                 expect(error.message).to.equal(`Server status 401 ({"error":"User is not logged in"})`)
             }
         })
-
     })
 
-    // TODO test registration with an existing email
+    describe(`Check registration with too many attempts`, () => {
+
+        // register
+        it('User regisration', async () => {
+            const json = await jsonPost(ROUTE_REGISTER, {
+                email:userEmail2,
+                password:'aBcdef+ghijkl9',
+                sendCodeByEmail: false
+            })
+            expect(json).to.have.keys('access-token', 'refresh-token')
+            expect(json['access-token']).to.be.a('string')
+            expect(json['refresh-token']).to.be.a('string')
+        })
+
+        it('Check newly created user in database', async () => {
+            const res = await requestDb('select * from users where email=?', [ userEmail2 ])
+            expect(res).to.be.instanceOf(Array)
+            const user = res[0]
+            expect(user).to.be.instanceOf(Object)
+
+            expect(user).to.have.property('id')
+            userId2 = user.id
+
+            expect(user).to.have.property('account_locked')
+            expect(user.account_locked).to.a('number').and.to.equal(1) // true
+
+            // control auth_code first to initialize authCode
+            expect(user).to.have.property('auth_code')
+            authCode = user.auth_code
+            expect(authCode).to.be.a('number').and.to.be.above(0)
+            expect(user).to.have.property('auth_action')
+            expect(user.auth_action).to.be.a('string').and.to.equal('register')
+            expect(user).to.have.property('auth_attempts')
+            expect(user.auth_attempts).to.be.a('number').and.to.be.equal(0)
+            expect(user).to.have.property('auth_expiration')
+            expect(user.auth_expiration).not.to.be.equal(null)
+            expect(user.auth_expiration).to.be.a('Date')
+            expect(user).to.have.property('auth_data')
+            expect(user.auth_data).to.be.equal(null)
+        })
+
+ 
+        //───────────── First attempt
+        it('First attempt to confirm registration with an invalid code', async () => {
+            const incorrectCode = authCode + 1
+            const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('validated')
+            expect(json.validated).to.be.a('boolean').and.to.equal(false)
+            expect(json).to.have.property('userId')
+            expect(json.userId).to.be.a('number').and.to.equal(userId2)
+        })
+
+        it('Check user in database after first attempt', async () => {
+            const res = await requestDb('select * from users where email=?', [ userEmail2 ])
+            expect(res).to.be.instanceOf(Array)
+            const user = res[0]
+            expect(user).to.be.instanceOf(Object)
+
+            expect(user).to.have.property('id')
+            userId2 = user.id
+
+            expect(user).to.have.property('account_locked')
+            expect(user.account_locked).to.a('number').and.to.equal(1) // true
+
+            // control auth_code first to initialize authCode
+            expect(user).to.have.property('auth_code')
+            authCode = user.auth_code
+            expect(authCode).to.be.a('number').and.to.be.above(0)
+            expect(user).to.have.property('auth_action')
+            expect(user.auth_action).to.be.a('string').and.to.equal('register')
+            expect(user).to.have.property('auth_attempts')
+            expect(user.auth_attempts).to.be.a('number').and.to.be.equal(1)
+            expect(user).to.have.property('auth_expiration')
+            expect(user.auth_expiration).not.to.be.equal(null)
+            expect(user.auth_expiration).to.be.a('Date')
+            expect(user).to.have.property('auth_data')
+            expect(user.auth_data).to.be.equal(null)
+        })
+
+        //───────────── Second attempt
+        it('Second attempt to confirm registration with an invalid code', async () => {
+            const incorrectCode = authCode + 1
+            const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('validated')
+            expect(json.validated).to.be.a('boolean').and.to.equal(false)
+            expect(json).to.have.property('userId')
+            expect(json.userId).to.be.a('number').and.to.equal(userId2)
+        })
+
+        it('Check user in database after second attempt', async () => {
+            const res = await requestDb('select * from users where email=?', [ userEmail2 ])
+            expect(res).to.be.instanceOf(Array)
+            const user = res[0]
+            expect(user).to.be.instanceOf(Object)
+            expect(user).to.have.property('auth_code')
+            authCode = user.auth_code
+            expect(user).to.have.property('auth_attempts')
+            expect(user.auth_attempts).to.be.a('number').and.to.be.equal(2)
+        })
+
+
+        //───────────── Third attempt
+        it('Third attempt to confirm registration with an invalid code', async () => {
+            const incorrectCode = authCode + 1
+            const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('validated')
+            expect(json.validated).to.be.a('boolean').and.to.equal(false)
+            expect(json).to.have.property('userId')
+            expect(json.userId).to.be.a('number').and.to.equal(userId2)
+        })
+
+        it('Check user in database after third attempt', async () => {
+            const res = await requestDb('select * from users where email=?', [ userEmail2 ])
+            expect(res).to.be.instanceOf(Array)
+            const user = res[0]
+            expect(user).to.be.instanceOf(Object)
+            expect(user).to.have.property('auth_code')
+            authCode = user.auth_code
+            expect(user).to.have.property('auth_attempts')
+            expect(user.auth_attempts).to.be.a('number').and.to.be.equal(3)
+        })
+
+
+        //───────────── Fourth attempt locks account
+        it('Fourth attempt to confirm registration with an invalid code', async () => {
+            const incorrectCode = authCode + 1
+            try {
+                const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
+                expect.fail("Too many attempts was not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 401 ({"error":"Number of attempts exceeded"})`)
+            }
+        })
+
+        it('Check user in database after fourth attempt', async () => {
+            const res = await requestDb('select * from users where email=?', [ userEmail2 ])
+            expect(res).to.be.instanceOf(Array)
+            const user = res[0]
+            expect(user).to.be.instanceOf(Object)
+            expect(user).to.have.property('auth_code')
+            authCode = user.auth_code
+            expect(user).to.have.property('auth_attempts')
+            expect(user.auth_attempts).to.be.a('number').and.to.be.equal(3)
+            // account must be locked
+            expect(user).to.have.property('account_locked')
+            expect(user.account_locked).to.a('number').and.to.equal(1) // true
+        })
+
+        it('Call logout route', async () => {
+            const json = await jsonPost(ROUTE_LOGOUT, {})
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('userId')
+            expect(json.userId).to.equal(null)
+            expect(json).to.have.property('access-token')
+            expect(json['access-token']).to.equal(null)
+            expect(json).to.have.property('refresh-token')
+            expect(json['refresh-token']).to.equal(null)
+            // check token in util.js
+            expect(accessToken).to.equal(null)
+            expect(refreshToken).to.equal(null)
+        })
+    })
+
+
         
 })
