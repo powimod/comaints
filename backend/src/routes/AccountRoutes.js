@@ -10,9 +10,6 @@ import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiE
 import { controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 
-
-
-
 class AccountRoutes {
 
     initialize(expressApp) {
@@ -35,7 +32,6 @@ class AccountRoutes {
             }
         })
 
-        // public route
         expressApp.post('/api/v1/account/change-password', requireUserAuth, async (request, response) => {
             const view = new View(request, response)
             try {
@@ -78,6 +74,49 @@ class AccountRoutes {
                 view.error(error)
             }
         })
+
+
+        expressApp.post('/api/v1/account/change-email', requireUserAuth, async (request, response) => {
+            const view = new View(request, response)
+            try {
+                const userId = request.userId
+                assert(userId !== null)
+                const user = await accountModel.getUserProfile(userId)
+                if (! user)
+                    throw new Error('User not found')
+
+
+                let newEmail = request.body.email
+                if (newEmail === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'email'})
+                if (typeof(newEmail) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'newEmail'})
+                const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', newEmail)
+                if (errorMsg1)
+                    throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1)
+
+                let currentPassword = request.body.password
+                if (currentPassword === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'password'})
+                if (typeof(currentPassword) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'password'})
+                const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', currentPassword)
+                if (errorMsg2)
+                    throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
+
+                const isCurrentPassordValid = await accountModel.checkPassword(userId, currentPassword)
+                if (! isCurrentPassordValid )
+                    throw new ComaintApiErrorUnauthorized('error.invalid_password')
+
+                await accountModel.prepareEmailChange(userId, newEmail)
+
+                view.json({message: 'Done, waiting for validation code'})
+            }
+            catch(error) {
+                view.error(error)
+            }
+        })
+
 
     }
 }

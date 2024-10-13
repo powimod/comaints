@@ -4,7 +4,8 @@ import assert from 'assert'
 import jwt from 'jsonwebtoken'
 
 import ModelSingleton from '../model.js'
-import { ComaintApiError, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken } from '../../../common/src/error.mjs'
+import { ComaintApiError, ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken } 
+    from '../../../common/src/error.mjs'
 import MailManagerSingleton from '../MailManager.js'
 
 class AuthModel {
@@ -51,6 +52,7 @@ class AuthModel {
 
     async register(email, password, authCode, invalidateCodeImmediately) {
         const authAction = 'register'
+        const authAttempts = 0
         const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
         const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
         const user = await this.#userModel.createUser({
@@ -58,7 +60,8 @@ class AuthModel {
             password,
             authCode,
             authAction,
-            authExpiration
+            authExpiration,
+            authAttempts
         })
         return { user }
     }
@@ -281,8 +284,6 @@ class AuthModel {
         const isPasswordValid = await this.#userModel.checkPassword(user.id, password)
         if (! isPasswordValid) {
             user.authAction = 'login'
-            if (user.authAttempts === null)
-                user.authAttempts = 0
             user.authAttempts++
             user.authExpiration = null
             user.authCode = 0
@@ -314,6 +315,31 @@ class AuthModel {
         // userId is not used
         // let user = await this.#userModel.getUserById(userId)
         await this.#tokenModel.deleteTokenById(refreshTokenId)
+    }
+
+    async prepareEmailChange(userId, newEmail, invalidateCodeImmediately) {
+        let user = await this.#userModel.getUserById(userId)
+        if (user === null)
+            throw new Error('User not found')
+
+        if (user.email === newEmail)
+            throw new ComaintApiErrorInvalidRequest('error.same_email')
+
+        const otherUser = await this.#userModel.getUserByEmail(newEmail)
+        if (otherUser !== null)
+            throw new ComaintApiErrorInvalidRequest('error.already_used_email')
+
+        const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
+        const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
+
+        user.authAction = 'change-email'
+        user.authExpiration = authExpiration
+        user.authCode = this.generateAuthCode()
+        user.authData = newEmail
+        user.authAttempts = 0
+
+        user = await this.#userModel.editUser(user)
+        return user
     }
 
 }

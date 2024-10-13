@@ -12,7 +12,7 @@ const ROUTE_PROFILE  = 'api/v1/account/profile'
 
 const ROUTE_CHANGE_PASSWORD = 'api/v1/account/change-password'
 
-describe('Test account routes', () => {
+describe('Test change password route', () => {
 
     const CURRENT_PASSWORD = '4BC+d3f-6H1.lMn!'
     const NEW_PASSWORD = '3aK+E3g-6H3+zYg.'

@@ -21,6 +21,8 @@
         "already_logged_in": "User already connected",
         "too_many_attempts": "Number of attempts exceeded",
         "expired_code": "Expired code",
+        "same_email": "New email address is the same",
+        "already_used_email": "Email address is already used",
 		"prop": {
 			"is_not_defined": "Property «{{property}}» is not defined",
 			"has_no_value": "Property «{{property}}» has no value",

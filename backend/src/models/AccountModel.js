@@ -33,6 +33,9 @@ class AccountModel {
         return await this.#userModel.editUser({ id: userId, password })
     }
 
+    async prepareEmailChange(userId, email) {
+        return await this.#authModel.prepareEmailChange(userId, email)
+    }
 }
 
 
