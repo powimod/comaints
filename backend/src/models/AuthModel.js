@@ -49,9 +49,9 @@ class AuthModel {
     }
 
 
-    async register(email, password, authCode) {
+    async register(email, password, authCode, invalidateCodeImmediately) {
         const authAction = 'register'
-        const codeValidityPeriod = this.#codeValidityPeriod
+        const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
         const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
         const user = await this.#userModel.createUser({
             email,
@@ -73,6 +73,9 @@ class AuthModel {
             throw new ComaintApiError('error.account_not_locked')
         if (user.authAttempts >= this.#maxAuthAttempts)
             throw new ComaintApiErrorUnauthorized('error.too_many_attempts')
+        const now = new Date()
+        if (user.authExpiration < now)
+            throw new ComaintApiErrorUnauthorized('error.expired_code')
 
         const validated = await this.#userModel.checkAuthCode(userId, authCode)
         if (validated) {

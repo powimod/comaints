@@ -98,13 +98,17 @@ class AuthRoutes {
                     throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
 
                 // self-test does not send validation code by email
-                let sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ? request.body.sendCodeByEmail : true
+                const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ? 
+                    request.body.sendCodeByEmail : true
+
+                const invalidateCodeImmediately = (request.body.invalidateCodeImmediately !== undefined) ? 
+                    request.body.invalidateCodeImmediately : false
 
                 // make a random validation code which will be sent by email to unlock account
                 const authCode = authModel.generateAuthCode()
                 console.log(`Validation code is ${ authCode }`) // TODO remove this
 
-                const result = await authModel.register(email, password, authCode)
+                const result = await authModel.register(email, password, authCode, invalidateCodeImmediately)
 
                 const user = result.user
                 if (! user)

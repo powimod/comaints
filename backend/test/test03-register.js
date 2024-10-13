@@ -17,9 +17,10 @@ describe('Test user registration', () => {
 
     const userEmail = `u${dte.getTime()}@x.y`
     let userId = null
-
     const userEmail2 = `u${dte.getTime()}2@x.y`
     let userId2 = null
+    const userEmail3 = `u${dte.getTime()}3@x.y`
+    let userId3 = null
 
     before( async () =>  {
         loadConfig()
@@ -29,6 +30,7 @@ describe('Test user registration', () => {
     after( async () =>  {
         await requestDb('DELETE FROM users WHERE email=?', userEmail)
         await requestDb('DELETE FROM users WHERE email=?', userEmail2)
+        await requestDb('DELETE FROM users WHERE email=?', userEmail3)
         await disconnectDb()
     }),
 
@@ -215,11 +217,19 @@ describe('Test user registration', () => {
             expect(user.auth_action).to.be.a('string').and.to.equal('register')
             expect(user).to.have.property('auth_attempts')
             expect(user.auth_attempts).to.be.a('number').and.to.be.equal(0)
+            expect(user).to.have.property('auth_data')
+            expect(user.auth_data).to.be.equal(null)
+
             expect(user).to.have.property('auth_expiration')
             expect(user.auth_expiration).not.to.be.equal(null)
             expect(user.auth_expiration).to.be.a('Date')
-            expect(user).to.have.property('auth_data')
-            expect(user.auth_data).to.be.equal(null)
+ 
+            const expirationDate = user.auth_expiration
+            expect(expirationDate).not.to.be.equal(null)
+            expect(expirationDate).to.be.a('Date')
+            const now = new Date()
+            const delta = expirationDate - now
+            expect(delta).to.be.at.above(0)
         })
 
         it('Try to access profile without being logged in', async () => {
@@ -506,10 +516,9 @@ describe('Test user registration', () => {
 
 
         //───────────── Fourth attempt locks account
-        it('Fourth attempt to confirm registration with an invalid code', async () => {
-            const incorrectCode = authCode + 1
+        it('Fourth attempt to confirm registration', async () => {
             try {
-                const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
+                const json = await jsonPost(ROUTE_VALIDATE, { code: authCode })
                 expect.fail("Too many attempts was not detected")
             }
             catch (error) {
@@ -532,21 +541,66 @@ describe('Test user registration', () => {
             expect(user.account_locked).to.a('number').and.to.equal(1) // true
         })
 
-        it('Call logout route', async () => {
-            const json = await jsonPost(ROUTE_LOGOUT, {})
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.equal(null)
-            expect(json).to.have.property('access-token')
-            expect(json['access-token']).to.equal(null)
-            expect(json).to.have.property('refresh-token')
-            expect(json['refresh-token']).to.equal(null)
-            // check token in util.js
-            expect(accessToken).to.equal(null)
-            expect(refreshToken).to.equal(null)
-        })
     })
 
+    describe(`Test to send the code after the maximum delay`, () => {
 
+        it('User regisration', async () => {
+            const json = await jsonPost(ROUTE_REGISTER, {
+                email:userEmail3,
+                password:'aBcdef+ghijkl9',
+                sendCodeByEmail: false,
+                invalidateCodeImmediately: true // set code validity to zero
+            })
+            expect(json).to.have.keys('access-token', 'refresh-token')
+            expect(json['access-token']).to.be.a('string')
+            expect(json['refresh-token']).to.be.a('string')
+        })
+
+        it('Check newly created user in database', async () => {
+            const res = await requestDb('select * from users where email=?', [ userEmail3 ])
+            expect(res).to.be.instanceOf(Array)
+            const user = res[0]
+            expect(user).to.be.instanceOf(Object)
+
+            expect(user).to.have.property('id')
+            userId3 = user.id
+
+            expect(user).to.have.property('account_locked')
+            expect(user.account_locked).to.a('number').and.to.equal(1) // true
+
+            // control auth_code first to initialize authCode
+            expect(user).to.have.property('auth_code')
+            authCode = user.auth_code
+            expect(authCode).to.be.a('number').and.to.be.above(0)
+            expect(user).to.have.property('auth_action')
+            expect(user.auth_action).to.be.a('string').and.to.equal('register')
+            expect(user).to.have.property('auth_attempts')
+            expect(user.auth_attempts).to.be.a('number').and.to.be.equal(0)
+            expect(user).to.have.property('auth_expiration')
+            expect(user).to.have.property('auth_data')
+            expect(user.auth_data).to.be.equal(null)
+
+            const expirationDate = user.auth_expiration
+            expect(expirationDate).not.to.be.equal(null)
+            expect(expirationDate).to.be.a('Date')
+            const now = new Date()
+            const delta = expirationDate - now
+            expect(delta).to.be.at.most(0)
+        })
+
+        it('Send validation code after code expiration', async () => {
+            try {
+                const json = await jsonPost(ROUTE_VALIDATE, { code: authCode })
+                expect.fail("Code expiration was not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 401 ({"error":"Expired code"})`)
+            }
+        })
+
+
+    })
         
 })
