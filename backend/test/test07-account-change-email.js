@@ -5,6 +5,9 @@ import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refr
 import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserById } from './helpers.js'
 
 const ROUTE_CHANGE_EMAIL = 'api/v1/account/change-email'
+const ROUTE_VALIDATE = 'api/v1/auth/validate'
+const ROUTE_LOGIN= 'api/v1/auth/login'
+const ROUTE_LOGOUT   = 'api/v1/auth/logout'
 
 describe('Test change password route', () => {
 
@@ -135,8 +138,6 @@ describe('Test change password route', () => {
                 expect(error.message).to.equal('Server status 400 ({"error":"Email address is already used"})')
             }
         })
-
-
     })
 
     describe('Call change email route with valid email', () => {
@@ -148,14 +149,90 @@ describe('Test change password route', () => {
             expect(json.message).to.be.a('string').and.to.equal('Done, waiting for validation code')
         })
 
-        it('Check user in database', async () => {
+        it('Check user in database before code validation', async () => {
             const dbUser = await getDatabaseUserById(user.id)
             expect(dbUser).to.be.instanceOf(Object)
             expect(dbUser.email).to.equal(originalEmail) // email not yet changed
             expect(dbUser.auth_action).to.equal('change-email')
             expect(dbUser.auth_data).to.equal(newEmail) // future email
-            expect(dbUser.auth_code).to.be.above(0)
             expect(dbUser.auth_attempts).to.be.equal(0)
+            expect(dbUser.auth_code).to.be.above(0)
+            authCode = dbUser.auth_code
+        })
+
+        it('Call route with incorrect code', async () => {
+            const badCode = authCode + 1
+            const json = await jsonPost(ROUTE_VALIDATE, { code: badCode})
+            expect(json).to.have.property('validated')
+            expect(json.validated).to.be.a('boolean').and.to.equal(false)
+        })
+
+        it('Check user in database after bad code attempt', async () => {
+            const dbUser = await getDatabaseUserById(user.id)
+            expect(dbUser).to.be.instanceOf(Object)
+            expect(dbUser.email).to.be.equal(originalEmail)
+            expect(dbUser.auth_action).to.be.a('string').and.to.equal('change-email')
+            expect(dbUser.auth_attempts).to.be.a('number').and.to.be.equal(1)
+            expect(dbUser.auth_data).to.be.equal(newEmail)
+        })
+
+
+        it('Call route to validate email change', async () => {
+            const json = await jsonPost(ROUTE_VALIDATE, { code: authCode})
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('validated')
+            expect(json.validated).to.be.a('boolean').and.to.equal(true)
+            expect(json).to.have.property('userId')
+            expect(json.userId).to.be.a('number').and.to.equal(user.id)
+        })
+
+        it('Check user in database after code validation', async () => {
+            const dbUser = await getDatabaseUserById(user.id)
+            expect(dbUser).to.be.instanceOf(Object)
+            expect(dbUser.email).to.equal(newEmail)
+            expect(dbUser.auth_action).to.equal(null)
+            expect(dbUser.auth_data).to.equal(null)
+            expect(dbUser.auth_attempts).to.be.equal(null)
+            expect(dbUser.auth_code).to.be.equal(null)
+        })
+
+        it('Call logout route', async () => {
+            const json = await jsonPost(ROUTE_LOGOUT, {})
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('userId')
+            expect(json.userId).to.equal(null)
+            expect(json).to.have.property('access-token')
+            expect(json['access-token']).to.equal(null)
+            expect(json).to.have.property('refresh-token')
+            expect(json['refresh-token']).to.equal(null)
+            // check token in util.js
+            expect(accessToken).to.equal(null)
+            expect(refreshToken).to.equal(null)
+        })
+
+        it('Try to login with previous email', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, { email: originalEmail, password: PASSWORD })
+                expect.fail("Attempt to log with previous email not detected")
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal(`Server status 401 ({"error":"Invalid EMail or password"})`)
+            }
+        })
+
+
+
+        it('Check login with new email', async () => {
+            let json = await jsonPost(ROUTE_LOGIN, { email: newEmail, password: PASSWORD })
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('access-token')
+            expect(json['access-token']).to.be.a('string')
+            expect(json).to.have.property('refresh-token')
+            expect(json['refresh-token']).to.be.a('string')
+            // check token in util.js
+            expect(accessToken).not.to.equal(null)
+            expect(refreshToken).not.to.equal(null)
         })
 
     })

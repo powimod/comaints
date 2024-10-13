@@ -113,7 +113,6 @@ class AuthRoutes {
                 const user = result.user
                 if (! user)
                     throw new Error('User not found in result')
-                console.log("dOm user", user)
 
                 if (user.password !== undefined)
                     throw new Error('User object should not have a password property')
@@ -149,14 +148,14 @@ class AuthRoutes {
         })
 
 
-        // public route
-        expressApp.post('/api/v1/auth/validateRegistration', async (request, response) => {
+        // public route(for registration, private route for email change
+        expressApp.post('/api/v1/auth/validate', async (request, response) => {
             const view = new View(request, response)
             try {
-                // get IDs obtained from HTTP header token
+                // get IDs from access token
                 const userId = request.userId
                 if (userId === null)
-                    throw new Error('User ID not found in request header')
+                    throw new Error('Access token not found in HTTP header')
                 const companyId = request.companyId // can be null with newly registered user
                 const refreshTokenId = request.refreshTokenId
                 assert (refreshTokenId !== null)
@@ -169,7 +168,8 @@ class AuthRoutes {
                 const [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'authCode',code)
                 if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
-                const validated = await authModel.validateRegistration(userId, code)
+
+                const validated = await authModel.validateCode(userId, code)
 
                 const jsonResponse = { validated, userId } // send userId to make API-Lib detect context change
                 if (validated) {
@@ -181,6 +181,7 @@ class AuthRoutes {
                 view.json(jsonResponse)
             }
             catch(error) {
+                console.log("dOm error", error)
                 view.error(error)
             }
         })

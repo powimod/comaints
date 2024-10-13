@@ -6,7 +6,7 @@ import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refr
 import { userPublicProperties } from './helpers.js'
 
 const ROUTE_REGISTER = 'api/v1/auth/register'
-const ROUTE_VALIDATE = 'api/v1/auth/validateRegistration'
+const ROUTE_VALIDATE = 'api/v1/auth/validate'
 const ROUTE_LOGOUT   = 'api/v1/auth/logout'
 const ROUTE_PROFILE  = 'api/v1/account/profile'
 
@@ -318,7 +318,7 @@ describe('Test user registration', () => {
             expect(user.administrator).to.a('number').and.to.equal(0)
 
             expect(user).to.have.property('auth_code')
-            expect(user.auth_code).to.be.a('number').and.to.equal(0) // false
+            expect(user.auth_code).to.equal(null)
 
             expect(user).to.have.property('auth_action')
             expect(user.auth_action).to.be.to.equal(null)

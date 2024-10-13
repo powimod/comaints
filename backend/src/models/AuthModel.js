@@ -4,7 +4,7 @@ import assert from 'assert'
 import jwt from 'jsonwebtoken'
 
 import ModelSingleton from '../model.js'
-import { ComaintApiError, ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken } 
+import { ComaintApiError, ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken }
     from '../../../common/src/error.mjs'
 import MailManagerSingleton from '../MailManager.js'
 
@@ -67,13 +67,11 @@ class AuthModel {
     }
 
 
-    async validateRegistration(userId, authCode) {
+    async validateCode(userId, authCode) {
 
         let user = await this.#userModel.getUserById(userId)
         if (user === null)
             throw new Error('User not found')
-        if (! user.accountLocked)
-            throw new ComaintApiError('error.account_not_locked')
         if (user.authAttempts >= this.#maxAuthAttempts)
             throw new ComaintApiErrorUnauthorized('error.too_many_attempts')
         const now = new Date()
@@ -82,12 +80,27 @@ class AuthModel {
 
         const validated = await this.#userModel.checkAuthCode(userId, authCode)
         if (validated) {
-            // unlock User account and reset validation code
-            user.accountLocked = false
-            user.authCode = 0
+
+            const action = user.authAction
+            switch (action) {
+                case 'register' :
+                    if (! user.accountLocked)
+                        throw new ComaintApiError('error.account_not_locked')
+                    user.accountLocked = false
+                    break
+                case 'change-email' :
+                    user.email = user.authData
+                    break
+                default:
+                    throw new Error(`Invalid action «${action}»`)
+            }
+
+            user.authCode = null
             user.authAction = null
+            user.authData = null
             user.authExpiration = null
             user.authAttempts = null
+
             delete user.password // do not re-encrypt already encrypted password !
             await this.#userModel.editUser(user)
             return true
