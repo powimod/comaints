@@ -117,7 +117,7 @@ class AuthModel {
         assert(code   !== undefined && typeof(code)   === 'number')
         assert(email  !== undefined && typeof(email)  === 'string')
         assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
-        const subject = i18n_t('register.mail_title')
+        const subject  = i18n_t('register.mail_title')
         const textBody = i18n_t('register.mail_body', { 'code' : code })
         const htmlBody = i18n_t('register.mail_body', { 'code' : `<b>${code}</b>code` })
         const mailManager = MailManagerSingleton.getInstance()
@@ -132,6 +132,17 @@ class AuthModel {
         const subject  = i18n_t('change_email.mail_title')
         const textBody = i18n_t('change_email.mail_body', { 'code' : code })
         const htmlBody = i18n_t('change_email.mail_body', { 'code' : `<b>${code}</b>code` })
+        const mailManager = MailManagerSingleton.getInstance()
+        return await mailManager.sendMail(email, subject, textBody, htmlBody)
+    }
+
+    async sendAccountDeletionAuthCode(code, email, i18n_t) {
+        assert(code   !== undefined && typeof(code)   === 'number')
+        assert(email  !== undefined && typeof(email)  === 'string')
+        assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
+        const subject  = i18n_t('account_deletion.mail_title')
+        const textBody = i18n_t('account_deletion.mail_body', { 'code' : code })
+        const htmlBody = i18n_t('account_deletion.mail_body', { 'code' : `<b>${code}</b>code` })
         const mailManager = MailManagerSingleton.getInstance()
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
@@ -154,7 +165,6 @@ class AuthModel {
             expiresIn: `${this.#accessTokenLifespan}s` // seconds
         })
     }
-
 
     checkAccessToken(token, expiredAccessTokenEmulation = false) {
         const expiredTokenErrorMessage = "Expired access token"
@@ -334,7 +344,7 @@ class AuthModel {
         await this.#tokenModel.deleteTokenById(refreshTokenId)
     }
 
-    async prepareEmailChange(userId, newEmail, invalidateCodeImmediately) {
+    async prepareEmailChange(userId, newEmail, authCode, invalidateCodeImmediately) {
         let user = await this.#userModel.getUserById(userId)
         if (user === null)
             throw new Error('User not found')
@@ -351,13 +361,32 @@ class AuthModel {
 
         user.authAction = 'change-email'
         user.authExpiration = authExpiration
-        user.authCode = this.generateAuthCode()
+        user.authCode = authCode
         user.authData = newEmail
         user.authAttempts = 0
 
         user = await this.#userModel.editUser(user)
         return user
     }
+
+    async prepareAccountDeletion(userId, authCode, invalidateCodeImmediately) {
+        let user = await this.#userModel.getUserById(userId)
+        if (user === null)
+            throw new Error('User not found')
+
+        const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
+        const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
+
+        user.authAction = 'account-deletion'
+        user.authExpiration = authExpiration
+        user.authCode = authCode
+        user.authData = null
+        user.authAttempts = 0
+
+        user = await this.#userModel.editUser(user)
+        return user
+    }
+
 
 }
 

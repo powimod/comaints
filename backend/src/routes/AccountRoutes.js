@@ -118,7 +118,7 @@ class AccountRoutes {
                 const authCode = accountModel.generateAuthCode()
                 console.log(`Validation code is ${ authCode }`) // TODO remove this
 
-                user = await accountModel.prepareEmailChange(userId, newEmail)
+                user = await accountModel.prepareEmailChange(userId, newEmail, authCode, invalidateCodeImmediately)
 
                 if (sendCodeByEmail)
                     await accountModel.sendChangeEmailAuthCode(authCode, user.email, newEmail, view.translation)
@@ -130,6 +130,47 @@ class AccountRoutes {
             }
         })
 
+        expressApp.post('/api/v1/account/delete', requireUserAuth, async (request, response) => {
+            const view = new View(request, response)
+            try {
+                const userId = request.userId
+                assert(userId !== null)
+                let user = await accountModel.getUserProfile(userId)
+                if (! user)
+                    throw new Error('User not found')
+
+                let confirmation = request.body.confirmation
+                if (confirmation === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'confirmation'})
+                if (typeof(confirmation) !== 'boolean')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'confirmation'})
+
+                // TODO check if user can be delete with administrator and companyId properties
+                // yes if companyId is null
+                // yes if campanyId is not null but he is not an administrator
+
+                const invalidateCodeImmediately = (request.body.invalidateCodeImmediately !== undefined) ?
+                    request.body.invalidateCodeImmediately : false
+
+                // self-test does not send validation code by email
+                const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
+                    request.body.sendCodeByEmail : true
+
+                // make a random validation code which will be sent by email to delete account
+                const authCode = accountModel.generateAuthCode()
+                console.log(`Validation code is ${ authCode }`) // TODO remove this
+
+                user = await accountModel.prepareAccountDeletion(userId, authCode, invalidateCodeImmediately)
+
+                if (sendCodeByEmail)
+                    await accountModel.sendAccountDeletionAuthCode(authCode, user.email, view.translation)
+
+                view.json({message: 'Done, waiting for validation code'})
+            }
+            catch(error) {
+                view.error(error)
+            }
+        })
 
     }
 }

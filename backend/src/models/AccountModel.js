@@ -25,10 +25,6 @@ class AccountModel {
         return this.#authModel.generateAuthCode()
     }
 
-    sendChangeEmailAuthCode(authCode, originalEmail, newEmail, translation) {
-        return this.#authModel.sendChangeEmailAuthCode(authCode, originalEmail, newEmail, translation)
-    }
-
     async checkPassword(userId, password) {
         return await this.#userModel.checkPassword(userId, password)
     }
@@ -37,9 +33,23 @@ class AccountModel {
         return await this.#userModel.editUser({ id: userId, password })
     }
 
-    async prepareEmailChange(userId, email) {
-        return await this.#authModel.prepareEmailChange(userId, email)
+    sendChangeEmailAuthCode(authCode, originalEmail, newEmail, translation) {
+        return this.#authModel.sendChangeEmailAuthCode(authCode, originalEmail, newEmail, translation)
     }
+
+    async prepareEmailChange(userId, email, authCode, invalidateCodeImmediately) {
+        return await this.#authModel.prepareEmailChange(userId, email, authCode, invalidateCodeImmediately)
+    }
+
+    async prepareAccountDeletion(userId, authCode, invalidateCodeImmediately) {
+        return await this.#authModel.prepareAccountDeletion(userId, authCode, invalidateCodeImmediately)
+    }
+
+    sendAccountDeletionAuthCode(authCode, email, translation) {
+        return this.#authModel.sendAccountDeletionAuthCode(authCode, email, translation)
+    }
+
+
 }
 
 

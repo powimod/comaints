@@ -52,6 +52,10 @@
 		"mail_body": "Hello,\nYour validation code for the creation of an account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
 		"mail_title": "[Comaint] - New account registration"
 	},
+	"account_deletion": {
+		"mail_body": "Hello,\nYour validation code for the definitive deletion of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
+		"mail_title": "[Comaint] Deletion of your account"
+	},
 	"change_email": {
 		"mail_body": "Hello,\nYour validation code to change the email address of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
 		"mail_title": "[Comaint] email address change"
