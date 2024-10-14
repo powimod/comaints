@@ -127,15 +127,12 @@ class AuthRoutes {
                 if (companyId !== null)
                     throw new Error('companyId should be null')
 
-
                 if (sendCodeByEmail)
                     await authModel.sendRegisterAuthCode(authCode, email, view.translation)
 
                 // access token with userConnected = false
                 const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId)
                 const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , false)
-
-                // TODO use newly create access and refresh tokens
 
                 view.json({
                     'refresh-token': newRefreshToken,
@@ -181,7 +178,6 @@ class AuthRoutes {
                 view.json(jsonResponse)
             }
             catch(error) {
-                console.log("dOm error", error)
                 view.error(error)
             }
         })

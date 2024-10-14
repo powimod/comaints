@@ -114,22 +114,26 @@ class AuthModel {
     }
 
     async sendRegisterAuthCode(code, email, i18n_t) {
-        assert(code !== undefined)
-        assert(typeof(code) === 'number')
-        assert(email !== undefined)
-        assert(typeof(email) === 'string')
-        assert(i18n_t !== undefined)
-        assert(typeof(i18n_t) === 'function')
+        assert(code   !== undefined && typeof(code)   === 'number')
+        assert(email  !== undefined && typeof(email)  === 'string')
+        assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
         const subject = i18n_t('register.mail_title')
         const textBody = i18n_t('register.mail_body', { 'code' : code })
         const htmlBody = i18n_t('register.mail_body', { 'code' : `<b>${code}</b>code` })
-        const mailManger = MailManagerSingleton.getInstance()
-        return await mailManager.sendMail(
-                email,
-                subject,
-                textBody,
-                htmlBody
-        )
+        const mailManager = MailManagerSingleton.getInstance()
+        return await mailManager.sendMail(email, subject, textBody, htmlBody)
+    }
+
+    async sendChangeEmailAuthCode(code, email, newEmail, i18n_t) {
+        assert(code      !== undefined && typeof(code)      === 'number')
+        assert(email     !== undefined && typeof(email)     === 'string')
+        assert(newEmail  !== undefined && typeof(newEmail)  === 'string')
+        assert(i18n_t    !== undefined && typeof(i18n_t)    === 'function')
+        const subject  = i18n_t('change_email.mail_title')
+        const textBody = i18n_t('change_email.mail_body', { 'code' : code })
+        const htmlBody = i18n_t('change_email.mail_body', { 'code' : `<b>${code}</b>code` })
+        const mailManager = MailManagerSingleton.getInstance()
+        return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
 
     generateAccessToken(userId, companyId, refreshTokenId, connected) {

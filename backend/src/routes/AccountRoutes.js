@@ -81,10 +81,9 @@ class AccountRoutes {
             try {
                 const userId = request.userId
                 assert(userId !== null)
-                const user = await accountModel.getUserProfile(userId)
+                let user = await accountModel.getUserProfile(userId)
                 if (! user)
                     throw new Error('User not found')
-
 
                 let newEmail = request.body.email
                 if (newEmail === undefined)
@@ -108,7 +107,21 @@ class AccountRoutes {
                 if (! isCurrentPassordValid )
                     throw new ComaintApiErrorUnauthorized('error.invalid_password')
 
-                await accountModel.prepareEmailChange(userId, newEmail)
+                // self-test does not send validation code by email
+                const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
+                    request.body.sendCodeByEmail : true
+
+                const invalidateCodeImmediately = (request.body.invalidateCodeImmediately !== undefined) ?
+                    request.body.invalidateCodeImmediately : false
+
+                // make a random validation code which will be sent by email to unlock account
+                const authCode = accountModel.generateAuthCode()
+                console.log(`Validation code is ${ authCode }`) // TODO remove this
+
+                user = await accountModel.prepareEmailChange(userId, newEmail)
+
+                if (sendCodeByEmail)
+                    await accountModel.sendChangeEmailAuthCode(authCode, user.email, newEmail, view.translation)
 
                 view.json({message: 'Done, waiting for validation code'})
             }

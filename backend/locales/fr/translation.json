@@ -49,8 +49,11 @@
 		}
     },
 	"register": {
-		"account_already_exists" : "Un compte avec cet email existe déjà",
 		"mail_body": "Bonjour,\nVotre code pour la création d'un compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
-		"mail_title": "Enregistrement Comaint"
+		"mail_title": "[Comaint] Enregistrement d'un nouveau compte"
+	},
+	"change_email": {
+		"mail_body": "Bonjour,\nVotre code pour le changement de l'adresse e-mail de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
+		"mail_title": "[Comaint] Changement d'adresse e-mail"
 	}
 }

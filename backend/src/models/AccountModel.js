@@ -25,6 +25,10 @@ class AccountModel {
         return this.#authModel.generateAuthCode()
     }
 
+    sendChangeEmailAuthCode(authCode, originalEmail, newEmail, translation) {
+        return this.#authModel.sendChangeEmailAuthCode(authCode, originalEmail, newEmail, translation)
+    }
+
     async checkPassword(userId, password) {
         return await this.#userModel.checkPassword(userId, password)
     }

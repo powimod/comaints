@@ -143,7 +143,7 @@ describe('Test change password route', () => {
     describe('Call change email route with valid email', () => {
 
         it('Call route to change email', async () => {
-            const json = await jsonPost(ROUTE_CHANGE_EMAIL, {email:newEmail, password:PASSWORD})
+            const json = await jsonPost(ROUTE_CHANGE_EMAIL, {email:newEmail, password:PASSWORD, sendCodeByEmail: false})
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('message')
             expect(json.message).to.be.a('string').and.to.equal('Done, waiting for validation code')
@@ -220,8 +220,6 @@ describe('Test change password route', () => {
                 expect(error.message).to.equal(`Server status 401 ({"error":"Invalid EMail or password"})`)
             }
         })
-
-
 
         it('Check login with new email', async () => {
             let json = await jsonPost(ROUTE_LOGIN, { email: newEmail, password: PASSWORD })
