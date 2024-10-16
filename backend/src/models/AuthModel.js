@@ -67,8 +67,9 @@ class AuthModel {
     }
 
 
-    async validateCode(userId, authCode) {
-
+    async checkAuthCode(userId, authCode) {
+        assert(userId !== undefined)
+        assert(authCode !== undefined)
         let user = await this.#userModel.getUserById(userId)
         if (user === null)
             throw new Error('User not found')
@@ -79,38 +80,47 @@ class AuthModel {
             throw new ComaintApiErrorUnauthorized('error.expired_code')
 
         const validated = await this.#userModel.checkAuthCode(userId, authCode)
-        if (validated) {
-
-            const action = user.authAction
-            switch (action) {
-                case 'register' :
-                    if (! user.accountLocked)
-                        throw new ComaintApiError('error.account_not_locked')
-                    user.accountLocked = false
-                    break
-                case 'change-email' :
-                    user.email = user.authData
-                    break
-                default:
-                    throw new Error(`Invalid action «${action}»`)
-            }
-
-            user.authCode = null
-            user.authAction = null
-            user.authData = null
-            user.authExpiration = null
-            user.authAttempts = null
-
-            delete user.password // do not re-encrypt already encrypted password !
-            await this.#userModel.editUser(user)
-            return true
-        }
-        else {
+        if (! validated) {
             assert(! isNaN(user.authAttempts))
             user.authAttempts++
             await this.#userModel.editUser(user)
             return false
         }
+        return true
+    }
+
+    async processAuthOperation(userId) {
+        assert(userId !== undefined)
+        let user = await this.#userModel.getUserById(userId)
+        if (user === null)
+            throw new Error('User not found')
+        const action = user.authAction
+        switch (action) {
+            case 'register' :
+                if (! user.accountLocked)
+                    throw new ComaintApiError('error.account_not_locked')
+                user.accountLocked = false
+                break
+            case 'change-email' :
+                user.email = user.authData
+                break
+            case 'account-deletion' :
+                await this.#userModel.deleteUserById(user.id)
+                user = null
+                break
+            default:
+                throw new Error(`Invalid action «${action}»`)
+        }
+        if (user !== null) {
+            user.authCode = null
+            user.authAction = null
+            user.authData = null
+            user.authExpiration = null
+            user.authAttempts = null
+            delete user.password // do not re-encrypt already encrypted password !
+            await this.#userModel.editUser(user)
+        }
+        return user
     }
 
     async sendRegisterAuthCode(code, email, i18n_t) {

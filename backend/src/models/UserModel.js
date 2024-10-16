@@ -62,9 +62,9 @@ class UserModel {
 
     async createUser(user) {
         user.accountLocked = true
-		if (user.password === undefined || user.password === null)
-			throw new Error('User password missing')
-		await this.encryptPasswordIfPresent(user)
+        if (user.password === undefined || user.password === null)
+            throw new Error('User password missing')
+        await this.encryptPasswordIfPresent(user)
 
         const [ fieldNames, fieldValues ] = buildFieldArrays(userObjectDef, user)
         const markArray = Array(fieldValues.length).fill('?').join(',')
@@ -94,25 +94,25 @@ class UserModel {
 
 
     async editUser(user) {
-		await this.encryptPasswordIfPresent(user)
+        await this.encryptPasswordIfPresent(user)
 
         const [ fieldNames, fieldValues ] = buildFieldArrays(userObjectDef, user)
-		const sqlRequest = `UPDATE users SET ${fieldNames.map(field => `${field}=?`).join(', ')} WHERE id = ?`
-		fieldValues.push(user.id) // WHERE clause
+        const sqlRequest = `UPDATE users SET ${fieldNames.map(field => `${field}=?`).join(', ')} WHERE id = ?`
+        fieldValues.push(user.id) // WHERE clause
 
-		const result = await this.#db.query(sqlRequest, fieldValues)
-		const userId = user.id
-		user = this.getUserById(userId)
-		return user
+        const result = await this.#db.query(sqlRequest, fieldValues)
+        const userId = user.id
+        user = this.getUserById(userId)
+        return user
     }
 
 
-	async encryptPasswordIfPresent(user) {
-		assert (user !== undefined)
-		if (user.password === undefined)
-			return
-		user.password = await bcrypt.hash(user.password, this.#hashSalt)
-	}
+    async encryptPasswordIfPresent(user) {
+        assert (user !== undefined)
+        if (user.password === undefined)
+            return
+        user.password = await bcrypt.hash(user.password, this.#hashSalt)
+    }
 
 
 
@@ -130,7 +130,7 @@ class UserModel {
         if (result.length === 0)
             throw new Error('User not found')
         const hashedPassword = result[0].password
-		const isValid = await bcrypt.compare(password, hashedPassword)
+        const isValid = await bcrypt.compare(password, hashedPassword)
         return isValid
 
     }
@@ -154,6 +154,14 @@ class UserModel {
         return validated
     }
 
+    async deleteUserById(userId){
+        assert(userId !== undefined)
+        if (typeof(userId) !== 'number')
+            throw new Error('Argument <userId> is not a number');
+        const sql = `DELETE FROM users WHERE id = ?`;
+        const result = await this.#db.query(sql, [userId]);
+        return (result.affectedRows !== 0)
+    }
 }
 
 

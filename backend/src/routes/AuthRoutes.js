@@ -150,7 +150,7 @@ class AuthRoutes {
             const view = new View(request, response)
             try {
                 // get IDs from access token
-                const userId = request.userId
+                let userId = request.userId
                 if (userId === null)
                     throw new Error('Access token not found in HTTP header')
                 const companyId = request.companyId // can be null with newly registered user
@@ -166,15 +166,20 @@ class AuthRoutes {
                 if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
 
-                const validated = await authModel.validateCode(userId, code)
+                const isAuthCodeValid = await authModel.checkAuthCode(userId, code)
 
-                const jsonResponse = { validated, userId } // send userId to make API-Lib detect context change
-                if (validated) {
+                const jsonResponse = {}
+                if (isAuthCodeValid) {
+                    const user = await authModel.processAuthOperation(userId)
+                    userId = (user === null) ? null : user.id
                     // generate a new access token with userConnected = true
                     const newAccessToken  = await authModel.generateAccessToken(userId, companyId, refreshTokenId, true)
                     jsonResponse['access-token'] = newAccessToken
                 }
 
+                // send userId to make API-Lib detect context change
+                jsonResponse.userId = userId
+                jsonResponse.validated = isAuthCodeValid
                 view.json(jsonResponse)
             }
             catch(error) {

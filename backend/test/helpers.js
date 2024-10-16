@@ -64,10 +64,9 @@ const getDatabaseUserByEmail = async (email) => {
 const getDatabaseUserById = async (userId) => {
     const res = await requestDb('select * from users where id =?', [ userId])
     expect(res).to.be.instanceOf(Array)
+    if (res.length === 0)
+        return null // user not found with this id
     const user = res[0]
-    expect(user).to.be.instanceOf(Object)
-    expect(user).to.have.property('id')
-    expect(user.id).to.equal(userId)
     return user
 }
 
