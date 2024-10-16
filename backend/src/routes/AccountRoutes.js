@@ -115,7 +115,7 @@ class AccountRoutes {
                     request.body.invalidateCodeImmediately : false
 
                 // make a random validation code which will be sent by email to unlock account
-                const authCode = accountModel.generateAuthCode()
+                const authCode = accountModel.generateRandomAuthCode()
                 console.log(`Validation code is ${ authCode }`) // TODO remove this
 
                 user = await accountModel.prepareEmailChange(userId, newEmail, authCode, invalidateCodeImmediately)
@@ -157,7 +157,7 @@ class AccountRoutes {
                     request.body.sendCodeByEmail : true
 
                 // make a random validation code which will be sent by email to delete account
-                const authCode = accountModel.generateAuthCode()
+                const authCode = accountModel.generateRandomAuthCode()
                 console.log(`Validation code is ${ authCode }`) // TODO remove this
 
                 user = await accountModel.prepareAccountDeletion(userId, authCode, invalidateCodeImmediately)

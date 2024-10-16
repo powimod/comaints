@@ -43,10 +43,12 @@ class AuthModel {
         this.#tokenModel = model.getTokenModel()
     }
 
-    generateAuthCode() {
+    generateRandomAuthCode() {
         const minimum = 10000
         const maximum = 99999
-        return parseInt(Math.random() * (maximum - minimum) + minimum)
+        const authCode = parseInt(Math.random() * (maximum - minimum) + minimum)
+        console.log(`Validation code is ${ authCode }`) // TODO remove this
+        return authCode
     }
 
 
@@ -123,14 +125,16 @@ class AuthModel {
         return user
     }
 
-    async resendAuthCode(userId) {
+    async changeAuthCode(userId, newAuthCode) {
         assert(userId !== undefined)
         let user = await this.#userModel.getUserById(userId)
         if (user === null)
             throw new Error('User not found')
         if (user.authAction === null)
             throw new ComaintApiErrorInvalidRequest('error.no_auth_in_progress')
-        throw new Error('not implemented')
+        user.authCode = newAuthCode
+        delete user.password // do not re-encrypt already encrypted password !
+        await this.#userModel.editUser(user)
     }
 
     async sendRegisterAuthCode(code, email, i18n_t) {

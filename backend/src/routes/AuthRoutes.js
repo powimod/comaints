@@ -104,9 +104,7 @@ class AuthRoutes {
                 const invalidateCodeImmediately = (request.body.invalidateCodeImmediately !== undefined) ? 
                     request.body.invalidateCodeImmediately : false
 
-                // make a random validation code which will be sent by email to unlock account
-                const authCode = authModel.generateAuthCode()
-                console.log(`Validation code is ${ authCode }`) // TODO remove this
+                const authCode = authModel.generateRandomAuthCode()
 
                 const result = await authModel.register(email, password, authCode, invalidateCodeImmediately)
 
@@ -162,7 +160,7 @@ class AuthRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'code'})
                 if (typeof(code) !== 'number')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'code'})
-                const [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'authCode',code)
+                const [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'authCode', code)
                 if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
 
@@ -189,17 +187,23 @@ class AuthRoutes {
 
         // public auth
         expressApp.post('/api/v1/auth/resendCode', requireUserAuth, async (request, response) => {
+            const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ? 
+                request.body.sendCodeByEmail : true
             const view = new View(request, response)
             try {
                 const userId = request.userId
                 assert(userId !== null) // due to requireUserAuth
-                await authModel.resendAuthCode(userId)
-                const code = null
+                // self-test does not send validation code by email
+
+                const profile = await authModel.getUserProfile(userId)
+                const authCode = authModel.generateRandomAuthCode()
+                if (sendCodeByEmail)
+                    await authModel.sendRegisterAuthCode(authCode, profile.email, view.translation)
+                await authModel.changeAuthCode(userId, authCode)
+
                 view.json({ message: "Code resent"})
-                await resendAuthCode(userId)
             }
             catch (error) {
-                console.log("dOm error", error)
                 view.error(error)
             }
         })

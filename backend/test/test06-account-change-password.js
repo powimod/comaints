@@ -113,7 +113,7 @@ describe('Test change password route', () => {
 
     describe('Call change password route with valid data', () => {
 
-        it('Try to call change password without empty password', async () => {
+        it('Try to call change password with new password', async () => {
             const json = await jsonPost(ROUTE_CHANGE_PASSWORD , { currentPassword:CURRENT_PASSWORD, newPassword:NEW_PASSWORD })
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('message')

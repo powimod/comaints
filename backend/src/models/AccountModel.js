@@ -21,8 +21,8 @@ class AccountModel {
         return await this.#userModel.getUserById(userId)
     }
 
-    generateAuthCode() {
-        return this.#authModel.generateAuthCode()
+    generateRandomAuthCode() {
+        return this.#authModel.generateRandomAuthCode()
     }
 
     async checkPassword(userId, password) {
