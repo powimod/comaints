@@ -123,6 +123,16 @@ class AuthModel {
         return user
     }
 
+    async resendAuthCode(userId) {
+        assert(userId !== undefined)
+        let user = await this.#userModel.getUserById(userId)
+        if (user === null)
+            throw new Error('User not found')
+        if (user.authAction === null)
+            throw new ComaintApiErrorInvalidRequest('error.no_auth_in_progress')
+        throw new Error('not implemented')
+    }
+
     async sendRegisterAuthCode(code, email, i18n_t) {
         assert(code   !== undefined && typeof(code)   === 'number')
         assert(email  !== undefined && typeof(email)  === 'string')

@@ -6,9 +6,9 @@ import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refr
 import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserByEmail } from './helpers.js'
 
 
-const ROUTE_LOGIN= 'api/v1/auth/login'
-const ROUTE_LOGOUT   = 'api/v1/auth/logout'
-const ROUTE_PROFILE  = 'api/v1/account/profile'
+const ROUTE_LOGIN = 'api/v1/auth/login'
+const ROUTE_LOGOUT = 'api/v1/auth/logout'
+const ROUTE_PROFILE = 'api/v1/account/profile'
 
 describe('Test user login', () => {
 

@@ -145,7 +145,7 @@ class AuthRoutes {
         })
 
 
-        // public route(for registration, private route for email change
+        // this route is public for registration, and private for email change
         expressApp.post('/api/v1/auth/validate', async (request, response) => {
             const view = new View(request, response)
             try {
@@ -187,6 +187,22 @@ class AuthRoutes {
             }
         })
 
+        // public auth
+        expressApp.post('/api/v1/auth/resendCode', requireUserAuth, async (request, response) => {
+            const view = new View(request, response)
+            try {
+                const userId = request.userId
+                assert(userId !== null) // due to requireUserAuth
+                await authModel.resendAuthCode(userId)
+                const code = null
+                view.json({ message: "Code resent"})
+                await resendAuthCode(userId)
+            }
+            catch (error) {
+                console.log("dOm error", error)
+                view.error(error)
+            }
+        })
 
 
         // public route
@@ -238,6 +254,7 @@ class AuthRoutes {
             }
         })
 
+        // public route (user not logged in are detected insight this function)
         expressApp.post('/api/v1/auth/logout', async (request, response) => {
             const view = new View(request, response)
             try {
@@ -259,6 +276,7 @@ class AuthRoutes {
             }
         })
 
+        // public route
         expressApp.post('/api/v1/auth/refresh', async (request, response) => {
             // do not control HTTP header access/refresh tokens : they may be null
             const view = new View(request, response)

@@ -23,6 +23,7 @@
         "expired_code": "Code expiré",
         "same_email": "L'adresse mail est identique",
         "already_used_email": "L'adresse mail est déjà utilisée",
+        "no_auth_in_progress": "Pas d'opératon d'authentification en cours",
 		"prop": {
 			"is_not_defined": "La propriété «{{property}}» n'est pas définie",
 			"has_no_value": "La propriété«{{property}}» n'a pas de valeur",
