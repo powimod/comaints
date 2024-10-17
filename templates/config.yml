@@ -84,12 +84,11 @@ objects:
         type: "string"
         mandatory: false
         maximum: 30
-      - name: "accountLocked"
-        type: "boolean"
-        default: false
-      - name: "active"
-        type: "boolean"
-        default: true
+      - name: "state"
+        type: "integer"
+        default: 0
+        minimum: 0 
+        maximum: 99999
       - name: "lastUse"
         type: "datetime"
         mandatory: false

@@ -190,7 +190,6 @@ describe('Test user login', () => {
             expect(accessToken).not.to.equal(null)
             expect(refreshToken).not.to.equal(null)
         })
-
         it('Get user profile', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
@@ -201,8 +200,7 @@ describe('Test user login', () => {
             expect(user).to.have.property('id')
             expect(user.id).to.equal(user.id)
             expect(user.email).to.be.a('string').and.to.equal(user.email)
-            expect(user.accountLocked).to.be.a('boolean').and.to.equal(false)
-            expect(user.active).to.be.a('boolean').and.to.equal(true)
+            expect(user.state).to.be.a('number').and.to.equal(1) // active
             expect(user.administrator).to.be.a('boolean').and.to.equal(false)
             expect(user.companyId).to.equal(null)
         })
@@ -270,8 +268,7 @@ describe('Test user login', () => {
             expect(user).to.have.keys(userPublicProperties)
             expect(user.id).to.equal(user.id)
             expect(user.email).to.be.a('string').and.to.equal(user.email)
-            expect(user.accountLocked).to.be.a('boolean').and.to.equal(false)
-            expect(user.active).to.be.a('boolean').and.to.equal(true)
+            expect(user.state).to.be.a('number').and.to.equal(1) // active
             expect(user.administrator).to.be.a('boolean').and.to.equal(false)
             expect(user.companyId).to.equal(null)
         })
@@ -314,6 +311,7 @@ describe('Test user login', () => {
             expect(dbUser.auth_action).to.be.a('string').and.to.equal('login')
             expect(dbUser).to.have.property('auth_attempts')
             expect(dbUser.auth_attempts).to.be.a('number').and.to.equal(1)
+            expect(dbUser.state).to.be.a('number').and.to.equal(1) // active
         })
 
         //──────── second attempt to login with invalid password
@@ -336,6 +334,7 @@ describe('Test user login', () => {
             expect(dbUser.auth_action).to.be.a('string').and.to.equal('login')
             expect(dbUser).to.have.property('auth_attempts')
             expect(dbUser.auth_attempts).to.be.a('number').and.to.equal(2)
+            expect(dbUser.state).to.be.a('number').and.to.equal(1) // active
         })
 
         //──────── third attempt to login with invalid password
@@ -352,36 +351,13 @@ describe('Test user login', () => {
                 expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
             }
         })
-        it('Check user in database after third login attempt', async () => {
-            const dbUser = await getDatabaseUserByEmail(user.email)
-            expect(dbUser).to.have.property('auth_action')
-            expect(dbUser.auth_action).to.be.a('string').and.to.equal('login')
-            expect(dbUser).to.have.property('auth_attempts')
-            expect(dbUser.auth_attempts).to.be.a('number').and.to.equal(3)
-        })
 
-        //──────── fourth attempt to login with invalid password
-        it('Fourth attempt to login with incorrect password', async () => {
-            try {
-                let json = await jsonPost(ROUTE_LOGIN, {
-                        email:user.email,
-                        password: PASSWORD
-                    })
-                expect.fail('Too many login failure not detected')
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Number of attempts exceeded"})')
-            }
-        })
-        it('Check user in database after fourth login attempt', async () => {
+        it('Check user account locked', async () => {
             const dbUser = await getDatabaseUserByEmail(user.email)
-            expect(dbUser).to.have.property('auth_action')
-            expect(dbUser.auth_action).to.be.a('string').and.to.equal('login')
-            expect(dbUser).to.have.property('auth_attempts')
-            expect(dbUser.auth_attempts).to.be.a('number').and.to.equal(3)
+            expect(dbUser.state).to.be.a('number').and.to.equal(3) // locked
+            expect(dbUser.auth_action).to.equal(null)
+            expect(dbUser.auth_attempts).to.equal(null)
         })
-
 
     })
 })

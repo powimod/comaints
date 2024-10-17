@@ -61,7 +61,6 @@ class UserModel {
 
 
     async createUser(user) {
-        user.accountLocked = true
         if (user.password === undefined || user.password === null)
             throw new Error('User password missing')
         await this.encryptPasswordIfPresent(user)

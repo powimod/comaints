@@ -10,9 +10,12 @@
         "invalid_request_error": "TODO change message",
         "internal_error": "TODO change message",
         "confict_error" : "Doublon sur le champ «{{field}»} pour l'ojet «{{object}}»",
-		"account_locked": "Le compte est verrouillé",
-		"account_not_locked": "Le compte n'est pas verrouillé",
-		"account_not_found": "Ce compte n'existe pas",
+        "account_locked": "Ce compte est verrouillé",
+        "account_not_locked": "Ce compte n'est pas verrouillé",
+        "account_disabled": "Ce compte est désactivé",
+        "account_already_registered": "Ce compte est déjà enregistré",
+        "account_not_registered": "Ce compte n'est pas encore enregistré",
+        "account_not_found": "Ce compte n'existe pas",
         "user_not_logged_in": "L'utilisateur n'est pas connecté",
         "unauthorized_error": "Accès non autorisé",
         "invalid_token": "Jeton invalide",
@@ -24,41 +27,41 @@
         "same_email": "L'adresse mail est identique",
         "already_used_email": "L'adresse mail est déjà utilisée",
         "no_auth_in_progress": "Pas d'opératon d'authentification en cours",
-		"prop": {
-			"is_not_defined": "La propriété «{{property}}» n'est pas définie",
-			"has_no_value": "La propriété«{{property}}» n'a pas de valeur",
-			"is_null": "La propriété «{{property}}» est vide",
-			"is_not_an_integer": "La propriété «{{property}}» n'est pas définie",
-			"is_too_small": "La propriété «{{property}}» est trop petite",
-			"is_too_large": "La propriété «{{property}}» est trop grande",
-			"is_not_a_string": "La propriété «{{property}}» n'est pas une chaîne",
-			"is_too_short": "La propriété «{{property}}» est trop courte",
-			"is_too_long": "La propriété «{{property}}» est trop longue",
-			"is_not_a_boolean": "La propriété «{{property}}» n'est pas un booléen",
-			"is_not_a_date": "La propriété «{{property}}» n'est pas une date",
-			"is_not_a_pure_date": "La propriété «{{property}}» n'est pas une date",
-			"is_not_a_date_time": "La propriété «{{property}}» n'est pas une date/heure",
-			"is_malformed_email": "La propriété «{{property}}» n'est pas une adresse mail valide",
-			"is_malformed_uuid": "La propriété «{{property}}» n'est pas un UUID valide",
-			"is_malformed": "La propriété «{{property}}» est mal formatée",
+        "prop": {
+            "is_not_defined": "La propriété «{{property}}» n'est pas définie",
+            "has_no_value": "La propriété«{{property}}» n'a pas de valeur",
+            "is_null": "La propriété «{{property}}» est vide",
+            "is_not_an_integer": "La propriété «{{property}}» n'est pas définie",
+            "is_too_small": "La propriété «{{property}}» est trop petite",
+            "is_too_large": "La propriété «{{property}}» est trop grande",
+            "is_not_a_string": "La propriété «{{property}}» n'est pas une chaîne",
+            "is_too_short": "La propriété «{{property}}» est trop courte",
+            "is_too_long": "La propriété «{{property}}» est trop longue",
+            "is_not_a_boolean": "La propriété «{{property}}» n'est pas un booléen",
+            "is_not_a_date": "La propriété «{{property}}» n'est pas une date",
+            "is_not_a_pure_date": "La propriété «{{property}}» n'est pas une date",
+            "is_not_a_date_time": "La propriété «{{property}}» n'est pas une date/heure",
+            "is_malformed_email": "La propriété «{{property}}» n'est pas une adresse mail valide",
+            "is_malformed_uuid": "La propriété «{{property}}» n'est pas un UUID valide",
+            "is_malformed": "La propriété «{{property}}» est mal formatée",
             "contains_line_feeds": "La propriété «{{property}}» contient des sauts à la ligne",
-			"password_to_small": "Le mot de passe est trop petit",
-			"password_no_lowercase_letter": "Le mot de passe ne contient pas de lettre minuscule",
-			"password_no_uppercase_letter": "Le mot de passe ne contient pas de lettre majsucule",
-			"password_no_digit_character": "Le mot de passe ne contient pas de caractère numérique",
-			"password_no_special_character": "Le mot de passe ne contient pas de caractère spécial"
-		}
+            "password_to_small": "Le mot de passe est trop petit",
+            "password_no_lowercase_letter": "Le mot de passe ne contient pas de lettre minuscule",
+            "password_no_uppercase_letter": "Le mot de passe ne contient pas de lettre majsucule",
+            "password_no_digit_character": "Le mot de passe ne contient pas de caractère numérique",
+            "password_no_special_character": "Le mot de passe ne contient pas de caractère spécial"
+        }
     },
-	"register": {
-		"mail_body": "Bonjour,\nVotre code pour la création d'un compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
-		"mail_title": "[Comaint] Enregistrement d'un nouveau compte"
-	},
-	"account_deletion": {
-		"mail_body": "Bonjour,\nVotre code pour la suppression définitive de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
-		"mail_title": "[Comaint] Suppression de votre compte"
-	},
-	"change_email": {
-		"mail_body": "Bonjour,\nVotre code pour le changement de l'adresse e-mail de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
-		"mail_title": "[Comaint] Changement d'adresse e-mail"
-	}
+    "register": {
+        "mail_body": "Bonjour,\nVotre code pour la création d'un compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
+        "mail_title": "[Comaint] Enregistrement d'un nouveau compte"
+    },
+    "account_deletion": {
+        "mail_body": "Bonjour,\nVotre code pour la suppression définitive de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
+        "mail_title": "[Comaint] Suppression de votre compte"
+    },
+    "change_email": {
+        "mail_body": "Bonjour,\nVotre code pour le changement de l'adresse e-mail de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
+        "mail_title": "[Comaint] Changement d'adresse e-mail"
+    }
 }

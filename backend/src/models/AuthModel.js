@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken'
 import ModelSingleton from '../model.js'
 import { ComaintApiError, ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken }
     from '../../../common/src/error.mjs'
+import { AccountState } from '../../../common/src/global.mjs'
 import MailManagerSingleton from '../MailManager.js'
 
 class AuthModel {
@@ -60,6 +61,7 @@ class AuthModel {
         const user = await this.#userModel.createUser({
             email,
             password,
+            state: AccountState.PENDING,
             authCode,
             authAction,
             authExpiration,
@@ -75,8 +77,8 @@ class AuthModel {
         let user = await this.#userModel.getUserById(userId)
         if (user === null)
             throw new Error('User not found')
-        if (user.authAttempts >= this.#maxAuthAttempts)
-            throw new ComaintApiErrorUnauthorized('error.too_many_attempts')
+        if (user.state === AccountState.DISABLED)
+            throw new ComaintApiErrorUnauthorized('error.account_disabled')
         const now = new Date()
         if (user.authExpiration < now)
             throw new ComaintApiErrorUnauthorized('error.expired_code')
@@ -85,6 +87,15 @@ class AuthModel {
         if (! validated) {
             assert(! isNaN(user.authAttempts))
             user.authAttempts++
+            if (user.authAttempts >= this.#maxAuthAttempts) {
+                user.state = AccountState.LOCKED
+                user.authCode = null
+                user.authAction = null
+                user.authData = null
+                user.authExpiration = null
+                user.authAttempts = null
+            }
+            delete user.password // do not re-encrypt already encrypted password !
             await this.#userModel.editUser(user)
             return false
         }
@@ -99,9 +110,14 @@ class AuthModel {
         const action = user.authAction
         switch (action) {
             case 'register' :
-                if (! user.accountLocked)
+                if (user.state !== AccountState.PENDING)
+                    throw new ComaintApiError('error.account_already_registered')
+                user.state = AccountState.ACTIVE
+                break
+            case 'unlock' :
+                if (user.state !== AccountState.LOCKED)
                     throw new ComaintApiError('error.account_not_locked')
-                user.accountLocked = false
+                user.state = AccountState.ACTIVE
                 break
             case 'change-email' :
                 user.email = user.authData
@@ -307,14 +323,14 @@ class AuthModel {
 		assert(this.#userModel !== null)
         await this.#userModel.editUser({
             id: userId,
-            accountLocked: true
+            state: AccountState.LOCK
         })
 	}
 
     async isAccountLocked(userId) {
 		assert(this.#userModel !== null)
         const user = await this.#userModel.getUserById(userId)
-        return user.accountLocked
+        return ( user.state === AccountState.LOCK )
     }
 
 
@@ -335,19 +351,32 @@ class AuthModel {
         const isPasswordValid = await this.#userModel.checkPassword(user.id, password)
         if (! isPasswordValid) {
             user.authAction = 'login'
-            user.authAttempts++
             user.authExpiration = null
-            user.authCode = 0
+            user.authCode = null 
             user.authData = null
+            if (user.authAttempts === null)
+                user.authAttempts = 0
+            user.authAttempts++
+            if (user.authAttempts >= this.#maxAuthAttempts) {
+                user.state = AccountState.LOCKED
+                user.authAction = null
+                user.authAttempts = null
+            }
+            delete user.password // do not re-encrypt already encrypted password !
             await this.#userModel.editUser(user)
             throw new ComaintApiErrorUnauthorized('error.invalid_email_or_password')
         }
+        
         if (user.authAttempts >= this.#maxAuthAttempts)
             throw new ComaintApiErrorUnauthorized('error.too_many_attempts')
 
-        // TODO check account is not locked
-        if (! user.active ) // FIXME active ou locked ?
-            throw new Error("Your account is locked") // FIXME translation
+        if (user.state === AccountState.PENDING)
+            throw new ComaintApiErrorUnauthorized('error.account_not_registered')
+        if (user.state === AccountState.DISABLED)
+            throw new ComaintApiErrorUnauthorized('error.account_disabled')
+        if (user.state === AccountState.LOCKED)
+            throw new ComaintApiErrorUnauthorized('error.account_locked')
+        assert (user.state === AccountState.ACTIVE)
 
         if (user.authAction !== null) {
             user.authAction = null

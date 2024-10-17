@@ -73,8 +73,7 @@ const getDatabaseUserById = async (userId) => {
 
 
 const userPublicProperties = [
-    'id', 'email', 'firstname', 'lastname', 'accountLocked', 
-    'active', 'lastUse', 'administrator', 'companyId'
+    'id', 'email', 'firstname', 'lastname', 'state', 'lastUse', 'administrator', 'companyId'
 ]
 
 export {

@@ -32,16 +32,11 @@ const userObjectDef = {
         "mandatory": "false",
         "scope": "public"
     },
-    "accountLocked" : {
-        "type": "boolean",
-        "field": "account_locked",
-        "default": "false",
-        "mandatory": "true",
-        "scope": "public"
-    },
-    "active" : {
-        "type": "boolean",
-        "default": "true",
+    "state" : {
+        "type": "integer",
+        "minimum": "0",
+        "maximum": "99999",
+        "default": "0",
         "mandatory": "true",
         "scope": "public"
     },

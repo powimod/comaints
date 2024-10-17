@@ -10,9 +10,12 @@
         "invalid_request_error": "TODO change message",
         "internal_error": "TODO change message",
         "confict_error" : "Duplicated «{{field}}» field for object «{{object}}»",
-		"account_locked": "Account is locked",
-		"account_not_locked": "Account is not locked",
-		"account_not_found": "This account does not exist",
+        "account_locked": "This account is locked",
+        "account_not_locked": "This account is not locked",
+        "account_disabled": "This account is disabled",
+        "account_already_registered": "This account is already registered",
+        "account_not_registered": "This account is not yet registered",
+        "account_not_found": "This account does not exist",
         "user_not_logged_in": "User is not logged in",
         "unauthorized_error": "Unauthorized error",
         "invalid_token": "Invalid token",
@@ -24,41 +27,41 @@
         "same_email": "New email address is the same",
         "already_used_email": "Email address is already used",
         "no_auth_in_progress": "No authentification operation in progress",
-		"prop": {
-			"is_not_defined": "Property «{{property}}» is not defined",
-			"has_no_value": "Property «{{property}}» has no value",
-			"is_null": "Property «{{property}}» is null",
-			"is_not_an_integer": "Property «{{property}}» is not an integer",
-			"is_too_small": "Property «{{property}}» is too small",
-			"is_too_large": "Property «{{property}}» is too large",
-			"is_not_a_string": "Property «{{property}}» is not a string",
-			"is_too_short": "Property «{{property}}» is too short",
-			"is_too_long": "Property «{{property}}» is too long",
-			"is_not_a_boolean": "Property «{{property}}» is not a boolean",
-			"is_not_a_date": "Property «{{property}}» is not a date",
-			"is_not_a_pure_date": "Property «{{property}}» is not a (pure) date",
-			"is_not_a_date_time": "Property «{{property}}» is not a date/time",
-			"is_malformed_email": "Property «{{property}}» is not a valid email",
-			"is_malformed_uuid": "Property «{{property}}» is not a valid uuid",
-			"is_malformed": "Property «{{property}}» is malformed",
+        "prop": {
+            "is_not_defined": "Property «{{property}}» is not defined",
+            "has_no_value": "Property «{{property}}» has no value",
+            "is_null": "Property «{{property}}» is null",
+            "is_not_an_integer": "Property «{{property}}» is not an integer",
+            "is_too_small": "Property «{{property}}» is too small",
+            "is_too_large": "Property «{{property}}» is too large",
+            "is_not_a_string": "Property «{{property}}» is not a string",
+            "is_too_short": "Property «{{property}}» is too short",
+            "is_too_long": "Property «{{property}}» is too long",
+            "is_not_a_boolean": "Property «{{property}}» is not a boolean",
+            "is_not_a_date": "Property «{{property}}» is not a date",
+            "is_not_a_pure_date": "Property «{{property}}» is not a (pure) date",
+            "is_not_a_date_time": "Property «{{property}}» is not a date/time",
+            "is_malformed_email": "Property «{{property}}» is not a valid email",
+            "is_malformed_uuid": "Property «{{property}}» is not a valid uuid",
+            "is_malformed": "Property «{{property}}» is malformed",
             "contains_line_feeds": "Property «{{property}}» contains line feeds",
-			"password_to_small": "Password is too small",
-			"password_no_lowercase_letter": "Password does not contain lowercase letter",
-			"password_no_uppercase_letter": "Password does not contain uppercase letter",
-			"password_no_digit_character": "Password does not contain digit character",
-			"password_no_special_character": "Password does not contain special character"
-		}
+            "password_to_small": "Password is too small",
+            "password_no_lowercase_letter": "Password does not contain lowercase letter",
+            "password_no_uppercase_letter": "Password does not contain uppercase letter",
+            "password_no_digit_character": "Password does not contain digit character",
+            "password_no_special_character": "Password does not contain special character"
+        }
     },
-	"register": {
-		"mail_body": "Hello,\nYour validation code for the creation of an account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
-		"mail_title": "[Comaint] - New account registration"
-	},
-	"account_deletion": {
-		"mail_body": "Hello,\nYour validation code for the definitive deletion of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
-		"mail_title": "[Comaint] Deletion of your account"
-	},
-	"change_email": {
-		"mail_body": "Hello,\nYour validation code to change the email address of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
-		"mail_title": "[Comaint] email address change"
-	}
+    "register": {
+        "mail_body": "Hello,\nYour validation code for the creation of an account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
+        "mail_title": "[Comaint] - New account registration"
+    },
+    "account_deletion": {
+        "mail_body": "Hello,\nYour validation code for the definitive deletion of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
+        "mail_title": "[Comaint] Deletion of your account"
+    },
+    "change_email": {
+        "mail_body": "Hello,\nYour validation code to change the email address of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
+        "mail_title": "[Comaint] email address change"
+    }
 }

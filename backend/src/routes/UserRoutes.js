@@ -12,14 +12,14 @@ class UserRoutes {
 
     initialize(expressApp) {
         const controller = ControllerSingleton.getInstance()
-	    const model  = ModelSingleton.getInstance()
+        const model  = ModelSingleton.getInstance()
         
         const userModel = model.getUserModel()
 
         // TODO ajouter withAuth
-	    expressApp.get('/api/v1/user/list', async (request, response) => {
+        expressApp.get('/api/v1/user/list', async (request, response) => {
             const view = new View(request, response)
-			const userList = await userModel.findUserList()
+            const userList = await userModel.findUserList()
             view.json({ userList })
         })
 
@@ -35,7 +35,19 @@ class UserRoutes {
                 const [ errorMsg, errorParam ] = controlObject(userObjectDef, user, { fullCheck:true, checkId:false })
                 if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
-			    user = await userModel.createUser(user)
+
+                // delete protected properties
+                delete user.companyId
+                delete user.password
+                delete user.state
+                delete user.lastUse
+                delete user.authAction
+                delete user.authData
+                delete user.authCode
+                delete user.authExpiration
+                delete user.authAttempts
+
+                user = await userModel.createUser(user)
                 view.json(user)
             }
             catch(error) {
@@ -50,15 +62,15 @@ class UserRoutesSingleton {
 
     static #instance = null
 
-	constructor() {
-		throw new Error('Can not instanciate UserRoutesSingleton!')
-	}
+    constructor() {
+        throw new Error('Can not instanciate UserRoutesSingleton!')
+    }
 
-	static getInstance() {
-		if (! UserRoutesSingleton.#instance)
-			UserRoutesSingleton.#instance = new UserRoutes()
-		return UserRoutesSingleton.#instance
-	}
+    static getInstance() {
+        if (! UserRoutesSingleton.#instance)
+            UserRoutesSingleton.#instance = new UserRoutes()
+        return UserRoutesSingleton.#instance
+    }
 }
 
 export default UserRoutesSingleton 

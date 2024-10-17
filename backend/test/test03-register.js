@@ -28,9 +28,11 @@ describe('Test user registration', () => {
     }),
 
     after( async () =>  {
+        /* TODO reactivate this
         await requestDb('DELETE FROM users WHERE email=?', userEmail)
         await requestDb('DELETE FROM users WHERE email=?', userEmail2)
         await requestDb('DELETE FROM users WHERE email=?', userEmail3)
+        */
         await disconnectDb()
     }),
 
@@ -203,8 +205,8 @@ describe('Test user registration', () => {
             expect(user.firstname).to.equal(null)
             expect(user).to.have.property('lastname')
             expect(user.lastname).to.equal(null)
-            expect(user).to.have.property('account_locked')
-            expect(user.account_locked).to.a('number').and.to.equal(1) // true
+            expect(user).to.have.property('state')
+            expect(user.state).to.a('number').and.to.equal(0) // pending
             expect(user).to.have.property('administrator')
             expect(user.administrator).to.a('number').and.to.equal(0) // false
 
@@ -287,7 +289,6 @@ describe('Test user registration', () => {
             expect(json.userId).to.be.a('number').and.to.equal(userId)
         })
 
-
         it('Send validation code', async () => {
             const json = await jsonPost(ROUTE_VALIDATE, { code: authCode})
             expect(json).to.be.instanceOf(Object)
@@ -312,8 +313,8 @@ describe('Test user registration', () => {
             expect(user.firstname).to.equal(null)
             expect(user).to.have.property('lastname')
             expect(user.lastname).to.equal(null)
-            expect(user).to.have.property('account_locked')
-            expect(user.account_locked).to.a('number').and.to.equal(0) // false
+            expect(user).to.have.property('state')
+            expect(user.state).to.a('number').and.to.equal(1) // active
             expect(user).to.have.property('administrator')
             expect(user.administrator).to.a('number').and.to.equal(0)
 
@@ -340,10 +341,8 @@ describe('Test user registration', () => {
             expect(user).to.have.keys(userPublicProperties)
             expect(user.id).to.be.a('number')
             expect(user.email).to.be.a('string').and.to.equal(userEmail)
-            expect(user.accountLocked).to.be.a('boolean').and.to.equal(false)
-            expect(user.active).to.be.a('boolean').and.to.equal(true)
+            expect(user.state).to.be.a('number').and.to.equal(1) // active
         })
-
 
     })
 
@@ -412,8 +411,8 @@ describe('Test user registration', () => {
             expect(user).to.have.property('id')
             userId2 = user.id
 
-            expect(user).to.have.property('account_locked')
-            expect(user.account_locked).to.a('number').and.to.equal(1) // true
+            expect(user).to.have.property('state')
+            expect(user.state).to.a('number').and.to.equal(0) // pending
 
             // control auth_code first to initialize authCode
             expect(user).to.have.property('auth_code')
@@ -451,8 +450,8 @@ describe('Test user registration', () => {
             expect(user).to.have.property('id')
             userId2 = user.id
 
-            expect(user).to.have.property('account_locked')
-            expect(user.account_locked).to.a('number').and.to.equal(1) // true
+            expect(user).to.have.property('state')
+            expect(user.state).to.a('number').and.to.equal(0) // pending
 
             // control auth_code first to initialize authCode
             expect(user).to.have.property('auth_code')
@@ -489,6 +488,9 @@ describe('Test user registration', () => {
             authCode = user.auth_code
             expect(user).to.have.property('auth_attempts')
             expect(user.auth_attempts).to.be.a('number').and.to.be.equal(2)
+
+            expect(user).to.have.property('state')
+            expect(user.state).to.a('number').and.to.equal(0) // pending
         })
 
 
@@ -510,35 +512,22 @@ describe('Test user registration', () => {
             expect(user).to.be.instanceOf(Object)
             expect(user).to.have.property('auth_code')
             authCode = user.auth_code
+
+            expect(user).to.have.property('state')
+            expect(user.state).to.a('number').and.to.equal(3) // locked
+
+            expect(user).to.have.property('auth_action')
+            expect(user.auth_action).to.equal(null)
+            expect(user).to.have.property('auth_data')
+            expect(user.auth_data).to.equal(null)
+            expect(user).to.have.property('auth_expiration')
+            expect(user.auth_expiration).to.equal(null)
             expect(user).to.have.property('auth_attempts')
-            expect(user.auth_attempts).to.be.a('number').and.to.be.equal(3)
-        })
-
-
-        //───────────── Fourth attempt locks account
-        it('Fourth attempt to confirm registration', async () => {
-            try {
-                const json = await jsonPost(ROUTE_VALIDATE, { code: authCode })
-                expect.fail("Too many attempts was not detected")
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 401 ({"error":"Number of attempts exceeded"})`)
-            }
-        })
-
-        it('Check user in database after fourth attempt', async () => {
-            const res = await requestDb('select * from users where email=?', [ userEmail2 ])
-            expect(res).to.be.instanceOf(Array)
-            const user = res[0]
-            expect(user).to.be.instanceOf(Object)
+            expect(user.auth_attempts).to.equal(null)
             expect(user).to.have.property('auth_code')
+            expect(user.auth_code).to.equal(null)
+
             authCode = user.auth_code
-            expect(user).to.have.property('auth_attempts')
-            expect(user.auth_attempts).to.be.a('number').and.to.be.equal(3)
-            // account must be locked
-            expect(user).to.have.property('account_locked')
-            expect(user.account_locked).to.a('number').and.to.equal(1) // true
         })
 
     })
@@ -566,8 +555,8 @@ describe('Test user registration', () => {
             expect(user).to.have.property('id')
             userId3 = user.id
 
-            expect(user).to.have.property('account_locked')
-            expect(user.account_locked).to.a('number').and.to.equal(1) // true
+            expect(user).to.have.property('state')
+            expect(user.state).to.a('number').and.to.equal(0) // pending
 
             // control auth_code first to initialize authCode
             expect(user).to.have.property('auth_code')
@@ -599,8 +588,6 @@ describe('Test user registration', () => {
                 expect(error.message).to.equal(`Server status 401 ({"error":"Expired code"})`)
             }
         })
-
-
     })
         
 })
