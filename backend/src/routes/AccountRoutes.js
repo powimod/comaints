@@ -145,7 +145,7 @@ class AccountRoutes {
                 if (typeof(confirmation) !== 'boolean')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'confirmation'})
 
-                // TODO check if user can be delete with administrator and companyId properties
+                // TODO check if user can be deleted with administrator and companyId properties
                 // yes if companyId is null
                 // yes if campanyId is not null but he is not an administrator
 
@@ -171,6 +171,39 @@ class AccountRoutes {
                 view.error(error)
             }
         })
+
+        expressApp.post('/api/v1/account/unlock', requireUserAuth, async (request, response) => {
+            const view = new View(request, response)
+            try {
+                const userId = request.userId
+                assert(userId !== null)
+                let user = await accountModel.getUserProfile(userId)
+                if (! user)
+                    throw new Error('User not found')
+
+                // self-test does not send validation code by email
+                const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
+                    request.body.sendCodeByEmail : true
+
+                // make a random validation code which will be sent by email to delete account
+                const authCode = accountModel.generateRandomAuthCode()
+
+                user = await accountModel.prepareAccountUnlock(userId, authCode)
+
+                console.log("dOm send mail", sendCodeByEmail)
+                if (sendCodeByEmail)
+                    await accountModel.sendUnlockAccountAuthCode(authCode, user.email, view.translation)
+
+                view.json({message: 'Done, waiting for validation code'})
+            }
+            catch(error) {
+                console.log("dOm error", error)
+                view.error(error)
+            }
+        })
+
+
+
 
     }
 }

@@ -63,5 +63,9 @@
     "change_email": {
         "mail_body": "Bonjour,\nVotre code pour le changement de l'adresse e-mail de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
         "mail_title": "[Comaint] Changement d'adresse e-mail"
+    },
+    "unlock_account_email": {
+		"mail_body": "Bonjour,\nLe code pour débloquer votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
+		"mail_title": "Déblocage de compte Comaint"
     }
 }

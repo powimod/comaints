@@ -49,6 +49,14 @@ class AccountModel {
         return this.#authModel.sendAccountDeletionAuthCode(authCode, email, translation)
     }
 
+    async prepareAccountUnlock(userId, authCode) {
+        return await this.#authModel.prepareAccountUnlock(userId, authCode)
+    }
+
+    async sendUnlockAccountAuthCode(authCode, email, translation) {
+        return this.#authModel.sendUnlockAccountAuthCode(authCode, email, translation)
+    }
+
 
 }
 

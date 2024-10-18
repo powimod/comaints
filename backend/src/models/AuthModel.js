@@ -187,6 +187,17 @@ class AuthModel {
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
 
+    async sendUnlockAccountAuthCode(code, email, i18n_t) {
+        assert(code   !== undefined && typeof(code)   === 'number')
+        assert(email  !== undefined && typeof(email)  === 'string')
+        assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
+        const subject  = i18n_t('unlock_account_email.mail_title')
+        const textBody = i18n_t('unlock_account_email.mail_body', { 'code' : code })
+        const htmlBody = i18n_t('unlock_account_email.mail_body', { 'code' : `<b>${code}</b>code` })
+        const mailManager = MailManagerSingleton.getInstance()
+        return await mailManager.sendMail(email, subject, textBody, htmlBody)
+    }
+
     generateAccessToken(userId, companyId, refreshTokenId, connected) {
         assert(userId !== undefined)
         assert(companyId !== undefined)
@@ -440,6 +451,15 @@ class AuthModel {
         return user
     }
 
+    async prepareAccountUnlock(userId, authCode) {
+        let user = await this.#userModel.getUserById(userId)
+        if (user === null)
+            throw new Error('User not found')
+        if (user.state !== AccountState.LOCKED)
+            throw new ComaintApiErrorInvalidRequest('error.account_not_locked')
+
+        throw new Error('Not implemented')
+    }
 
 }
 

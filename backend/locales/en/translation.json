@@ -63,5 +63,9 @@
     "change_email": {
         "mail_body": "Hello,\nYour validation code to change the email address of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
         "mail_title": "[Comaint] email address change"
+    },
+    "unlock_account_email": {
+		"mail_body": "Hello,\nValidation code to unlock your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
+		"mail_title": "Comaint account unlock"
     }
 }
