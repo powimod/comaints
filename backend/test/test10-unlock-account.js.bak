@@ -1,0 +1,161 @@
+'use strict'
+import { expect } from 'chai'
+
+import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
+import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserByEmail } from './helpers.js'
+
+const ROUTE_UNLOCK_ACCOUNT = 'api/v1/account/unlock'
+const ROUTE_LOGIN = 'api/v1/auth/login'
+const ROUTE_LOGOUT = 'api/v1/auth/logout'
+const ROUTE_CHANGE_EMAIL = 'api/v1/account/change-email'
+const ROUTE_VALIDATE = 'api/v1/auth/validate'
+const ROUTE_REFRESH  = 'api/v1/auth/refresh'
+const ROUTE_PROFILE  = 'api/v1/account/profile'
+
+describe('Test unlock account route', () => {
+
+    const dte = new Date()
+    const PASSWORD = '4BC+d3f-6H1.lMn!'
+    const EMAIL = `u${dte.getTime()}A@x.y`
+ 
+    let user = null
+    let userId = null
+    let authCode  = null
+    let cpyRefreshToken
+    let cpyAccessToken
+
+    before( async () =>  {
+        loadConfig()
+        await connectDb()
+        user = await createUserAccount({email: EMAIL, password: PASSWORD, logout:true})
+        userId = user.id
+    })
+
+    after( async () =>  {
+        await deleteUserAccount(user)
+        await disconnectDb()
+    })
+
+    it ('Try to unlock account without being connected', async () => {
+        try {
+            const json = await jsonPost(ROUTE_UNLOCK_ACCOUNT)
+            expect.fail('Call without being connected not detected')
+        }
+        catch (error) {
+            expect(error).to.be.instanceOf(Error)
+            expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+        }
+    })
+
+
+    it('Try to access with emulation of an expired token', async () => {
+        try {
+            const json = await jsonGet(ROUTE_PROFILE, { expiredAccessTokenEmulation : true})
+            expect.fail('Expired token emulation not detected')
+        }
+        catch (error) {
+            expect(error).to.be.instanceOf(Error)
+            expect(error.message).to.equal('x')
+            expect(accessToken).to.equal(null)
+            expect(refreshToken).to.equal(null)
+        }
+    })
+
+
+    it('Call login route', async () => {
+        let json = await jsonPost(ROUTE_LOGIN, {
+                email:user.email,
+                password: PASSWORD
+            })
+        expect(json).to.be.instanceOf(Object)
+        expect(json).to.have.property('access-token')
+        expect(json['access-token']).to.be.a('string')
+        expect(json).to.have.property('refresh-token')
+        expect(json['refresh-token']).to.be.a('string')
+        // check token in util.js
+        expect(accessToken).not.to.equal(null)
+        expect(refreshToken).not.to.equal(null)
+        cpyRefreshToken = refreshToken
+        cpyAccessToken = accessToken
+    })
+
+    it ('Try to unlock account which is not locked', async () => {
+        try {
+            const json = await jsonPost(ROUTE_UNLOCK_ACCOUNT, {sendCodeByEmail: false})
+            expect.fail('Call with account not locked not detected')
+        }
+        catch (error) {
+            expect(error).to.be.instanceOf(Error)
+            expect(error.message).to.equal('Server status 400 ({"error":"This account is not locked"})')
+        }
+    })
+
+
+
+
+    it('Refresh access token', async () => {
+        const json = await jsonPost(ROUTE_REFRESH, {token: cpyRefreshToken})
+        expect(json).to.be.instanceOf(Object)
+
+        expect(json).to.have.property('access-token')
+        const newAccessToken = json['access-token']
+        expect(newAccessToken).to.be.a('string')
+        expect(newAccessToken !== cpyAccessToken)
+
+        expect(json).to.have.property('refresh-token')
+        const newRefreshToken = json['refresh-token']
+        expect(newRefreshToken).to.be.a('string')
+        expect(newRefreshToken !== cpyRefreshToken)
+
+        // check HTTP header tokens
+        expect(accessToken === newAccessToken)
+        expect(refreshToken === newRefreshToken)
+    })
+
+    it('Try to reuse refresh token', async () => {
+        try {
+            const json = await jsonPost(ROUTE_REFRESH, {token: cpyRefreshToken})
+            expect.fail('Refresh token reuse not detected')
+        }
+        catch (error) {
+            expect(error).to.be.instanceOf(Error)
+            expect(error.message).to.equal('Server status 500 ({"error":"Attempt to reuse a token"})')
+        }
+
+    })
+ 
+    it('Try to access profile with locked account', async () => {
+        try {
+            const json = await jsonGet(ROUTE_PROFILE)
+            console.log(json)
+            expect.fail('Locked account not detected')
+        }
+        catch (error) {
+            expect(error).to.be.instanceOf(Error)
+            expect(error.message).to.equal('')
+        }
+    })
+
+
+    /*
+
+    it('Check user is locked', async () => {
+        const dbUser = await getDatabaseUserByEmail(EMAIL)
+        expect(dbUser).to.be.instanceOf(Object)
+        expect(dbUser.email).to.equal(EMAIL) // email not yet changed
+        expect(dbUser.auth_action).to.equal(null)
+        expect(dbUser.auth_attempts).to.be.equal(null)
+        expect(dbUser.auth_code).to.be.equal(null)
+        expect(dbUser.state).to.be.equal(3) // locked
+    })
+
+    it ('Call unlock account route', async () => {
+        const json = await jsonPost(ROUTE_UNLOCK_ACCOUNT)
+        console.log(json)
+    })
+    */
+
+
+})
+
+
