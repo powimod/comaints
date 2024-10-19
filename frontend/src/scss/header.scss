@@ -8,8 +8,7 @@ header.root_header {
 
     display: grid;
     grid-template-areas:
-        "logo title"
-        "logo subtitle";
+        "logo";
     grid-template-columns: auto 1fr;
 
     background-color: var(--header-background-color);
@@ -17,27 +16,57 @@ header.root_header {
 
     svg {
         grid-area: logo;
-        width: 100px;
-        height: 100px;
-        margin-right: var(--marge-size-huge);
+        width: 5rem;
+        height: 5rem;
+        margin-right: var(--marge-size-large);
     }
     h1 {
-        grid-area: title;
-        align-self: end;
+        display: none;
 
         color: var(--header-title-color);
 
-        font-size: var(--font-size-huge);
         font-family: "Orbitron", sans-serif;
         font-optical-sizing: auto;
         font-weight: 900;
         font-style: normal;
-        letter-spacing: var(--marge-size-large);
+        letter-spacing: var(--marge-size-medium);
     }
     h2 {
-        grid-area: subtitle;
-        align-self: start;
+        display: none;
         color: var(--header-subtitle-color);
-        font-size: var(--font-size-normal);
+    }
+
+    @media (min-width: variables.$screen-size-small)  {
+        border: red solid 1px;
+
+        grid-template-areas:
+            "logo title"
+            "logo subtitle";
+        grid-template-columns: auto 1fr;
+
+        h1 {
+            display: block;
+            grid-area: title;
+            align-self: end;
+            font-size: var(--font-size-normal);
+            letter-spacing: var(--marge-size-large);
+        }
+
+        h2 {
+            display: block;
+            align-self: start;
+            grid-area: subtitle;
+            font-size: var(--font-size-tiny);
+        }
+    }
+
+    @media (min-width: variables.$screen-size-medium)  {
+        border: green solid 1px;
+        h1 {
+            font-size: var(--font-size-huge);
+        }
+        h2 {
+            font-size: var(--font-size-normal);
+        }
     }
 }
