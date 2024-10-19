@@ -1,23 +1,14 @@
-import { useEffect, useState } from 'react'
-import api from './api.js'
+import { Outlet } from 'react-router-dom'
 
+import Header from './components/Header'
+import Footer from './components/Footer'
 
 function App() {
 
-
-    const [versionBackend, setVersionBackend ]  = useState('?')
-
-    useEffect( () => {
-        const getBackendVersion = async () => {
-            const ret = await api.getBackendVersion()
-            setVersionBackend( ret.success ? ret.version : ret.message)
-        }
-        getBackendVersion()
-    }, [])
-
     return (<>
-        <h1>Comaint</h1>
-        <p>Version : {versionBackend}</p>
+        <Header/>
+        <Outlet/>
+        <Footer/>
     </>)
 }
 
