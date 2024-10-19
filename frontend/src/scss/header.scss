@@ -11,5 +11,10 @@ header.root_header {
     h1 {
         color: var(--header-title-color);
         font-size: var(--font-size-huge);
+        font-family: "Orbitron", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 900;
+        font-style: normal;
+        letter-spacing: var(--marge-size-large);
     }
 }

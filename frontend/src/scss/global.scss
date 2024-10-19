@@ -1,5 +1,9 @@
 @use './variables';
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+
+
 :root {
     --font-size-huge   : 3rem;
     --font-size-large  : 2rem;
@@ -23,9 +27,21 @@ html {
     height:100%; /* to move footer at the bottom of the window */
 }
 
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
 *{
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     font-size: var(--font-size-medium);
 }
+
+.orbitron-900 {
+    font-family: "Orbitron", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 900;
+    font-style: normal;
+}
+
