@@ -1,7 +1,9 @@
+import '../scss/home.scss'
+
 const Home = (props) => {
 
 	return (
-		<main>
+		<main className='page_home'>
             <h2>Comaint main page</h2>
 		</main>
 	)

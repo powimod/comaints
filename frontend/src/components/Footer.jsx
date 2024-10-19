@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import api from '../api.js'
 
+import '../scss/footer.scss'
+
 const Footer = () => {
 
     const [backendVersion, setBackendVersion ]  = useState('?')
@@ -14,7 +16,7 @@ const Footer = () => {
     }, [])
 
     return (
-        <footer>
+        <footer className="root_footer">
             Backend version : {backendVersion}
         </footer>
     )

@@ -1,0 +1,12 @@
+@import './variables';
+
+footer.root_footer{
+
+    --footer-background-color: var(--global-color-1); /* dark blue */
+    --footer-text-color: var(--global-color-2); /* white */
+
+    background-color: var(--footer-background-color);
+    color: var(--footer-text-color);
+    padding: var(--marge-size-tiny);
+
+}

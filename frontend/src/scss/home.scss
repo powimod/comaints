@@ -1,0 +1,8 @@
+@import './variables';
+
+main.page_home {
+    padding: var(--marge-size-large);
+    h2 {
+        font-size: var(--font-size-large);
+    }
+}

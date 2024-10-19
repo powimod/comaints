@@ -1,0 +1,15 @@
+@import './variables';
+
+header.root_header {
+
+    --header-background-color: var(--global-color-1); /* dark blue */
+    --header-title-color: var(--global-color-0); /* white */
+
+    background-color: var(--header-background-color);
+    padding: var(--marge-size-huge);
+
+    h1 {
+        color: var(--header-title-color);
+        font-size: var(--font-size-huge);
+    }
+}
