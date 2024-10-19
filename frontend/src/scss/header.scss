@@ -4,6 +4,7 @@ header.root_header {
 
     --header-background-color: var(--global-color-1); /* dark blue */
     --header-title-color: var(--global-color-0); /* white */
+    --header-subtitle-color: var(--global-color-2); /* blue */
 
     background-color: var(--header-background-color);
     padding: var(--marge-size-huge);
@@ -17,4 +18,9 @@ header.root_header {
         font-style: normal;
         letter-spacing: var(--marge-size-large);
     }
+    h2 {
+        color: var(--header-subtitle-color);
+        font-size: var(--font-size-normal);
+    }
+
 }
