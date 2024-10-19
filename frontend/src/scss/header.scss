@@ -6,11 +6,27 @@ header.root_header {
     --header-title-color: var(--global-color-0); /* white */
     --header-subtitle-color: var(--global-color-2); /* blue */
 
-    background-color: var(--header-background-color);
-    padding: var(--marge-size-huge);
+    display: grid;
+    grid-template-areas:
+        "logo title"
+        "logo subtitle";
+    grid-template-columns: auto 1fr;
 
+    background-color: var(--header-background-color);
+    padding: var(--marge-size-medium);
+
+    svg {
+        grid-area: logo;
+        width: 100px;
+        height: 100px;
+        margin-right: var(--marge-size-huge);
+    }
     h1 {
+        grid-area: title;
+        align-self: end;
+
         color: var(--header-title-color);
+
         font-size: var(--font-size-huge);
         font-family: "Orbitron", sans-serif;
         font-optical-sizing: auto;
@@ -19,8 +35,9 @@ header.root_header {
         letter-spacing: var(--marge-size-large);
     }
     h2 {
+        grid-area: subtitle;
+        align-self: start;
         color: var(--header-subtitle-color);
         font-size: var(--font-size-normal);
     }
-
 }
