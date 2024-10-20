@@ -9,6 +9,7 @@ const StandardDialog = () => {
     const [ dialogState, dialogDispatch ] = useContext(DialogContext)
     const [ dialogData, setDialogData] = useState(null)
     const dialogRef = useRef(null)
+    const validation = useRef(false)
 
     const _showDialog = (dialogType, message, resolve)  => {
         setDialogData({ type:dialogType, message, resolve })
@@ -37,19 +38,19 @@ const StandardDialog = () => {
 	}, [dialogState])
 
     useEffect( () => {
-        if (dialogRef.current === null)
-            return
         if (dialogData !== null)
             dialogRef.current.showModal()
         else
-            dialogRef.current.hide()
+            dialogRef.current.close()
     }, [dialogData])
 
+    /*
     const evDialogClose = () => {
         console.log("dOm dialog close")
         dialogData.resolve(false)
         setDialogData(null)
     }
+    */
 
     const evValidateButtonClick = () => {
         dialogData.resolve(true)
@@ -62,8 +63,9 @@ const StandardDialog = () => {
     }
 
 	return ( <>
+        <dialog ref={dialogRef} className='standard-dialog'>
         { dialogData !== null && (
-            <dialog ref={dialogRef} className='standard-dialog'>
+            <>
                 <div>{dialogData.message}</div>
                 <div>
                     { dialogData.type === 'message' && 
@@ -82,8 +84,9 @@ const StandardDialog = () => {
                             </>
                     }
                 </div>
-            </dialog>
+            </>
         ) }
+        </dialog>
     </>)
 }
 
