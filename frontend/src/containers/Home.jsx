@@ -9,7 +9,7 @@ const Home = (props) => {
             <div>
                 <StockIcon icon='user' size="huge"/>
                 <StockIcon icon='order' size="large"/>
-                <StockIcon icon='unit' size="medium"/>
+                <StockIcon icon='unit' size="medium" style={{ color: 'red' }} />
                 <StockIcon icon='equipment' size="small"/>
                 <StockIcon icon='supplier' size="tiny"/>
             </div>

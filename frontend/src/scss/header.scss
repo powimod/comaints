@@ -37,7 +37,6 @@ header.root_header {
     }
 
     @media (min-width: variables.$screen-size-small)  {
-        border: red solid 1px;
 
         grid-template-areas:
             "logo title"
@@ -61,7 +60,6 @@ header.root_header {
     }
 
     @media (min-width: variables.$screen-size-medium)  {
-        border: green solid 1px;
         h1 {
             font-size: var(--font-size-huge);
         }

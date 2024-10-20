@@ -3,10 +3,10 @@ import logoSvg from '../assets/logo.svg'
 
 import '../scss/logo.scss'
 
-const Logo = () => {
+const Logo = (props) => {
     return (
-        <svg className="logo" >
-            <use href={`${logoSvg}#logo-symbol`} fill="currentColor" />
+        <svg className="logo" {...props} >
+            <use href={`${logoSvg}#logo-symbol`}/>
         </svg>
     )
 }
