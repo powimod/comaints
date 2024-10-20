@@ -7,25 +7,30 @@ import '../../scss/dialog.scss'
 const StandardDialog = () => {
 
     const [ dialogState, dialogDispatch ] = useContext(DialogContext)
+
     const [ dialogData, setDialogData] = useState(null)
+    const dialogDataRef = useRef(dialogData) // used by close dialog callback function
+
     const dialogRef = useRef(null)
-    const validation = useRef(false)
+    const validationRef = useRef(false)
 
     const _showDialog = (dialogType, message, resolve)  => {
+        validationRef.current = false
         setDialogData({ type:dialogType, message, resolve })
+        dialogRef.current.showModal()
     }
 
-    /*
+    useEffect(() => {
+        dialogDataRef.current = dialogData;
+    }, [dialogData])
+
     useEffect( () => {
         const modalDialog = dialogRef.current
-        if (modalDialog === null)
-            return
         modalDialog.addEventListener('close', evDialogClose)
         return () => {
             modalDialog.removeEventListener('close', evDialogClose)
         }
-    }, [dialogRef.current])
-    */
+    }, [])
 
 	useEffect( () => {
 		for (const request of dialogState) {
@@ -37,29 +42,21 @@ const StandardDialog = () => {
 		}
 	}, [dialogState])
 
-    useEffect( () => {
-        if (dialogData !== null)
-            dialogRef.current.showModal()
-        else
-            dialogRef.current.close()
-    }, [dialogData])
 
-    /*
     const evDialogClose = () => {
-        console.log("dOm dialog close")
-        dialogData.resolve(false)
-        setDialogData(null)
+        if (dialogDataRef.current !== null) {
+            dialogDataRef.current.resolve(validationRef.current)
+            setDialogData(null)
+        }
     }
-    */
 
     const evValidateButtonClick = () => {
-        dialogData.resolve(true)
-        setDialogData(null)
+        validationRef.current = true
+        dialogRef.current.close()
     }
 
     const evInvalidateButtonClick = () => {
-        dialogData.resolve(false)
-        setDialogData(null)
+        dialogRef.current.close()
     }
 
 	return ( <>
