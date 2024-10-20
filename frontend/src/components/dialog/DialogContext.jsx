@@ -4,17 +4,37 @@ const DialogContext = createContext([]);
 
 const dialogReducer = (requestList, newRequest) => {
 
-    switch (newRequest.type) {
-        case 'flash':
-            const flashMessage = (newRequest.message) ? newRequest.message : '???'
-            const flashDuration = (newRequest.duration) ? newRequest.duration : null
-            const flashRequest = {
-                id: Date.now(),
-                type: 'flash',
-                message: flashMessage,
-                duration: flashDuration
+    let request, diagId 
+    const requestType = newRequest.type
+
+    switch (requestType) {
+        case 'flash-add':
+            diagId = (newRequest.id) ? newRequest.id : Date.now()
+            const message = (newRequest.message) ? newRequest.message : '???'
+            const duration = (newRequest.duration) ? newRequest.duration : null
+            const dismissible = (newRequest.dismissible) ? newRequest.dismissible : false
+            request = {
+                type: requestType,
+                id: diagId,
+                message,
+                duration,
+                dismissible
             }
-            return [ ...requestList, flashRequest ]
+            return [ ...requestList, request]
+
+        case 'flash-remove':
+            diagId = newRequest.id
+            request = {
+                type: requestType,
+                id: diagId
+            }
+            return [ ...requestList, request ]
+
+        case 'flash-clear':
+            request = {
+                type: requestType
+            }
+            return [ ...requestList, request ]
 
         case 'bubble.show':
             const bubbleMessage = (newRequest.message) ? newRequest.message : '???'

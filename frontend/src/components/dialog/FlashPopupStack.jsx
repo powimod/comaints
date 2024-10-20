@@ -8,37 +8,43 @@ const FlashPopupStack = () => {
 
     const [ dialogState, dialogDispatch ] = useContext(DialogContext)
     const [ messageStack, setMessageStack ] = useState([])
-    const _keyRef = useRef(0)
 
     const _flashPopupStackRemove = (popupId) => {
         setMessageStack( (stack) => stack.filter( popup => popup.id !== popupId ) )
     }
 
-    const _flashPopupStackAppend = (newMessage, duration = null) => {
-        _keyRef.current++
-        const popupId = _keyRef.current
+    const _flashPopupStackAppend = (popupId, message, duration = null, dismissible = false) => {
         if (duration !== null)
             setTimeout( () => {
                 _flashPopupStackRemove(popupId)
             }, duration)
-        setMessageStack( (stack) => [ ...stack,
-            {
-                id: popupId,
-                message:newMessage,
-                duration: duration
-            }
-        ])
+        setMessageStack( (stack) => [ ...stack, { id: popupId, message, duration, dismissible } ])
+        return popupId
     }
 
     const _flashPopupStackClear = () => {
-        flashPopupStack.setMessageStack( (stack) =>  [])
+        setMessageStack( (stack) =>  [])
     }
 
     useEffect( () => {
-        for (const dialogRequest of dialogState) {
-            if (dialogRequest.type === 'flash') {
-                _flashPopupStackAppend(dialogRequest.message, dialogRequest.duration)
-                dialogDispatch({type:'acquit', id: dialogRequest.id})
+        for (const request of dialogState) {
+            const requestType = request.type
+            switch (requestType) {
+                case 'flash-add':
+                    _flashPopupStackAppend(request.id, request.message, request.duration, request.dismissible)
+                    dialogDispatch({type:'acquit', id: request.id})
+                    break
+                case 'flash-remove':
+                    _flashPopupStackRemove(request.id)
+                    dialogDispatch({type:'acquit', id: request.id})
+                    break
+                case 'flash-clear':
+                    _flashPopupStackClear()
+                    dialogDispatch({type:'acquit', id: request.id})
+                    break
+                default:
+                    console.error(`Invalid request «${requestType}»`)
+                    break
             }
         }
     }, [dialogState])
@@ -47,10 +53,10 @@ const FlashPopupStack = () => {
         _flashPopupStackRemove(popupId)
     }
 
-    return (<div className="popup-stack"> {
+    return (<div className='popup-stack'> {
             messageStack.map( (popup) =>  (
                 <div key={popup.id}> {
-                    (popup.duration !== null) ? popup.message : <>
+                    (popup.dismissible === false) ? popup.message : <>
                         <div>{popup.message}</div>
                         <div><button onClick={ev => onCloseButtonClicked(popup.id)}>OK</button></div>
                     </>
@@ -61,11 +67,23 @@ const FlashPopupStack = () => {
 
 const useFlashPopupStack = () => {
     const [ dialogState, dialogDispatch ] = useContext(DialogContext)
+    const _keyRef = useRef(1)
 
-    const add = (message, duration = 3000) => {
-        dialogDispatch({type:'flash', message, duration})
+    const add = ({message, duration = null, dismissible = false}) => {
+        const id = _keyRef.current++
+        dialogDispatch({type:'flash-add', id, message, duration, dismissible})
+        return id
     }
-    return { add }
+
+    const remove = (id) => {
+        dialogDispatch({type:'flash-remove', id})
+    }
+
+    const clear = (id) => {
+        dialogDispatch({type:'flash-clear'})
+    }
+
+    return { add, remove, clear }
 }
 
 export { useFlashPopupStack }

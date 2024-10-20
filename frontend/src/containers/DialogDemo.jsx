@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, useRef } from 'react'
 
 import { useFlashPopupStack }  from '../components/dialog/FlashPopupStack'
 /*
@@ -11,6 +11,7 @@ import ConfirmationDialog from '../components/dialog/ConfirmationDialog'
 const DialogDemo = (props) => {
 
     const flashPopupStack = useFlashPopupStack()
+    const [ flashDialogId, setFlashDialogId ]  = useState(null)
 
     //const [ dialogRequestList, pushDialogRequest ] = useContext(DialogContext)
     /*
@@ -22,7 +23,23 @@ const DialogDemo = (props) => {
 
     const showFlashMessage = () => {
         const duration = parseInt(500 + Math.random() * 3000)
-        flashPopupStack.add(`message ${Date.now()} (${duration}ms)`, duration)
+        flashPopupStack.add({message: `message ${Date.now()} (${duration}ms)`, duration})
+    }
+
+    const showPersistantFlashMessage = () => {
+        if (flashDialogId === null) {
+            setFlashDialogId(flashPopupStack.add({message: `Dismissible flash message`}))
+        }
+        else {
+            flashPopupStack.remove(flashDialogId)
+            setFlashDialogId(null)
+        }
+    }
+    const showDismissibleFlashMessage = () => {
+        flashPopupStack.add({message: `message ${Date.now()} (dismissible)`, dismissible: true})
+    }
+    const clearFlashStack = () => {
+        flashPopupStack.clear()
     }
 
 /*
@@ -84,7 +101,15 @@ const DialogDemo = (props) => {
     return (
         <main>
             <h1>Dialog demo</h1>
-            <div><button onClick={showFlashMessage}>Flash message</button></div>
+            <h2>Flash popup stack</h2>
+            <div>
+                <button onClick={showFlashMessage}>Flash message</button>
+                <button onClick={showDismissibleFlashMessage}>Dismissible message</button>
+                <button onClick={showPersistantFlashMessage}>
+                    { flashDialogId === null ? 'Show': 'Hide' } persistant message
+                </button>
+                <button onClick={clearFlashStack}>Clear flash stack</button>
+            </div>
         {/*
             <div><button onClick={showBlockingPopup}>Blocking popup</button></div>
             <div><button onClick={showBubbleMessage}>Show bubble popup</button></div>
