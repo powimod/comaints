@@ -5,6 +5,7 @@ import Footer from './components/Footer'
 
 import FlashPopupStack from './components/dialog/FlashPopupStack';
 import BubbleMessage from './components/dialog/BubbleMessage';
+import StandardDialog from './components/dialog/StandardDialog';
 
 import './scss/global.scss'
 
@@ -15,6 +16,7 @@ function App() {
         <Footer/>
         <FlashPopupStack/>
         <BubbleMessage/>
+        <StandardDialog/>
     </>)
 }
 

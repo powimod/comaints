@@ -1,6 +1,8 @@
 import { createContext, useReducer } from 'react'
 
-const DialogContext = createContext([]);
+import '../../scss/dialog.scss'
+
+const DialogContext = createContext([])
 
 const dialogReducer = (requestList, newRequest) => {
 
@@ -53,6 +55,20 @@ const dialogReducer = (requestList, newRequest) => {
                 type: requestType,
             }
             return [ ...requestList, hideBubbleRequest ]
+
+
+        case 'standard-dialog':
+            const dialogType    =  (newRequest.dialog) ? newRequest.dialog: 'message'
+            const dialogMessage = (newRequest.message) ? newRequest.message : '???'
+            const dialogResolve = (newRequest.resolve) ? newRequest.resolve : null
+            const dialogRequest = {
+                id: Date.now(),
+                type: requestType,
+                dialog: dialogType,
+                message: dialogMessage,
+                resolve: dialogResolve
+            }
+            return [ ...requestList, dialogRequest ]
 
         case 'acquit':
             const id = newRequest.id

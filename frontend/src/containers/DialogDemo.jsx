@@ -2,6 +2,8 @@ import { useState, useContext, useEffect, useRef } from 'react'
 
 import { useFlashPopupStack }  from '../components/dialog/FlashPopupStack'
 import { useBubbleMessage }  from '../components/dialog/BubbleMessage'
+import { useStandardDialog }  from '../components/dialog/StandardDialog'
+
 /*
 import { DialogContext} from '../components/dialog/DialogContext'
 import MessageDialog from '../components/dialog/MessageDialog'
@@ -15,6 +17,7 @@ const DialogDemo = (props) => {
 
     const flashPopupStack = useFlashPopupStack()
     const bubbleMessage = useBubbleMessage()
+    const standardDialog = useStandardDialog()
 
     //const [ dialogRequestList, pushDialogRequest ] = useContext(DialogContext)
     /*
@@ -56,53 +59,24 @@ const DialogDemo = (props) => {
         bubbleMessage.hide()
     }
 
-
-/*
-    const showBlockingPopup = () => {
-        pushDialogRequest({type:'flash', message: `message ${Date.now()}`})
+    const showMessageDialog = async () => {
+        await standardDialog.messageDialog('This is a first message dialog')
+        await standardDialog.messageDialog('This is a second message dialog')
     }
 
-
-    const showHealthQuestionDialog = () => {
-         setHealthQuestionDialogOpen(true)
-    }
-
-     const onHealthQuestionDialogResponse = (response) => {
-         setHealthQuestionDialogOpen(false)
-        if (response === null) {
-            pushDialogRequest({type:'bubble.show', message: `No response (escape key was pressed)`, duration: 3000})
-            return
-        }
-        if (response === true)
-            setMessage("Fine! it's a good news!")
+    const showQuestionDialog = async () => {
+        const valid = await standardDialog.questionDialog('Are you happy ?')
+        if (valid)
+            await standardDialog.messageDialog("Fine! it's a good news!")
         else
-            setMessage("Oh bad news! it makes me sad...")
-         setHealthResponseDialogOpen(true)
-     }
-
-    const showConfirmationQuestionDialog = () => {
-         setConfirmationDialogOpen(true)
+            await standardDialog.messageDialog("Oh bad news! it makes me sad...")
     }
 
-     const onConfirmationDialogResponse = (response) => {
-         setConfirmationDialogOpen(false)
-        let message
-        if (response === true)
-            message = "Action was confirmed"
-        else
-            message = "Action was canceled"
-        pushDialogRequest({type:'bubble.show', message: message, duration: 3000})
-     }
-
-
-    const showHealthResponseDialog = () => {
-         setHealthResponseDialogOpen(true)
+    const showConfirmationDialog = async () => {
+        const valid = await standardDialog.confirmationDialog('A popup message will be displayed...')
+        if (valid)
+            await standardDialog.messageDialog("Here is the popup message")
     }
-
-     const onHealthResponseDialogClose = () => {
-         setHealthResponseDialogOpen(false)
-     }
-    */
 
 
     return (
@@ -124,21 +98,14 @@ const DialogDemo = (props) => {
                 <button onClick={showBubbleMessage}>Show bubble message</button>
                 <button onClick={hideBubbleMessage}>Hide bubble message</button>
             </div>
+
+            <h2>Standard message</h2>
+            <div>
+                <button onClick={showMessageDialog}>Show message dialog</button>
+                <button onClick={showQuestionDialog}>Show question dialog</button>
+                <button onClick={showConfirmationDialog}>Show confirmation dialog</button>
+            </div>
  
-        {/*
-            <div><button onClick={showBlockingPopup}>Blocking popup</button></div>
-            <div><button onClick={showHealthQuestionDialog}>Show Question dialog</button></div>
-            <div><button onClick={showConfirmationQuestionDialog}>Show Confirmation dialog</button></div>
-            <QuestionDialog isOpen={isHealthQuestionDialogOpen} onResponse={onHealthQuestionDialogResponse}>
-                Are you happy ?
-            </QuestionDialog> 
-            <MessageDialog isOpen={isHealthResponseDialogOpen} onClose={onHealthResponseDialogClose}>
-                {message}
-            </MessageDialog>
-            <ConfirmationDialog isOpen={isConfirmationDialogOpen} onResponse={onConfirmationDialogResponse}>
-                A popup message will be displayed...
-            </ConfirmationDialog> 
-            */}
         </main>
     )
 }

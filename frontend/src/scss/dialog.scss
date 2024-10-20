@@ -51,4 +51,36 @@ div.bubble-message {
 	background-color: black;
 }
 
+dialog.standard-dialog {
+	position: relative;
+    display: flex;
+    flex-direction: column;
+	margin: auto; /* horizontal and vertical center of the dialog box */
+	padding: 1rem;
+	border: 0;
+	border-radius: 0.5rem;
+
+    &::backdrop {
+        background: hsl(0 0% 0% / 70%);
+    }
+
+    /* dialog content */
+    & > div:first-child { 
+        padding: 1rem;
+    }
+
+    /* button bar */
+    & > div:last-child {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        & > button {
+            min-width: 6rem; /* TODO hard coded min button size */
+            min-height: 4rem; /* TODO hard coded min button size */
+            margin-left: 1rem;
+            margin-right: 1rem;
+        }
+    }
+
+}
 
