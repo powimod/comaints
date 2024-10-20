@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 
 import FlashPopupStack from './components/dialog/FlashPopupStack';
+import BubbleMessage from './components/dialog/BubbleMessage';
 
 import './scss/global.scss'
 
@@ -13,6 +14,7 @@ function App() {
         <Outlet/>
         <Footer/>
         <FlashPopupStack/>
+        <BubbleMessage/>
     </>)
 }
 

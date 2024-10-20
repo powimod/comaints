@@ -43,7 +43,7 @@ const FlashPopupStack = () => {
                     dialogDispatch({type:'acquit', id: request.id})
                     break
                 default:
-                    console.error(`Invalid request «${requestType}»`)
+                    // simply ignore other requests (bubble message)
                     break
             }
         }

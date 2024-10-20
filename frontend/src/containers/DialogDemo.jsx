@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect, useRef } from 'react'
 
 import { useFlashPopupStack }  from '../components/dialog/FlashPopupStack'
+import { useBubbleMessage }  from '../components/dialog/BubbleMessage'
 /*
 import { DialogContext} from '../components/dialog/DialogContext'
 import MessageDialog from '../components/dialog/MessageDialog'
@@ -10,8 +11,10 @@ import ConfirmationDialog from '../components/dialog/ConfirmationDialog'
 
 const DialogDemo = (props) => {
 
-    const flashPopupStack = useFlashPopupStack()
     const [ flashDialogId, setFlashDialogId ]  = useState(null)
+
+    const flashPopupStack = useFlashPopupStack()
+    const bubbleMessage = useBubbleMessage()
 
     //const [ dialogRequestList, pushDialogRequest ] = useContext(DialogContext)
     /*
@@ -28,33 +31,37 @@ const DialogDemo = (props) => {
 
     const showPersistantFlashMessage = () => {
         if (flashDialogId === null) {
-            setFlashDialogId(flashPopupStack.add({message: `Dismissible flash message`}))
+            setFlashDialogId(flashPopupStack.add({message: `Persistant flash message`}))
         }
         else {
             flashPopupStack.remove(flashDialogId)
             setFlashDialogId(null)
         }
     }
+
     const showDismissibleFlashMessage = () => {
-        flashPopupStack.add({message: `message ${Date.now()} (dismissible)`, dismissible: true})
+        flashPopupStack.add({message: `Dissmissble message ${Date.now()}`, dismissible: true})
     }
+
     const clearFlashStack = () => {
         flashPopupStack.clear()
     }
+
+    const showBubbleMessage = () => {
+        const duration = parseInt(500 + Math.random() * 3000)
+        bubbleMessage.show({message: `Bubble message ${Date.now()} (${duration}ms)`, duration})
+    }
+
+    const hideBubbleMessage = () => {
+        bubbleMessage.hide()
+    }
+
 
 /*
     const showBlockingPopup = () => {
         pushDialogRequest({type:'flash', message: `message ${Date.now()}`})
     }
 
-    const showBubbleMessage = () =>  {
-        const duration = parseInt(500 + Math.random() * 3000)
-        pushDialogRequest({type:'bubble.show', message: `message ${Date.now()} (${duration}ms)`, duration: duration})
-    }
-
-    const hideBubbleMessage = () =>  {
-        pushDialogRequest({type:'bubble.hide'})
-    }
 
     const showHealthQuestionDialog = () => {
          setHealthQuestionDialogOpen(true)
@@ -101,6 +108,7 @@ const DialogDemo = (props) => {
     return (
         <main>
             <h1>Dialog demo</h1>
+
             <h2>Flash popup stack</h2>
             <div>
                 <button onClick={showFlashMessage}>Flash message</button>
@@ -110,10 +118,15 @@ const DialogDemo = (props) => {
                 </button>
                 <button onClick={clearFlashStack}>Clear flash stack</button>
             </div>
+
+            <h2>Bubble message</h2>
+            <div>
+                <button onClick={showBubbleMessage}>Show bubble message</button>
+                <button onClick={hideBubbleMessage}>Hide bubble message</button>
+            </div>
+ 
         {/*
             <div><button onClick={showBlockingPopup}>Blocking popup</button></div>
-            <div><button onClick={showBubbleMessage}>Show bubble popup</button></div>
-            <div><button onClick={hideBubbleMessage}>Hide bubble popup</button></div>
             <div><button onClick={showHealthQuestionDialog}>Show Question dialog</button></div>
             <div><button onClick={showConfirmationQuestionDialog}>Show Confirmation dialog</button></div>
             <QuestionDialog isOpen={isHealthQuestionDialogOpen} onResponse={onHealthQuestionDialogResponse}>

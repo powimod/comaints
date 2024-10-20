@@ -36,21 +36,21 @@ const dialogReducer = (requestList, newRequest) => {
             }
             return [ ...requestList, request ]
 
-        case 'bubble.show':
+        case 'bubble-show':
             const bubbleMessage = (newRequest.message) ? newRequest.message : '???'
             const bubbleDuration = (newRequest.duration) ? newRequest.duration : 2000
             const showBubbleRequest = {
                 id: Date.now(),
-                type: 'bubble.show',
+                type: requestType,
                 message: bubbleMessage,
                 duration: bubbleDuration
             }
             return [ ...requestList, showBubbleRequest ]
 
-        case 'bubble.hide':
+        case 'bubble-hide':
             const hideBubbleRequest = {
                 id: Date.now(),
-                type: 'bubble.hide'
+                type: requestType,
             }
             return [ ...requestList, hideBubbleRequest ]
 
