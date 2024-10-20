@@ -1,0 +1,38 @@
+div.popup-stack {
+	pointer-events: none; /* popup stack must not respond to click */
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	max-width: 50%;
+	min-width: 15rem;
+	top:10%;
+	height: 80%;
+	right:10%;
+
+    & > div{
+        pointer-events: auto; /* popup (with close button) must respond to click */
+        border: solid black 1px;
+        border-radius: 5px;
+        margin: 1rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0 0.5rem 0.25rem hsl(0 0% 0% / 60%);
+        color: white;
+        background-color: black;
+    }
+    & > div > div:last-child{
+        padding-top: 1.5rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    button {
+        min-width: 5rem; /* TODO hard coded min button size */
+        min-height: 3rem; /* TODO hard coded min button size */
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+}
+
+
