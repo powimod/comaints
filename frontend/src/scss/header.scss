@@ -8,18 +8,23 @@ header.root_header {
 
     display: grid;
     grid-template-areas:
-        "logo";
+        "logo accessibility";
     grid-template-columns: auto 1fr;
 
     background-color: var(--header-background-color);
     padding: var(--marge-size-medium);
 
+    /* size of logo and buttons */
     svg {
+        max-width: var(--icon-size-medium);
+        max-height: var(--icon-size-medium);
+    }
+
+    svg:first-of-type {
         grid-area: logo;
-        width: 5rem;
-        height: 5rem;
         margin-right: var(--marge-size-large);
     }
+
     h1 {
         display: none;
 
@@ -36,11 +41,19 @@ header.root_header {
         color: var(--header-subtitle-color);
     }
 
+    .accessibility-button {
+        grid-area: accessibility;
+        border: solid 1px var(--header-title-color);
+        padding: var(--marge-size-large);
+        border-radius: var(--marge-size-large);
+    }
+
+
     @media (min-width: variables.$screen-size-small)  {
 
         grid-template-areas:
-            "logo title"
-            "logo subtitle";
+            "logo title    accessibility"
+            "logo subtitle accessibility";
         grid-template-columns: auto 1fr;
 
         h1 {
@@ -60,6 +73,10 @@ header.root_header {
     }
 
     @media (min-width: variables.$screen-size-medium)  {
+        svg {
+            max-width: var(--icon-size-huge);
+            max-height: var(--icon-size-huge);
+        }
         h1 {
             font-size: var(--font-size-huge);
         }
