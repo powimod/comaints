@@ -1,4 +1,7 @@
 {
 	"header_title" : "Comaint CMMS",
-	"header_subtitle": "Computerized Maintenance Management System"
+	"header_subtitle": "Computerized Maintenance Management System",
+    "action": {
+        "logout": "Logout"
+    }
 }

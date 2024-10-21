@@ -1,6 +1,9 @@
 {
 	"header_title" : "GMAO Comaint",
-	"header_subtitle": "Gestion de maintenance assistée par ordinateur"
+	"header_subtitle": "Gestion de maintenance assistée par ordinateur",
+    "action": {
+        "logout": "Se déconnecter"
+    }
 }
 
 

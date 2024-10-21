@@ -1,0 +1,55 @@
+:root {
+	--popup-menu-width: 20rem;
+}
+
+div.popup-menu {
+    /* menu background */
+    border: solid red 1px;
+	position: fixed;
+	z-index: 100;
+	left:0;
+	top: 0;
+	bottom:0;
+	right:0;
+	background-color: rgba(0,0,0,0.5);
+
+    & > div {
+        /* menu box */
+        position: absolute;
+        width: var(--popup-menu-width);
+        border-radius: var(--marge-size-huge);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--global-color-3);
+        color: var(--global-color-0);
+        overflow-x: hidden;
+        transition-duration: 0.3s;
+        transition-property: right;
+        top: 100px;
+        right: calc( var(--popup-menu-width) * -1.1 ) ; /* hidden on the right of screen before transition */
+
+        & > * {
+            cursor: pointer;
+            padding: var(--marge-size-large);
+            margin: var(--marge-size-small);
+        }
+
+        & > *:hover {
+            background-color: white;
+            color: black;
+        }
+
+        /* close button */
+        & > *:first-child { 
+            align-self: end;
+            border: solid white 1px;
+            border-radius: 5px;
+        }
+    }
+
+    div.menu-box-shown {
+        right: 0;
+    }
+}
+
