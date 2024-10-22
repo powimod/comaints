@@ -2,6 +2,18 @@
 	"header_title" : "Comaint CMMS",
 	"header_subtitle": "Computerized Maintenance Management System",
     "action": {
-        "logout": "Logout"
+        "logout": "Logout",
+        "close": "Close"
+    },
+    "accessibility": {
+        "theme" : "Theme",
+        "light-theme" : "Light",
+        "dark-theme" : "Dark",
+        "line-spacing" : "Line spacing",
+        "line-spacing-simple" : "Simple",
+        "line-spacing-double" : "Double",
+        "lang" : "Language",
+        "lang-en" : "English",
+        "lang-fr" : "French"
     }
 }

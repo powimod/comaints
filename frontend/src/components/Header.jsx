@@ -7,16 +7,14 @@ import { faWheelchair } from '@fortawesome/free-solid-svg-icons'
 import Logo from './Logo'
 import StockButton from './StockButton'
 import PopupMenu from './PopupMenu'
+import AccessibilityDialog from './AccessibilityDialog'
 
 import '../scss/header.scss'
 
 const Header = () => {
     const { t } = useTranslation()
 	const [isAccountMenuVisible, setAccountMenuVisible] = useState(false)
-
-    const onAccessibilityButtonClick = () => {
-        console.log('accessibility')
-    }
+	const [isAccessibilityDialogOpen, setIsAccessibilityDialogOpen] = useState(false)
 
     const onAccountButtonClick = () => {
         setAccountMenuVisible(true)
@@ -25,6 +23,16 @@ const Header = () => {
 	const onLogoutClick = () => {
 		setIsLogoutDialogOpen(true)
     }
+
+	const onAccessibilityDialogClose = () => {
+		setIsAccessibilityDialogOpen(false)
+	}
+
+	const onAccessibilityButtonClick = () => {
+		setIsAccessibilityDialogOpen(true)
+	}
+
+
 
     return (
         <>
@@ -45,6 +53,7 @@ const Header = () => {
                 <div onClick={onLogoutClick}>{t('action.logout')}</div>
                 <div onClick={onLogoutClick}>{t('action.logout')}</div>
             </PopupMenu>
+		    <AccessibilityDialog isOpen={isAccessibilityDialogOpen} onClose={onAccessibilityDialogClose} /> 
         </>
     )
 }

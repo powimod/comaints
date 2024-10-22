@@ -2,7 +2,19 @@
 	"header_title" : "GMAO Comaint",
 	"header_subtitle": "Gestion de maintenance assistée par ordinateur",
     "action": {
-        "logout": "Se déconnecter"
+        "logout": "Se déconnecter",
+        "close": "Fermer"
+    },
+    "accessibility": {
+        "theme" : "Thème",
+        "light-theme" : "Clair",
+        "dark-theme" : "Sombre",
+        "line-spacing" : "Interlignage",
+        "line-spacing-simple" : "Simple",
+        "line-spacing-double" : "Double",
+        "lang" : "Langue",
+        "lang-en" : "Anglais",
+        "lang-fr" : "Français"
     }
 }
 
