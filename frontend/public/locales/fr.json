@@ -5,6 +5,14 @@
         "logout": "Se déconnecter",
         "close": "Fermer"
     },
+	"button": {
+		"yes" : "Oui",
+		"no" : "Non",
+		"ok" : "OK",
+		"cancel": "Annuler",
+		"validate": "Valider",
+        "home": "Accueil"
+	},
     "accessibility": {
         "theme" : "Thème",
         "light-theme" : "Clair",
@@ -15,6 +23,13 @@
         "lang" : "Langue",
         "lang-en" : "Anglais",
         "lang-fr" : "Français"
+    },
+    "about": {
+        "label": "À propos de",
+        "frontend_version": "Version du frontal : {{version}}", 
+        "backend_version": "Version du dorsal : {{version}}", 
+        "website": "Site web",
+        "contact": "Contact"
     }
 }
 

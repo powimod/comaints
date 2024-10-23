@@ -1,0 +1,25 @@
+main.about {
+	display: flex;
+	flex-direction: column;
+	img {
+		max-width: 10cm;
+		align-self: center;
+	}
+	h2, h3 {
+		align-self: center;
+	}
+	ul {
+		align-self: center;
+		margin: var(--marge-size-huge);
+		padding: var(--marge-size-large);
+	}
+	& > div {
+		align-self: center;
+		a {
+			font-size: var(--font-size-large);
+		}
+	}
+    svg {
+        color: var(--global-color-1);
+    }
+}

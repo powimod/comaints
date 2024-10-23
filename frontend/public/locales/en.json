@@ -5,6 +5,14 @@
         "logout": "Logout",
         "close": "Close"
     },
+	"button": {
+		"yes" : "Yes",
+		"no" : "No",
+		"ok" : "OK",
+		"cancel": "Cancel",
+		"validate": "Validate",
+        "home": "Home"
+	},
     "accessibility": {
         "theme" : "Theme",
         "light-theme" : "Light",
@@ -15,5 +23,12 @@
         "lang" : "Language",
         "lang-en" : "English",
         "lang-fr" : "French"
+    },
+    "about": {
+        "label": "About",
+        "frontend_version": "Frontal version : {{version}}", 
+        "backend_version": "Backend version : {{version}}", 
+        "website": "Website",
+        "contact": "Contact"
     }
 }
