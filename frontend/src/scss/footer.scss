@@ -9,4 +9,53 @@ footer.root_footer{
     color: var(--footer-text-color);
     padding: var(--marge-size-tiny);
 
+	display: grid;
+	grid-template-areas: 
+		"links links"
+		"copyright copyright"
+		"concept   concept";
+	padding: 0.5rem;
+	ul {
+		grid-area: links;
+		display: flex;
+		flex-direction: column;
+		flex-wrap: wrap;
+		padding: 0.2rem;
+		li {
+			margin-left: 3rem;
+            list-style: none;
+			padding: 1rem;
+			a {
+				color: var(--global-color-2);
+				text-decoration: none;
+			}
+			a:hover {
+				color: var(--global-color-0);
+			}
+            &:not(&:first-of-type):before {
+                content: "─";
+            }
+		}
+	}
+	p {
+		margin:0.5rem;
+	}
+	p.copyright {
+		grid-area: copyright;
+	}
+	p.concept {
+		grid-area: concept;
+	}
+	@media (min-width: variables.$screen-size-small)  {
+		grid-template-areas: 
+			"links links"
+			"copyright concept";
+		ul {
+			flex-direction: row;
+		}
+		
+		p.concept {
+			justify-self: end;
+		}
+	}
 }

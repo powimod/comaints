@@ -30,7 +30,13 @@
         "backend_version": "Version du dorsal : {{version}}", 
         "website": "Site web",
         "contact": "Contact"
+    },
+    "footer": {
+        "contact_us": "Contactez-nous",
+        "privacy_policy": "Politique de confidentialité",
+        "terms_of_use": "Conditions d'utilisation",
+        "all_right_reserved": "© Tous droits réservés {{name}} - {{years}}", 
+	    "about_link": "À propos de",
+        "product_conception": "Conçu par {{name}}"
     }
 }
-
-

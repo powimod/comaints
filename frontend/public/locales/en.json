@@ -30,5 +30,13 @@
         "backend_version": "Backend version : {{version}}", 
         "website": "Website",
         "contact": "Contact"
+    },
+    "footer": {
+        "contact_us": "Contact us",
+        "privacy_policy": "Privacy policy",
+        "terms_of_use": "Terms of use",
+	    "about_link": "About",
+        "all_right_reserved": "© All right reserved {{name}} - {{years}}", 
+        "product_conception": "{{name}} conception"
     }
 }

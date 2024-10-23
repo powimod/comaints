@@ -5,15 +5,11 @@ import Logo from '../components/Logo'
 import Config from '../Config'
 
 import '../scss/about.scss'
-
-//TODO import { getApiVersion } from '../api/global-api.js'
-const getApiVersion = () => {
-    return '?'
-}
+import api from '../api.js'
 
 const loader = async () => {
 	try {
-		const result = await getApiVersion()
+        const result = await api.getBackendVersion()
 		return {backendVersion: result.version}
 	}
 	catch (error) {
