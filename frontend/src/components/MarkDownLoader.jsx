@@ -24,6 +24,7 @@ const MarkDownLoader = ({source}) => {
     useEffect(() => {
         setLang(i18n.language)
         const onLanguageChanged = (lang) => {
+            console.log("dOm language changed", lang)
             setLang(lang)
         }
         i18n.on('languageChanged', onLanguageChanged)
@@ -34,6 +35,7 @@ const MarkDownLoader = ({source}) => {
 
     useEffect(() => {
         const url = lang === null ? null : `content/${lang}/${source}`
+        console.log("dOm url changed", url)
         const loadContent = async () => {
             try {
                 let response = await fetch(url)
@@ -50,90 +52,89 @@ const MarkDownLoader = ({source}) => {
             loadContent()
     }, [lang, source])
 
-
 	const interpretContent = (data) => {
-			const componentStack = []
-			let currentComponent = null 
-			let contextBuffer = []
-			let n = 0
-			let lastMode = MODE_NONE
+        const componentStack = []
+        let currentComponent = null 
+        let contextBuffer = []
+        let n = 0
+        let lastMode = MODE_NONE
 
-			const lines = data.split('\n')
-			lines.push(''); // add an empty line at then end to force last data to be rendered
+        const lines = data.split('\n')
+        lines.push(''); // add an empty line at then end to force last data to be rendered
 
-			for (let line of lines) {
-				line = line.trim()
+        for (let line of lines) {
+            line = line.trim()
 
-				if (currentComponent === null) {
-					currentComponent = []
-					componentStack.push(currentComponent)
-				}
-				
-				const extractOrderedItem =  orderedListRegExp.exec(line)
+            if (currentComponent === null) {
+                currentComponent = []
+                componentStack.push(currentComponent)
+            }
+            
+            const extractOrderedItem =  orderedListRegExp.exec(line)
 
-				let newMode = MODE_NONE
-				if (line.startsWith('###'))
-					newMode = MODE_TITLE_3 
-				else if (line.startsWith('##'))
-					newMode = MODE_TITLE_2 
-				else if (line.startsWith('#'))
-					newMode = MODE_TITLE_1 
-				else if (line.startsWith('-'))
-					newMode = MODE_ORDERED_LIST
-				else if (extractOrderedItem !== null)
-					newMode = MODE_UNORDERED_LIST
-				else if (line.length > 0)
-					newMode = MODE_PARAGRAPH
+            let newMode = MODE_NONE
+            if (line.startsWith('###'))
+                newMode = MODE_TITLE_3 
+            else if (line.startsWith('##'))
+                newMode = MODE_TITLE_2 
+            else if (line.startsWith('#'))
+                newMode = MODE_TITLE_1 
+            else if (line.startsWith('-'))
+                newMode = MODE_ORDERED_LIST
+            else if (extractOrderedItem !== null)
+                newMode = MODE_UNORDERED_LIST
+            else if (line.length > 0)
+                newMode = MODE_PARAGRAPH
 
-				// render and empty buffers when mode changes
-				switch (lastMode) {
-					case MODE_PARAGRAPH:
-						if (newMode !== MODE_PARAGRAPH) {
-							currentComponent.push(<p key={n++}>{contextBuffer.join('\n')}</p>)
-							contextBuffer = []
-						}
-						break
-					case MODE_ORDERED_LIST:
-						if (newMode !== MODE_ORDERED_LIST) {
-							currentComponent.push( <ul key={n++}> { contextBuffer.map( (line,i) => <li key={i}>{line}</li> ) } </ul>)
-							contextBuffer = []
-						}
-						break
-					case MODE_UNORDERED_LIST:
-						if (lastMode === MODE_UNORDERED_LIST && newMode !== MODE_UNORDERED_LIST) {
-							currentComponent.push( <ol key={n++}> { contextBuffer.map( (line,i) => <li key={i}>{line}</li> ) } </ol>)
-							contextBuffer = []
-						}
-						break
-				}
+            // render and empty buffers when mode changes
+            switch (lastMode) {
+                case MODE_PARAGRAPH:
+                    if (newMode !== MODE_PARAGRAPH) {
+                        currentComponent.push(<p key={n++}>{contextBuffer.join('\n')}</p>)
+                        contextBuffer = []
+                    }
+                    break
+                case MODE_ORDERED_LIST:
+                    if (newMode !== MODE_ORDERED_LIST) {
+                        currentComponent.push( <ul key={n++}> { contextBuffer.map( (line,i) => <li key={i}>{line}</li> ) } </ul>)
+                        contextBuffer = []
+                    }
+                    break
+                case MODE_UNORDERED_LIST:
+                    if (lastMode === MODE_UNORDERED_LIST && newMode !== MODE_UNORDERED_LIST) {
+                        currentComponent.push( <ol key={n++}> { contextBuffer.map( (line,i) => <li key={i}>{line}</li> ) } </ol>)
+                        contextBuffer = []
+                    }
+                    break
+            }
 
-				switch (newMode) {
-					case MODE_PARAGRAPH:
-						contextBuffer.push(line)
-						break
-					case MODE_ORDERED_LIST:
-						contextBuffer.push(line.substr(1).trim())
-						break
-					case MODE_UNORDERED_LIST:
-						contextBuffer.push(extractOrderedItem[1])
-						break
-					case MODE_TITLE_3 :
-						currentComponent.push(<h3 key={n++}>{line.substr(3).trim()}</h3>)
-						break
-					case MODE_TITLE_2 :
-						currentComponent.push(<h2 key={n++}>{line.substr(2).trim()}</h2>)
-						break
-					case MODE_TITLE_1 :
-						currentComponent.push(<h1 key={n++}>{line.substr(1).trim()}</h1>)
-						break
-				}
+            switch (newMode) {
+                case MODE_PARAGRAPH:
+                    contextBuffer.push(line)
+                    break
+                case MODE_ORDERED_LIST:
+                    contextBuffer.push(line.substr(1).trim())
+                    break
+                case MODE_UNORDERED_LIST:
+                    contextBuffer.push(extractOrderedItem[1])
+                    break
+                case MODE_TITLE_3 :
+                    currentComponent.push(<h3 key={n++}>{line.substr(3).trim()}</h3>)
+                    break
+                case MODE_TITLE_2 :
+                    currentComponent.push(<h2 key={n++}>{line.substr(2).trim()}</h2>)
+                    break
+                case MODE_TITLE_1 :
+                    currentComponent.push(<h1 key={n++}>{line.substr(1).trim()}</h1>)
+                    break
+            }
 
-				lastMode = newMode
-			}
+            lastMode = newMode
+        }
 
-			if (componentStack.length > 1)
-				console.error('Component stack root is not unique')
-			setContent(componentStack[0])
+        if (componentStack.length > 1)
+            console.error('Component stack root is not unique')
+        setContent(componentStack[0])
 	}
 
     if (error !== null) 
@@ -143,7 +144,7 @@ const MarkDownLoader = ({source}) => {
         return <>{t('loading')}</>
 
 	return (<div className='markdown'>
-        { content }
+            { content }
         </div>)
 }
 
