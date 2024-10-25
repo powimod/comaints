@@ -53,8 +53,7 @@ const MarkDownLoader = ({source}) => {
     }, [lang, source])
 
 	const interpretContent = (data) => {
-        const componentStack = []
-        let currentComponent = null 
+        const componentArray = []
         let contextBuffer = []
         let n = 0
         let lastMode = MODE_NONE
@@ -65,10 +64,6 @@ const MarkDownLoader = ({source}) => {
         for (let line of lines) {
             line = line.trim()
 
-            if (currentComponent === null) {
-                currentComponent = []
-                componentStack.push(currentComponent)
-            }
             
             const extractOrderedItem =  orderedListRegExp.exec(line)
 
@@ -90,19 +85,19 @@ const MarkDownLoader = ({source}) => {
             switch (lastMode) {
                 case MODE_PARAGRAPH:
                     if (newMode !== MODE_PARAGRAPH) {
-                        currentComponent.push(<p key={n++}>{contextBuffer.join('\n')}</p>)
+                        componentArray.push(<p key={n++}>{contextBuffer.join('\n')}</p>)
                         contextBuffer = []
                     }
                     break
                 case MODE_ORDERED_LIST:
                     if (newMode !== MODE_ORDERED_LIST) {
-                        currentComponent.push( <ul key={n++}> { contextBuffer.map( (line,i) => <li key={i}>{line}</li> ) } </ul>)
+                        componentArray.push(<ul key={n++}> { contextBuffer.map( (line,i) => <li key={i}>{line}</li> ) } </ul>)
                         contextBuffer = []
                     }
                     break
                 case MODE_UNORDERED_LIST:
                     if (lastMode === MODE_UNORDERED_LIST && newMode !== MODE_UNORDERED_LIST) {
-                        currentComponent.push( <ol key={n++}> { contextBuffer.map( (line,i) => <li key={i}>{line}</li> ) } </ol>)
+                        componentArray.push(<ol key={n++}> { contextBuffer.map( (line,i) => <li key={i}>{line}</li> ) } </ol>)
                         contextBuffer = []
                     }
                     break
@@ -119,22 +114,20 @@ const MarkDownLoader = ({source}) => {
                     contextBuffer.push(extractOrderedItem[1])
                     break
                 case MODE_TITLE_3 :
-                    currentComponent.push(<h3 key={n++}>{line.substr(3).trim()}</h3>)
+                    componentArray.push(<h3 key={n++}>{line.substr(3).trim()}</h3>)
                     break
                 case MODE_TITLE_2 :
-                    currentComponent.push(<h2 key={n++}>{line.substr(2).trim()}</h2>)
+                    componentArray.push(<h2 key={n++}>{line.substr(2).trim()}</h2>)
                     break
                 case MODE_TITLE_1 :
-                    currentComponent.push(<h1 key={n++}>{line.substr(1).trim()}</h1>)
+                    componentArray.push(<h1 key={n++}>{line.substr(1).trim()}</h1>)
                     break
             }
 
             lastMode = newMode
         }
 
-        if (componentStack.length > 1)
-            console.error('Component stack root is not unique')
-        setContent(componentStack[0])
+        setContent(componentArray)
 	}
 
     if (error !== null) 
