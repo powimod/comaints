@@ -19,7 +19,8 @@ const MarkDownLoader = ({source}) => {
 
 	const [ lang, setLang ] = useState(null)
     const [ error, setError] = useState(null)
-    const [ content, setContent ] = useState(null)
+    const [ textContent, setTextContent ] = useState(null)
+    const [ contentComponents, setContentComponents ] = useState(null)
 
     useEffect(() => {
         setLang(i18n.language)
@@ -41,8 +42,8 @@ const MarkDownLoader = ({source}) => {
                 let response = await fetch(url)
                 if (! response.ok)
                     throw new Error(response.statusText)
-                let data = await response.text()
-                interpretContent(data)
+                let text = await response.text()
+                setTextContent(text)
             } catch (error) {
                 setError(`Failed to load «${url}» : ${error.message}`)
                 console.error(error)
@@ -52,13 +53,17 @@ const MarkDownLoader = ({source}) => {
             loadContent()
     }, [lang, source])
 
-	const interpretContent = (data) => {
+
+    useEffect( () => {
+        if (textContent === null)
+            return
+
         const componentArray = []
         let contextBuffer = []
         let n = 0
         let lastMode = MODE_NONE
 
-        const lines = data.split('\n')
+        const lines = textContent.split('\n')
         lines.push(''); // add an empty line at then end to force last data to be rendered
 
         for (let line of lines) {
@@ -127,17 +132,17 @@ const MarkDownLoader = ({source}) => {
             lastMode = newMode
         }
 
-        setContent(componentArray)
-	}
+        setContentComponents(componentArray)
+	}, [ textContent ])
 
     if (error !== null) 
         return <>Error {error}</>
 
-    if (content === null) 
+    if (contentComponents === null) 
         return <>{t('loading')}</>
 
 	return (<div className='markdown'>
-            { content }
+            { contentComponents }
         </div>)
 }
 
