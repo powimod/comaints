@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import i18n from 'i18next'
 
+import '../scss/markdown-loader.scss'
+
 const MODE_NONE = 0
 const MODE_TITLE_1 = 1
 const MODE_TITLE_2 = 2
@@ -52,9 +54,7 @@ const MarkDownLoader = ({source}) => {
 	const interpretContent = (data) => {
 			const componentStack = []
 			let currentComponent = null 
-			let bulletList = []
-			let orderedList = []
-			let paragraph = []
+			let contextBuffer = []
 			let n = 0
 			let lastMode = MODE_NONE
 
@@ -89,33 +89,33 @@ const MarkDownLoader = ({source}) => {
 				switch (lastMode) {
 					case MODE_PARAGRAPH:
 						if (newMode !== MODE_PARAGRAPH) {
-							currentComponent.push(<p key={n++}>{paragraph.join('\n')}</p>)
-							paragraph = []
+							currentComponent.push(<p key={n++}>{contextBuffer.join('\n')}</p>)
+							contextBuffer = []
 						}
 						break
 					case MODE_ORDERED_LIST:
 						if (newMode !== MODE_ORDERED_LIST) {
-							currentComponent.push( <ul key={n++}> { bulletList.map( (line,i) => <li key={i}>{line}</li> ) } </ul>)
-							bulletList = []
+							currentComponent.push( <ul key={n++}> { contextBuffer.map( (line,i) => <li key={i}>{line}</li> ) } </ul>)
+							contextBuffer = []
 						}
 						break
 					case MODE_UNORDERED_LIST:
 						if (lastMode === MODE_UNORDERED_LIST && newMode !== MODE_UNORDERED_LIST) {
-							currentComponent.push( <ol key={n++}> { orderedList.map( (line,i) => <li key={i}>{line}</li> ) } </ol>)
-							orderedList = []
+							currentComponent.push( <ol key={n++}> { contextBuffer.map( (line,i) => <li key={i}>{line}</li> ) } </ol>)
+							contextBuffer = []
 						}
 						break
 				}
 
 				switch (newMode) {
 					case MODE_PARAGRAPH:
-						paragraph.push(line)
+						contextBuffer.push(line)
 						break
 					case MODE_ORDERED_LIST:
-						bulletList.push(line.substr(1).trim())
+						contextBuffer.push(line.substr(1).trim())
 						break
 					case MODE_UNORDERED_LIST:
-						orderedList.push(extractOrderedItem[1])
+						contextBuffer.push(extractOrderedItem[1])
 						break
 					case MODE_TITLE_3 :
 						currentComponent.push(<h3 key={n++}>{line.substr(3).trim()}</h3>)
@@ -140,9 +140,11 @@ const MarkDownLoader = ({source}) => {
         return <>Error {error}</>
 
     if (content === null) 
-        return <>Loading...</>
+        return <>{t('loading')}</>
 
-	return (<> { content } </>)
+	return (<div className='markdown'>
+        { content }
+        </div>)
 }
 
 export default MarkDownLoader
