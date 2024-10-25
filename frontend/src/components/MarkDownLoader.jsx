@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import i18n from 'i18next'
 
-const MODE_NONE = 0; // FIXME really used ?
+const MODE_NONE = 0
 const MODE_TITLE_1 = 1
 const MODE_TITLE_2 = 2
 const MODE_TITLE_3 = 3
@@ -16,47 +16,37 @@ const MarkDownLoader = ({source}) => {
 	const orderedListRegExp =  new RegExp('^\\d+ +(.*)')
 
 	const [ lang, setLang ] = useState(null)
-    const [ content, setContent ] = useState(null)
     const [ error, setError] = useState(null)
-    const [ url, setUrl ] = useState(null)
-    const urlRef = useRef(null)
+    const [ content, setContent ] = useState(null)
 
-    useEffect( () => {
-        setUrl( lang === null ? null : `content/${lang}/${source}`)
-    }, [ lang ])
+    useEffect(() => {
+        setLang(i18n.language)
+        const onLanguageChanged = (lang) => {
+            setLang(lang)
+        }
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => {
+            i18n.off('languageChanged', onLanguageChanged)
+        }
+    }, [])
 
-    useEffect( () => {
-        urlRef.current = url
-    }, [ url ])
-
-	const onLanguageChanged = (lang) => {
-		setLang(lang)
-	}
-
-	useEffect( () => {
-		setLang(i18n.language)
-		i18n.on('languageChanged', onLanguageChanged)
-		return () => {
-			i18n.off('languageChanged', onLanguageChanged)
-		}
-	}, [])
-
-    useEffect( () => {
+    useEffect(() => {
+        const url = lang === null ? null : `content/${lang}/${source}`
         const loadContent = async () => {
-            let response = await fetch(urlRef.current)
-            // .htaccess and vite.config has been customized to return an error if a MarkDown file does not exist. 
-            // Otherwise all requests are redirected to index.html and fetch always obtains a 200 OK.
-            console.log(response)
-            if (! response.ok) {
-                setError(`File «${urlRef.current}» not found`)
-            }
-            else {
-                let data  = await response.text()
+            try {
+                let response = await fetch(url)
+                if (! response.ok)
+                    throw new Error(response.statusText)
+                let data = await response.text()
                 interpretContent(data)
+            } catch (error) {
+                setError(`Failed to load «${url}» : ${error.message}`)
+                console.error(error)
             }
         }
-        loadContent()
-    }, [ url ])
+        if (lang !== null)
+            loadContent()
+    }, [lang, source])
 
 
 	const interpretContent = (data) => {
@@ -152,15 +142,7 @@ const MarkDownLoader = ({source}) => {
     if (content === null) 
         return <>Loading...</>
 
-
-	return (<>
-        { content === null ?
-            'Loading' :
-            <>
-                { content }
-            </>
-        }
-        </>)
+	return (<> { content } </>)
 }
 
 export default MarkDownLoader
