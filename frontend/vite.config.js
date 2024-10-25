@@ -1,9 +1,31 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { existsSync } from 'fs'
+import { join } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [ react() ],
+    plugins: [
+        react(),
+        {
+            name: 'control-md-files',
+            configureServer(server) {
+                server.middlewares.use((req, res, next) => {
+                    if (! req.url.endsWith('.md')) {
+                        next()
+                        return
+                    }
+                    const filePath = join(process.cwd(), 'public', req.url)
+                    if (existsSync(filePath)) {
+                        next()
+                        return
+                    }
+                    res.statusCode = 404
+                    res.end('Not Found')
+                })
+            }
+        }
+    ],
     server: {
 		host: "0.0.0.0",
 		port: 9000,
