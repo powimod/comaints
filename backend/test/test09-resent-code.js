@@ -39,7 +39,7 @@ describe('Test delete account route', () => {
         }
         catch (error) {
             expect(error).to.be.instanceOf(Error)
-            expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+            expect(error.message).to.equal('Unauthorized')
         }
     })
 
@@ -65,7 +65,7 @@ describe('Test delete account route', () => {
         }
         catch (error) {
             expect(error).to.be.instanceOf(Error)
-            expect(error.message).to.equal('Server status 400 ({"error":"No authentification operation in progress"})')
+            expect(error.message).to.equal('No authentification operation in progress')
         }
     })
 

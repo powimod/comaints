@@ -51,7 +51,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Expired access token","refresh-token":null,"access-token":null})')
+                expect(error.message).to.equal('Expired access token')
                 expect(accessToken).to.equal(null)
                 expect(refreshToken).to.equal(null)
             }
@@ -65,7 +65,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «token» not found in request body"})')
+                expect(error.message).to.equal('Parameter «token» not found in request body')
             }
         })
 
@@ -76,7 +76,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Invalid value for «token» parameter in request body"})')
+                expect(error.message).to.equal('Invalid value for «token» parameter in request body')
             }
         })
 
@@ -88,7 +88,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid token"})')
+                expect(error.message).to.equal('Invalid token')
             }
         })
 

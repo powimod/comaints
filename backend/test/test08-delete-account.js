@@ -39,7 +39,7 @@ describe('Test delete account route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «confirmation» not found in request body"})')
+                expect(error.message).to.equal('Parameter «confirmation» not found in request body')
             }
         })
     })
@@ -85,7 +85,7 @@ describe('Test delete account route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+                expect(error.message).to.equal('Unauthorized')
             }
         })
 
@@ -99,7 +99,7 @@ describe('Test delete account route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 401 ({"error":"Invalid EMail or password"})`)
+                expect(error.message).to.equal(`Invalid EMail or password`)
             }
         })
 

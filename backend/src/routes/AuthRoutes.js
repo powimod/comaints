@@ -5,7 +5,8 @@ import assert from 'assert'
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import ControllerSingleton from '../controller.js'
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs'
+import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, 
+    ComaintApiError, comaintErrors } from '../../../common/src/error.mjs'
 import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 
@@ -52,7 +53,8 @@ class AuthRoutes {
                     // TODO View.sendJsonError(response, error)
                     // TODO add selftest to check invalid token 
                     return response.status(401).json({
-                        error: errorMessage, // FIXME translation
+                        error: comaintErrors.UNAUTHORIZED_ERROR,
+                        message: errorMessage, // FIXME translation
                         'refresh-token': null,
                         'access-token': null
                     })
@@ -354,7 +356,10 @@ const requireUserAuth = (request, response, next) => {
     assert(connected !== undefined)
     console.log(`require user auth, userId:${userId}, connected:${connected}`)
     if (userId === null || connected !== true)
-        return response.status(401).json({ error: 'Unauthorized' }) // FIXME translation
+        return response.status(401).json({ 
+            error: comaintErrors.UNAUTHORIZED_ERROR,
+            message: 'Unauthorized' // FIXME translation
+        })
     next()
 }
 

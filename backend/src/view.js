@@ -2,7 +2,7 @@
 
 import assert from 'assert'
 
-import { ComaintTranslatedError } from '../../common/src/error.mjs'
+import { ComaintTranslatedError, comaintErrors } from '../../common/src/error.mjs'
 
 class View {
 
@@ -68,7 +68,11 @@ class View {
         else
             throw new Error(`Invalid error parameter`)
         this.response.set('Content-Type', 'application/json')
-        this.response.status(error.httpStatus || 500).send({error: errorMessage})
+        const errorId = error.errorId || comaintErrors.INTERNAL_ERROR
+        this.response.status(error.httpStatus || 500).send({
+            error: errorId,
+            message: errorMessage
+        })
     }
 }
 

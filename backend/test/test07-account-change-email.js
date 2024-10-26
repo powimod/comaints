@@ -43,7 +43,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «email» not found in request body"})')
+                expect(error.message).to.equal('Parameter «email» not found in request body')
             }
         })
 
@@ -54,7 +54,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Invalid value for «newEmail» parameter in request body"})')
+                expect(error.message).to.equal('Invalid value for «newEmail» parameter in request body')
             }
         })
 
@@ -65,7 +65,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Property «email» is not a valid email"})')
+                expect(error.message).to.equal('Property «email» is not a valid email')
             }
         })
 
@@ -77,7 +77,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «password» not found in request body"})')
+                expect(error.message).to.equal('Parameter «password» not found in request body')
             }
         })
 
@@ -88,7 +88,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Invalid value for «password» parameter in request body"})')
+                expect(error.message).to.equal('Invalid value for «password» parameter in request body')
             }
         })
 
@@ -99,7 +99,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password is too small"})')
+                expect(error.message).to.equal('Password is too small')
             }
         })
 
@@ -111,7 +111,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid password"})')
+                expect(error.message).to.equal('Invalid password')
             }
         })
 
@@ -123,7 +123,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"New email address is the same"})')
+                expect(error.message).to.equal('New email address is the same')
             }
         })
 
@@ -135,7 +135,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Email address is already used"})')
+                expect(error.message).to.equal('Email address is already used')
             }
         })
     })
@@ -217,7 +217,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 401 ({"error":"Invalid EMail or password"})`)
+                expect(error.message).to.equal(`Invalid EMail or password`)
             }
         })
 

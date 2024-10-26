@@ -65,18 +65,19 @@ const jsonFull = async (routeUrl, httpMethod, options = {}, requestParams = {}) 
            url.searchParams.append(paramName, paramValue)
     }
     const response = await fetch(url, fetchParam)
-   
+
     // Interpret response before HTTP status
     const contentType = response.headers.get('content-type');
     if (! contentType)
         throw new Error('API response content type not found')
 
+
     if (contentType.includes('text/html')) {
         const textResponse = await response.text()
-        throw new Error(`Server status ${response.status} (${textResponse})`)
+        throw new Error(textResponse)
     }
 
-    if (! contentType.includes('application/json')) 
+    if (! contentType.includes('application/json'))
         throw new Error(`API response content type is not JSON (${contentType}`)
 
     const jsonResponse = await response.json()
@@ -89,8 +90,8 @@ const jsonFull = async (routeUrl, httpMethod, options = {}, requestParams = {}) 
         refreshToken = jsonResponse['refresh-token']
 
     if (! response.ok) {
-        const textResponse = jsonResponse.message ? jsonReponse.message : JSON.stringify(jsonResponse)
-        throw new Error(`Server status ${response.status} (${textResponse})`)
+        const message = jsonResponse.message ? jsonResponse.message : JSON.stringify(jsonResponse)
+        throw new Error(message)
     }
 
     return jsonResponse
@@ -156,7 +157,7 @@ const util = {
     disconnectDb,
     requestDb,
     accessToken,
-    refreshToken 
+    refreshToken
 }
 
 export default util
@@ -171,6 +172,6 @@ export {
     disconnectDb,
     requestDb,
     accessToken,
-    refreshToken 
+    refreshToken
 }
 

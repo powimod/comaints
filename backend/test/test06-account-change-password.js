@@ -49,7 +49,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «currentPassword» not found in request body"})')
+                expect(error.message).to.equal('Parameter «currentPassword» not found in request body')
             }
         })
 
@@ -60,7 +60,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Invalid value for «currentPassword» parameter in request body"})')
+                expect(error.message).to.equal('Invalid value for «currentPassword» parameter in request body')
             }
         })
 
@@ -71,7 +71,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password is too small"})')
+                expect(error.message).to.equal('Password is too small')
             }
         })
 
@@ -82,7 +82,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Invalid value for «newPassword» parameter in request body"})')
+                expect(error.message).to.equal('Invalid value for «newPassword» parameter in request body')
             }
         })
 
@@ -93,7 +93,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password is too small"})')
+                expect(error.message).to.equal('Password is too small')
             }
         })
 
@@ -106,7 +106,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid password"})')
+                expect(error.message).to.equal('Invalid password')
             }
         })
     })
@@ -141,7 +141,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+                expect(error.message).to.equal('Unauthorized')
             }
         })
 
@@ -152,7 +152,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+                expect(error.message).to.equal('Unauthorized')
             }
         })
 

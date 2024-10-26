@@ -38,7 +38,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Parameter «email» not found in request body"})`)
+                expect(error.message).to.equal(`Parameter «email» not found in request body`)
             }
         })
 
@@ -52,7 +52,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Property «email» is too short"})`)
+                expect(error.message).to.equal(`Property «email» is too short`)
             }
         })
 
@@ -66,7 +66,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Property «email» is not a valid email"})`)
+                expect(error.message).to.equal(`Property «email» is not a valid email`)
             }
         })
 
@@ -81,7 +81,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «password» not found in request body"})')
+                expect(error.message).to.equal('Parameter «password» not found in request body')
             }
         })
 
@@ -97,7 +97,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password is too small"})')
+                expect(error.message).to.equal('Password is too small')
             }
         })
 
@@ -112,7 +112,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain uppercase letter"})')
+                expect(error.message).to.equal('Password does not contain uppercase letter')
             }
         })
 
@@ -127,7 +127,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain digit character"})')
+                expect(error.message).to.equal('Password does not contain digit character')
             }
         })
 
@@ -142,7 +142,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain special character"})')
+                expect(error.message).to.equal('Password does not contain special character')
             }
         })
 
@@ -157,7 +157,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+                expect(error.message).to.equal('Unauthorized')
             }
         })
 
@@ -172,7 +172,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+                expect(error.message).to.equal('Invalid EMail or password')
             }
         })
 
@@ -215,7 +215,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"User already connected"})')
+                expect(error.message).to.equal('User already connected')
             }
         })
 
@@ -240,7 +240,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+                expect(error.message).to.equal('Unauthorized')
             }
         })
 
@@ -302,7 +302,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+                expect(error.message).to.equal('Invalid EMail or password')
             }
         })
         it('Check user in database after first login attempt', async () => {
@@ -325,7 +325,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+                expect(error.message).to.equal('Invalid EMail or password')
             }
         })
         it('Check user in database after second login attempt', async () => {
@@ -348,7 +348,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+                expect(error.message).to.equal('Invalid EMail or password')
             }
         })
 
