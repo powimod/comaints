@@ -12,7 +12,6 @@ class ComaintBackendApi {
         this.#backendUrl = backendUrl
     }
 
-
     checkApiLib() {
         return {success: true, message: 'Comaint api-lib is working !'}
     }
