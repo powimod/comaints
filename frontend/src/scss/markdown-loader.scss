@@ -1,0 +1,33 @@
+div.markdown {
+    background-color: var(--global-color-0);
+    padding: var(--marge-size-huge);
+
+    h1 {
+        color: var(--global-color-1);
+        font-size: var(--font-size-huge);
+        margin-top: var(--marge-size-medium);
+        margin-bottom: var(--marge-size-huge);
+    }
+    h2 {
+        color: var(--global-color-1);
+        font-size: var(--font-size-large);
+        margin-top: var(--marge-size-huge);
+        margin-bottom: var(--marge-size-medium);
+    }
+    h3 {
+        color: var(--global-color-1);
+        font-size: var(--font-size-medium);
+        margin-top: var(--marge-size-huge);
+        margin-bottom: var(--marge-size-medium);
+    }
+    p {
+        color: var(--global-color-3);
+        font-size: var(--font-size-medium);
+        margin-top: var(--marge-size-medium);
+        margin-bottom: var(--marge-size-medium);
+    }
+    li {
+        margin-left: 2rem;
+    }
+
+}

@@ -1,0 +1,27 @@
+.accessibility-dialog {
+	min-width: 30rem;
+	line-height: normal;
+	fieldset {
+		margin: var(--marge-size-large);
+		border: solid black 1px;
+		padding-left: var(--marge-size-large);
+		& > legend {
+			font-weight: bold;
+			font-size: var(--font-size-medium);
+		}
+		&> div {
+			margin: var(--marge-size-huge);
+			& > label {
+				font-size: var(--font-size-medium);
+                margin: var(--marge-size-medium);
+			}
+		}
+	}
+
+    /* button bar */
+    & > div:last-of-type {
+        display: flex;
+        justify-content: center;
+        margin: var(--marge-size-large) var(--marge-size-medium);
+    }  
+}

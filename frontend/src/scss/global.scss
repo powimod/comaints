@@ -1,0 +1,55 @@
+@use './variables';
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+
+
+:root {
+    --font-size-huge   : 3rem;
+    --font-size-large  : 2rem;
+    --font-size-medium : 1.5rem;
+    --font-size-small  : 1.3rem;
+    --font-size-tiny   : 1.1rem;
+
+    --marge-size-huge   : 1.2rem;
+    --marge-size-large  : 0.7rem;
+    --marge-size-medium : 0.3rem;
+    --marge-size-small  : 0.2rem;
+    --marge-size-tiny   : 0.1rem;
+
+    --icon-size-huge   : 6rem;
+    --icon-size-large  : 4rem;
+    --icon-size-medium : 3rem;
+    --icon-size-small  : 2rem;
+    --icon-size-tiny   : 1rem;
+
+    --global-color-0: #ffffff; /* white */
+    --global-color-1: #104992; /* dark blue */
+    --global-color-2: #72b6fe; /* light blue */
+    --global-color-3: #000000; /* black */
+    --global-color-4: #323232; /* dark gray*/
+}
+
+html {  
+    font-size: 62.5%; /* 1rem = 10 px */
+    height:100%; /* to move footer at the bottom of the window */
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-size: var(--font-size-medium);
+}
+
+.orbitron-900 {
+    font-family: "Orbitron", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 900;
+    font-style: normal;
+}
+

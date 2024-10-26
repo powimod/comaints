@@ -1,0 +1,43 @@
+{
+    "loading": "Chargement...",
+	"header_title" : "GMAO Comaint",
+	"header_subtitle": "Gestion de maintenance assistée par ordinateur",
+    "action": {
+        "logout": "Se déconnecter",
+        "close": "Fermer"
+    },
+	"button": {
+		"yes" : "Oui",
+		"no" : "Non",
+		"ok" : "OK",
+		"cancel": "Annuler",
+		"validate": "Valider",
+        "home": "Accueil"
+	},
+    "accessibility": {
+        "theme" : "Thème",
+        "light-theme" : "Clair",
+        "dark-theme" : "Sombre",
+        "line-spacing" : "Interlignage",
+        "line-spacing-simple" : "Simple",
+        "line-spacing-double" : "Double",
+        "lang" : "Langue",
+        "lang-en" : "Anglais",
+        "lang-fr" : "Français"
+    },
+    "about": {
+        "label": "À propos de",
+        "frontend_version": "Version du frontal : {{version}}", 
+        "backend_version": "Version du dorsal : {{version}}", 
+        "website": "Site web",
+        "contact": "Contact"
+    },
+    "footer": {
+        "contact_us": "Contactez-nous",
+        "privacy_policy": "Politique de confidentialité",
+        "terms_of_use": "Conditions d'utilisation",
+        "all_right_reserved": "© Tous droits réservés {{name}} - {{years}}", 
+	    "about_link": "À propos de",
+        "product_conception": "Conçu par {{name}}"
+    }
+}

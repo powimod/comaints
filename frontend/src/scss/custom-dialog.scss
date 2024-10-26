@@ -1,0 +1,25 @@
+dialog.custom-dialog {
+	position: fixed;
+	margin: auto; /* horizontal and vertical center */
+	padding: 0;
+	border: 0;
+	border-radius: 0.5rem;
+	box-shadow: 0 0 0.5rem 0.25rem hsl(0 0% 0% / 10%);
+
+    &::backdrop {
+        background: hsl(0 0% 0% / 70%);
+    }
+
+    & > div:first-child {
+        padding: 0.5rem;
+    }
+
+    & > div:last-child button { /* button bar */
+        min-width: 6rem; /* TODO hard coded min button size */
+        min-height: 4rem; /* TODO hard coded min button size */
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+}
+
+
