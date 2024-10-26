@@ -1,15 +1,22 @@
 'use strict'
 
 import { jsonGet, jsonPost } from './util.js'
+import AuthApi from './AuthApi.js'
 
 class ComaintBackendApi {
 
     #backendUrl = null
+    #auth = null
 
     constructor(backendUrl) {
         if (! backendUrl)
             throw new Error('Parameter «backendUrl» not defined')
         this.#backendUrl = backendUrl
+        this.#auth = new AuthApi(backendUrl)
+    }
+
+    get auth() {
+        return this.#auth
     }
 
     checkApiLib() {

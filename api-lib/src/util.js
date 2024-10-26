@@ -23,9 +23,17 @@ const jsonFull = async (backendUrl, routeUrl, httpMethod, options, requestBody) 
 
 	const response = await fetch(url, fetchParam)
 	if (! response.ok) {
-        const message = await response.text()
-        //console.log("Erreur : ", message)
-		throw new Error(`Server status ${response.status} (${message})`)
+        let errorMessage = 'Unknown error'
+        try {
+            const error = await response.json()
+            //console.log("JSON Error : ", error.error)
+            errorMessage = error.error
+        }
+        catch(error) {
+            const text = await response.text()
+            errorMessage = text
+        }
+        throw new Error(errorMessage)
     }
 	return await response.json()
 }
