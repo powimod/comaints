@@ -22,7 +22,7 @@ const useAuthActions = () => {
     }
 
     const validateCode = (code) => {
-        dispatch(validateAuthCode())
+        dispatch(validateAuthCode({code}))
     }
 
     return {

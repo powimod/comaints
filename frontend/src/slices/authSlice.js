@@ -19,7 +19,7 @@ export const validateAuthCode = createAsyncThunk(
     'auth/validateAuthCode',
     async ({ code }, { rejectWithValue }) => {
         try {
-            const response = await api.auth.validate(code)
+            const response = await api.auth.validate({ code })
             return response
         } catch (error) {
             console.error('Auth code validation failed: ', error.message)

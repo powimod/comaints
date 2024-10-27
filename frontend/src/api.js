@@ -10,7 +10,7 @@ const accountSerializeFunction = (data) => {
     else {
         // save account to local storage
         const accountData = JSON.stringify(data)
-        localStorage.setItem(accountStorageKey, accountId)
+        localStorage.setItem(accountStorageKey, accountData)
     }
     return data
 }
