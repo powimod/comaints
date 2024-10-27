@@ -53,19 +53,23 @@
         }
     },
     "register": {
-        "mail_body": "Hello,\nYour validation code for the creation of an account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
+        "mail_body": "Hello,\nYour validation code for the creation of an account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message.",
         "mail_title": "[Comaint] - New account registration"
     },
     "account_deletion": {
-        "mail_body": "Hello,\nYour validation code for the definitive deletion of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
+        "mail_body": "Hello,\nYour validation code for the definitive deletion of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message.",
         "mail_title": "[Comaint] Deletion of your account"
     },
     "change_email": {
-        "mail_body": "Hello,\nYour validation code to change the email address of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
+        "mail_body": "Hello,\nYour validation code to change the email address of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message.",
         "mail_title": "[Comaint] email address change"
     },
     "unlock_account_email": {
-		"mail_body": "Hello,\nValidation code to unlock your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message",
-		"mail_title": "Comaint account unlock"
+		"mail_body": "Hello,\nValidation code to unlock your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message.",
+		"mail_title": "[Comaint] account unlock"
+    },
+    "register_attempt_with_used_email": {
+		"mail_body": "Hello,\nAn attempt was done to create an account with this e-mail address\nIf your are the initiator of this request, please connect with your credentials or reinitialize your password. Otherwise, simply ignore this message.",
+		"mail_title": "[Comaint] registration attempt with an already used e-mail"
     }
 }

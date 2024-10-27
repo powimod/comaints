@@ -58,15 +58,34 @@ class AuthModel {
         const authAttempts = 0
         const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
         const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
-        const user = await this.#userModel.createUser({
-            email,
-            password,
-            state: AccountState.PENDING,
-            authCode,
-            authAction,
-            authExpiration,
-            authAttempts
-        })
+
+        let user = await this.#userModel.getUserByEmail(email)
+        if (user !== null) {
+            // case where user already exists
+            assert(user.state === AccountState.PENDING) // already checked in authRoute 
+            // update user registration
+            user = await this.#userModel.editUser({
+                id: user.id,
+                password,
+                state: AccountState.PENDING,
+                authCode,
+                authAction,
+                authExpiration,
+                authAttempts
+            })
+        }
+        else {
+            // case where user does not exist
+            user = await this.#userModel.createUser({
+                email,
+                password,
+                state: AccountState.PENDING,
+                authCode,
+                authAction,
+                authExpiration,
+                authAttempts
+            })
+        }
         return { user }
     }
 
@@ -194,6 +213,16 @@ class AuthModel {
         const subject  = i18n_t('unlock_account_email.mail_title')
         const textBody = i18n_t('unlock_account_email.mail_body', { 'code' : code })
         const htmlBody = i18n_t('unlock_account_email.mail_body', { 'code' : `<b>${code}</b>code` })
+        const mailManager = MailManagerSingleton.getInstance()
+        return await mailManager.sendMail(email, subject, textBody, htmlBody)
+    }
+
+    async sendExistingEmailAlertMessage(email, i18n_t) {
+        assert(email  !== undefined && typeof(email)  === 'string')
+        assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
+        const subject  = i18n_t('register_attempt_with_used_email.mail_title')
+        const textBody = i18n_t('register_attempt_with_used_email.mail_body')
+        const htmlBody = i18n_t('register_attempt_with_used_email.mail_body')
         const mailManager = MailManagerSingleton.getInstance()
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
@@ -353,6 +382,10 @@ class AuthModel {
 
     async getUserProfile(userId) {
         return await this.#userModel.getUserById(userId)
+    }
+
+    async getUserProfileByEmail(email) {
+        return await this.#userModel.getUserByEmail(email)
     }
 
     async login(email, password) {

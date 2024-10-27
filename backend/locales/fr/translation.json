@@ -53,19 +53,23 @@
         }
     },
     "register": {
-        "mail_body": "Bonjour,\nVotre code pour la création d'un compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
+        "mail_body": "Bonjour,\nVotre code pour la création d'un compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",
         "mail_title": "[Comaint] Enregistrement d'un nouveau compte"
     },
     "account_deletion": {
-        "mail_body": "Bonjour,\nVotre code pour la suppression définitive de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
+        "mail_body": "Bonjour,\nVotre code pour la suppression définitive de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",
         "mail_title": "[Comaint] Suppression de votre compte"
     },
     "change_email": {
-        "mail_body": "Bonjour,\nVotre code pour le changement de l'adresse e-mail de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
+        "mail_body": "Bonjour,\nVotre code pour le changement de l'adresse e-mail de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",
         "mail_title": "[Comaint] Changement d'adresse e-mail"
     },
     "unlock_account_email": {
-		"mail_body": "Bonjour,\nLe code pour débloquer votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message",
-		"mail_title": "Déblocage de compte Comaint"
+		"mail_body": "Bonjour,\nLe code pour débloquer votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",
+		"mail_title": "[Comaint] Déblocage de compte"
+    },
+    "register_attempt_with_used_email": {
+		"mail_body": "Bonjour,\n.Une tentative a été faite pour créer un compte avec cette adresse e-mail.\nSi vous êtes à l'origine de cette demande, veuillez vous connecter avec vos identifiants ou réinitialiser votre mot de passe. Sinon, vous pouvez ignorer simplement ce message.\n",
+		"mail_title": "[Comaint] Tentative d'enregistrement avec une adresse e-mail déjà utilisée"
     }
 }

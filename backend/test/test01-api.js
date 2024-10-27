@@ -51,7 +51,6 @@ describe('Check API version', () => {
 		})
 
 
-
         const DATABASE_CHECK_VERSION = '/api/v1/check-database'
 		it(`Control route ${DATABASE_CHECK_VERSION }`, async () => {
 			let json = await jsonPost(DATABASE_CHECK_VERSION )

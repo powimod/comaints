@@ -7,6 +7,7 @@ import ModelSingleton from '../model.js'
 import ControllerSingleton from '../controller.js'
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, 
     ComaintApiError, comaintErrors } from '../../../common/src/error.mjs'
+import { AccountState } from '../../../common/src/global.mjs'
 import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 
@@ -108,27 +109,44 @@ class AuthRoutes {
 
                 const authCode = authModel.generateRandomAuthCode()
 
-                const result = await authModel.register(email, password, authCode, invalidateCodeImmediately)
+                let userId = null
+                let companyId = null
+                let registeredAccount = false
 
-                const user = result.user
-                if (! user)
-                    throw new Error('User not found in result')
+                // Si le compte existe déjà pour cet email alors on va tester si le compte est en cours
+                // d'enregistrement ou s'il est opérationnel.
+                // S'il est déjà opérationnel, on envoie un mail à l'utilisateur pour l'informer d'une tentative de
+                // création d'un compte avec son email et on ne signale pas que le compte est déjà utilisé 
+                // car ça donne des informations à un pirate que le compte existe.
+                // Si le compte existe déjà mais qu'il est en cours d'enregistrement, on va juste générer
+                // un nouveau code d'authentification.
+                let profile = await authModel.getUserProfileByEmail(email)
+                if (profile !== null) {
+                    if (profile.state !== AccountState.PENDING) {
+                        // if user is fully registered, send him an information message
+                        if (sendCodeByEmail)
+                            await authModel.sendExistingEmailAlertMessage(email, view.translation)
+                        registeredAccount = true
+                    }
+                    userId = profile.id
+                    companyId = profile.companyId
+                }
 
-                if (user.password !== undefined)
-                    throw new Error('User object should not have a password property')
+                // if account does not exist or is not fully registered
+                if (registeredAccount === false) {
+                    const result = await authModel.register(email, password, authCode, invalidateCodeImmediately)
 
-                const userId = user.id
-                if (! userId)
-                    throw new Error('userId not found')
+                    const user = result.user
+                    assert(user !== undefined)
+                    userId = user.id
+                    companyId = user.companyId
+                    assert(userId !== undefined)
+                    assert (companyId === null) // companyId should be null
 
-                const companyId = user.companyId
-                if (companyId === undefined )
-                    throw new Error('companyId not found')
-                if (companyId !== null)
-                    throw new Error('companyId should be null')
+                    if (sendCodeByEmail)
+                        await authModel.sendRegisterAuthCode(authCode, email, view.translation)
+                }
 
-                if (sendCodeByEmail)
-                    await authModel.sendRegisterAuthCode(authCode, email, view.translation)
 
                 // access token with userConnected = false
                 const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId)
@@ -253,6 +271,7 @@ class AuthRoutes {
                 if (errorMsg2)
                     throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
 
+                console.log("Auth login email", email)
                 const user = await authModel.login(email, password)
                 const userId = user.id
                 const companyId = user.companyId
