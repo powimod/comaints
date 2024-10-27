@@ -135,6 +135,7 @@ class AuthRoutes {
                 const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , false)
 
                 view.json({
+                    message: 'User registration done, waiting for validation code',
                     'refresh-token': newRefreshToken,
                     'access-token': newAccessToken
                 })

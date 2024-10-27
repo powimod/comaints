@@ -170,9 +170,10 @@ describe('Test user registration', () => {
                 password:'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             })
-            expect(json).to.have.keys('access-token', 'refresh-token')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
             expect(json['access-token']).to.be.a('string')
             expect(json['refresh-token']).to.be.a('string')
+            expect(json['message']).to.be.a('string').and.to.equal('User registration done, waiting for validation code')
         })
 
         it('Check registration attempt with an existing email', async () => {
@@ -397,9 +398,10 @@ describe('Test user registration', () => {
                 password:'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             })
-            expect(json).to.have.keys('access-token', 'refresh-token')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
             expect(json['access-token']).to.be.a('string')
             expect(json['refresh-token']).to.be.a('string')
+            expect(json['message']).to.be.a('string').and.to.equal('User registration done, waiting for validation code')
         })
 
         it('Check newly created user in database', async () => {
@@ -541,9 +543,10 @@ describe('Test user registration', () => {
                 sendCodeByEmail: false,
                 invalidateCodeImmediately: true // set code validity to zero
             })
-            expect(json).to.have.keys('access-token', 'refresh-token')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
             expect(json['access-token']).to.be.a('string')
             expect(json['refresh-token']).to.be.a('string')
+            expect(json['message']).to.be.a('string').and.to.equal('User registration done, waiting for validation code')
         })
 
         it('Check newly created user in database', async () => {
