@@ -13,36 +13,57 @@ const ROUTE_PROFILE  = 'api/v1/account/profile'
 
 describe('Test user login', () => {
 
+    const dte = new Date()
+    const userEmail1 = `u${dte.getTime()}-a@x.y`
+    const userEmail2 = `u${dte.getTime()}-b@x.y`
+
     const PASSWORD = '4BC+d3f-6H1.lMn!'
-    let user = null
+    let user1 = null
+    let user2 = null
     let cpyAccessToken
     let cpyRefreshToken
 
     before( async () =>  {
         loadConfig()
         await connectDb()
-        user = await createUserAccount({password: PASSWORD})
+        user1 = await createUserAccount({email:userEmail1, password: PASSWORD, logout:true})
+        user2 = await createUserAccount({email:userEmail2, password: PASSWORD, logout:true})
     }),
 
     after( async () =>  {
-        await deleteUserAccount(user)
+        await deleteUserAccount(user1)
+        await deleteUserAccount(user2)
         await disconnectDb()
     }),
 
-    describe(`Call route /${ROUTE_LOGIN} with valid data`, () => {
+    describe(`Call route /${ROUTE_LOGIN}`, () => {
+
+        it('Call login route', async () => {
+            let json = await jsonPost(ROUTE_LOGIN, {
+                    email:userEmail1,
+                    password: PASSWORD
+                })
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('access-token')
+            expect(json['access-token']).to.be.a('string')
+            expect(json).to.have.property('refresh-token')
+            expect(json['refresh-token']).to.be.a('string')
+            // check token in util.js
+            expect(accessToken).not.to.equal(null)
+            expect(refreshToken).not.to.equal(null)
+        })
 
         it('Check profile access', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            const user1 = json.user
+            expect(user1).to.be.instanceOf(Object)
+            expect(user1).to.have.keys(userPublicProperties)
+            expect(user1.email).to.be.a('string').and.to.equal(userEmail1)
             cpyAccessToken = accessToken
             cpyRefreshToken = refreshToken
         })
-
 
         it('Try to access with emulation of an expired token', async () => {
             try {
@@ -118,10 +139,10 @@ describe('Test user login', () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            const user1 = json.user
+            expect(user1).to.be.instanceOf(Object)
+            expect(user1).to.have.keys(userPublicProperties)
+            expect(user1.email).to.be.a('string').and.to.equal(userEmail1)
             cpyAccessToken = accessToken
             cpyRefreshToken = refreshToken
         })
@@ -130,13 +151,71 @@ describe('Test user login', () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            const user1 = json.user
+            expect(user1).to.be.instanceOf(Object)
+            expect(user1).to.have.keys(userPublicProperties)
+            expect(user1.email).to.be.a('string').and.to.equal(user1.email)
+        })
+    })
+
+    describe(`Call route /${ROUTE_LOGIN}`, () => {
+
+        it('Call logout route being connected', async () => {
+            let json = await jsonPost(ROUTE_LOGOUT)
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('access-token')
+            expect(json['access-token']).to.equal(null)
+            expect(json).to.have.property('refresh-token')
+            expect(json['refresh-token']).to.equal(null)
+            // check token in util.js
+            expect(accessToken).to.equal(null)
+            expect(refreshToken).to.equal(null)
         })
 
+        it('Call logout route not being connected', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGOUT)
+                expect.fail('Being already disconnected not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('User is not logged in')
+                expect(accessToken).to.equal(null)
+                expect(refreshToken).to.equal(null)
+            }
+        })
 
+        it('Call login route with first account and a bad password', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, {
+                    email:userEmail1,
+                    password: PASSWORD + 'Z'
+                })
+                expect.fail('Bad password not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Invalid EMail or password')
+                expect(accessToken).to.equal(null)
+                expect(refreshToken).to.equal(null)
+            }
+        })
+
+        it('Call login route with second account and a bad password', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, {
+                    email:userEmail2,
+                    password: PASSWORD + 'Z'
+                })
+                expect.fail('Bad password not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Invalid EMail or password')
+                expect(accessToken).to.equal(null)
+                expect(refreshToken).to.equal(null)
+            }
+        })
     })
 
 })

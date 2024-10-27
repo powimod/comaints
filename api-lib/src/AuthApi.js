@@ -1,11 +1,11 @@
-import { jsonGet, jsonPost } from './util.js'
+'use strict'
 
 class AuthApi {
 
-    #backendUrl = null
+    #context = null
 
-    constructor(backendUrl) {
-        this.#backendUrl = backendUrl
+    constructor(context) {
+        this.#context = context
     }
 
     async login(email, password) {
@@ -14,7 +14,23 @@ class AuthApi {
         if (password === undefined)
             throw new Error("Argument «password» not defined")
         const LOGIN_ROUTE = '/api/v1/auth/login'
-        response = await jsonPost(this.#backendUrl, LOGIN_ROUTE, {email, password})
+        const response = await this.#context.jsonPost(LOGIN_ROUTE, {email, password})
+        return response
+    }
+
+    async register({email, password, sendMail = true}) {
+        if (email === undefined)
+            throw new Error("Argument «email» not defined")
+        if (password === undefined)
+            throw new Error("Argument «password» not defined")
+        const REGISTER_ROUTE = '/api/v1/auth/register'
+        const response = await this.#context.jsonPost(REGISTER_ROUTE, {
+            email,
+            password,
+            sendCodeByEmail: sendMail
+        })
+        console.log(response)
+        return response
     }
 
 }

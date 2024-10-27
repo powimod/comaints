@@ -171,10 +171,18 @@ class AuthRoutes {
                 const jsonResponse = {}
                 if (isAuthCodeValid) {
                     const user = await authModel.processAuthOperation(userId)
-                    userId = (user === null) ? null : user.id
-                    // generate a new access token with userConnected = true
-                    const newAccessToken  = await authModel.generateAccessToken(userId, companyId, refreshTokenId, true)
-                    jsonResponse['access-token'] = newAccessToken
+                    if (user === null) {
+                        // with delete account route, user is set to null
+                        userId = null
+                        jsonResponse['access-token'] = null
+                        jsonResponse['refresh-token'] = null
+                    }
+                    else {
+                        // generate a new access token with userConnected = true
+                        userId = user.id
+                        const newAccessToken  = await authModel.generateAccessToken(userId, companyId, refreshTokenId, true)
+                        jsonResponse['access-token'] = newAccessToken
+                    }
                 }
 
                 // send userId to make API-Lib detect context change
@@ -215,7 +223,7 @@ class AuthRoutes {
         expressApp.post('/api/v1/auth/login', async (request, response) => {
             const view = new View(request, response)
             try {
-                if (request.userId !== null)
+                if (request.userConnected)
                     throw new ComaintApiErrorUnauthorized('error.already_logged_in')
 
                 let email = request.body.email

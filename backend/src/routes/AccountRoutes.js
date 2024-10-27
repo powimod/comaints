@@ -165,7 +165,7 @@ class AccountRoutes {
                 if (sendCodeByEmail)
                     await accountModel.sendAccountDeletionAuthCode(authCode, user.email, view.translation)
 
-                view.json({message: 'Done, waiting for validation code'})
+                view.json({ message: 'Done, waiting for validation code' })
             }
             catch(error) {
                 view.error(error)

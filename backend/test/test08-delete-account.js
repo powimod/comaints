@@ -51,6 +51,8 @@ describe('Test delete account route', () => {
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('message')
             expect(json.message).to.be.a('string').and.to.equal('Done, waiting for validation code')
+            expect(accessToken).not.to.equal(null)
+            expect(refreshToken).not.to.equal(null)
         })
 
         it('Check user in database before code validation', async () => {
@@ -71,6 +73,14 @@ describe('Test delete account route', () => {
             expect(json.validated).to.be.a('boolean').and.to.equal(true)
             expect(json).to.have.property('userId')
             expect(json.userId).and.to.equal(null)
+
+            expect(json).to.have.property('access-token')
+            expect(json['access-token']).to.equal(null)
+            expect(json).to.have.property('refresh-token')
+            expect(json['refresh-token']).to.equal(null)
+            // check token in util.js
+            expect(accessToken).to.equal(null)
+            expect(refreshToken).to.equal(null)
         })
 
         it('Check user was deleted in database after code validation', async () => {
@@ -99,6 +109,7 @@ describe('Test delete account route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
+                //User already connected
                 expect(error.message).to.equal(`Invalid EMail or password`)
             }
         })
