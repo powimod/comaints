@@ -1,15 +1,25 @@
 'use strict'
 import dotenv from 'dotenv'
+dotenv.config()
 
 import { ComaintBackendApi } from 'comaint-api-lib'
 
-dotenv.config()
+let accountData = null
+
+const accountSerializeFunction = (data) => {
+    if (data === undefined)
+        data = JSON.parse(accountData)
+    else
+        accountData = JSON.stringify(data)
+    return data
+}
+
 
 const main = async () => {
     const backendUrl = process.env.BACKEND_URL
     if (! backendUrl)
         throw new Error('backendUrl not defined')
-    const api = new ComaintBackendApi(backendUrl)
+    const api = new ComaintBackendApi(backendUrl, accountSerializeFunction)
 
     console.log("Checking API library...")
     let ret = api.checkApiLib()
@@ -40,7 +50,6 @@ const main = async () => {
     if (ret.success) 
         throw new Error('Error handling is not workinkg')
     console.log(`\t→ done`)
-
 
     console.log('End')
 }
