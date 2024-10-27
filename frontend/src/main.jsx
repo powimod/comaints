@@ -1,6 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom"
+import { Provider } from 'react-redux'
+import store from './store'
 
 import DialogProvider from  './components/dialog/DialogContext.jsx'
 
@@ -9,8 +11,10 @@ import createRouter from './router'
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
-        <DialogProvider>
-            <RouterProvider router={createRouter()} />
-        </DialogProvider>
+        <Provider store={store}>
+            <DialogProvider>
+                <RouterProvider router={createRouter()} />
+            </DialogProvider>
+        </Provider>
     </StrictMode>
 )
