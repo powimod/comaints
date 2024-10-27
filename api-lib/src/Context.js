@@ -20,17 +20,16 @@ class Context{
 
         const lang = options.lang ?? 'en'
 
-        const httpHeaders = {
+        const fetchParam = {
+            method : httpMethod,
+            headers:  {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Accept-Language': lang 
+                'Accept-Language': lang
             }
-        if (this.#accessToken !== null)
-            httpHeaders['x-access-token'] = this.#accessToken
-        const fetchParam = {
-            method: httpMethod,
-            headers: httpHeaders
         }
+        if (this.#accessToken !== null)
+            fetchParam.headers['x-access-token'] = this.#accessToken
 
         const methodsWithBody = ['POST', 'PUT', 'PATCH']
         if (methodsWithBody.includes(httpMethod))

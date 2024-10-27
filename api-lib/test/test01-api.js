@@ -2,16 +2,18 @@
 
 import { expect } from 'chai'
 
-import { initializeApi } from './util.js'
+import { api, initializeApi, terminateApi } from './util.js'
 
 
 describe('Check API version', () => {
 
-    let api = null
+	before( async () =>  {
+		await initializeApi()
+	})
 
-	before( () =>  {
-		api = initializeApi()
-	}),
+    after( async () =>  {
+        await terminateApi()
+    })
 
     it('Check library', () => {
         let response = api.checkApiLib()

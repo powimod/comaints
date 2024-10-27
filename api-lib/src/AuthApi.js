@@ -10,28 +10,42 @@ class AuthApi {
 
     async login(email, password) {
         if (email === undefined)
-            throw new Error("Argument «email» not defined")
+            throw new Error('Argument «email» not defined')
         if (password === undefined)
-            throw new Error("Argument «password» not defined")
+            throw new Error('Argument «password» not defined')
         const LOGIN_ROUTE = '/api/v1/auth/login'
-        const response = await this.#context.jsonPost(LOGIN_ROUTE, {email, password})
+        await this.#context.jsonPost(LOGIN_ROUTE, {email, password})
+    }
+
+    async logout() {
+        const LOGOUT_ROUTE = '/api/v1/auth/logout'
+        const response = await this.#context.jsonPost(LOGOUT_ROUTE)
         return response
     }
 
+
     async register({email, password, sendMail = true}) {
         if (email === undefined)
-            throw new Error("Argument «email» not defined")
+            throw new Error('Argument «email» not defined')
         if (password === undefined)
-            throw new Error("Argument «password» not defined")
+            throw new Error('Argument «password» not defined')
         const REGISTER_ROUTE = '/api/v1/auth/register'
         const response = await this.#context.jsonPost(REGISTER_ROUTE, {
             email,
             password,
             sendCodeByEmail: sendMail
         })
-        console.log(response)
         return response
     }
+
+    async validate({code}) {
+        if (code === undefined)
+            throw new Error('Argument «code» not defined')
+        const VALIDATE_ROUTE = 'api/v1/auth/validate'
+        const response = await this.#context.jsonPost(VALIDATE_ROUTE, { code })
+        return response
+    }
+
 
 }
 export default AuthApi

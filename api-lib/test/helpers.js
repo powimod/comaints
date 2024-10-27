@@ -2,7 +2,7 @@
 
 import { expect } from 'chai'
 
-import { requestDb } from './util.js'
+import { api, requestDb } from './util.js'
 
 const ROUTE_REGISTER = 'api/v1/auth/register'
 const ROUTE_LOGOUT = 'api/v1/auth/logout'
@@ -22,22 +22,25 @@ const createUserAccount = async (options = {}) => {
         email = `u${dte.getTime()}@x.y`
     }
 
-	let json = await jsonPost(ROUTE_REGISTER, { email, password, sendCodeByEmail: false })
+    if (api === null)
+        throw new Error('API not initialized')
+    let json = await api.auth.register({email, password, sendMail:false})
 
-    const res = await requestDb('select * from users where email=?', [ email ])
-    expect(res).to.be.instanceOf(Array)
-    const user = res[0]
+    let user = await getDatabaseUserByEmail(email)
     expect(user).to.be.instanceOf(Object)
-    expect(user).to.have.property('id')
+    expect(user).to.have.property('auth_code')
     const authCode = user.auth_code
+    expect(authCode).to.be.a('number')
 
-    json = await jsonPost(ROUTE_VALIDATE, { code: authCode})
+    json = await api.auth.validate({code: authCode})
     expect(json).to.be.instanceOf(Object)
     expect(json).to.have.property('validated')
     expect(json.validated).to.be.a('boolean').and.to.equal(true)
 
-    if (logout)
-        await jsonPost(ROUTE_LOGOUT)
+    if (logout) {
+        json = await api.auth.logout()
+        expect(json).to.be.instanceOf(Object)
+    }
 
     return {
         id: user.id,
@@ -45,10 +48,10 @@ const createUserAccount = async (options = {}) => {
     }
 }
 
-const deleteUserAccount = async (user) => {
-    if (user === null || typeof(user) !== 'object')
+const deleteUserAccountById = async (userId) => {
+    if (userId === null)
         return
-    await requestDb('DELETE FROM users WHERE id=?', user.id)
+    await requestDb('DELETE FROM users WHERE id=?', userId)
 }
 
 const getDatabaseUserByEmail = async (email) => {
@@ -70,15 +73,13 @@ const getDatabaseUserById = async (userId) => {
     return user
 }
 
-
-
 const userPublicProperties = [
     'id', 'email', 'firstname', 'lastname', 'state', 'lastUse', 'administrator', 'companyId'
 ]
 
 export {
     createUserAccount,
-    deleteUserAccount,
+    deleteUserAccountById,
     getDatabaseUserByEmail,
     getDatabaseUserById,
     userPublicProperties 

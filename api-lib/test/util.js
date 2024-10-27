@@ -6,7 +6,9 @@ import ComaintBackendApi from '../src/ComaintBackendApi.js'
 
 dotenv.config({ path: './test/.env' })
 
+let api = null
 let accountData = null
+
 let db = null
 let dbHost
 let dbPort
@@ -26,10 +28,13 @@ const initializeApi = () => {
     const backendUrl = process.env.BACKEND_URL
     if (! backendUrl)
         throw new Error('Env variable «BACKEND_URL» is not defined')
-    const api = new ComaintBackendApi(backendUrl, accountSerializeFunction)
-    return api
+    api = new ComaintBackendApi(backendUrl, accountSerializeFunction)
 }
 
+const terminateApi = () => {
+    api = null
+    accountData = null
+}
 
 const connectDb = async () => {
     dbHost = process.env.DB_HOST || 'localhost'
@@ -69,7 +74,9 @@ const requestDb = async (sqlQuery, sqlValues = []) => {
 }
 
 export {
+    api,
     initializeApi,
+    terminateApi,
     connectDb,
     disconnectDb,
     requestDb,
