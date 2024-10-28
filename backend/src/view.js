@@ -11,15 +11,13 @@ class View {
     constructor(request, response) {
         this.request = request
         this.response = response
-
         // ensure that the translation function is mapped to this class
         this.translation = this.translation.bind(this)
     }
 
     translation(messageId, prop = {}) {
         // operator «this» should be undefined if bind function was not called in constructor
-        if (this === undefined)
-            throw new Error('Translation function not mapped to view')
+        assert (this !== undefined)
         if (this.request === undefined)
             throw new Error('Request is not initialized in view')
         if (this.request.t === undefined)

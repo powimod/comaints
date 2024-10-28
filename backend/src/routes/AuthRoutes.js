@@ -20,9 +20,7 @@ class AuthRoutes {
 
         // middleware to check access token
         expressApp.use( async (request, response, next) => {
-            const view = new View(request, response)
-            request.view = view
-
+            assert(request.view !== undefined) // view middleware must have been called first
             console.log(`Token middleware : load access token for request ${request.url} ...`)
             assert(authModel !== null)
             let userId = null

@@ -21,6 +21,14 @@ class Controller {
 	#tokenRoutes = null;
 
     async initialize(config, expressApp) {
+
+        // Express middleware to initialize a View instance associated with the request
+        expressApp.use( async (request, response, next) => {
+            const view = new View(request, response)
+            request.view = view
+            next()
+        })
+
 	    const model  = ModelSingleton.getInstance()
 
         // IMPORTANT :authRoutes must be initialized first because it has a middleware to handle session cookies
@@ -38,6 +46,7 @@ class Controller {
 
         this.#tokenRoutes = TokenRoutesSingleton.getInstance()
         this.#tokenRoutes.initialize(expressApp)
+
 
         // special API routes to check i18n support
         expressApp.get(`/api/welcome`, (request, response) => {
