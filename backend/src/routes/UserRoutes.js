@@ -2,7 +2,6 @@
 
 import View from '../view.js'
 import ModelSingleton from '../model.js'
-import ControllerSingleton from '../controller.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
 
 import { controlObject } from '../../../common/src/objects/object-util.mjs'
@@ -11,7 +10,6 @@ import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 class UserRoutes {
 
     initialize(expressApp) {
-        const controller = ControllerSingleton.getInstance()
         const model  = ModelSingleton.getInstance()
         
         const userModel = model.getUserModel()

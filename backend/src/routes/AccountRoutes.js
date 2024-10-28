@@ -4,7 +4,6 @@ import assert from 'assert'
 
 import View from '../view.js'
 import ModelSingleton from '../model.js'
-import ControllerSingleton from '../controller.js'
 import { requireUserAuth } from './AuthRoutes.js'
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs'
 import { controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs'
@@ -13,7 +12,6 @@ import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 class AccountRoutes {
 
     initialize(expressApp) {
-        const controller = ControllerSingleton.getInstance()
         const model  = ModelSingleton.getInstance()
 
         const accountModel = model.getAccountModel()

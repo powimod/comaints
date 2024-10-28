@@ -8,6 +8,8 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon node src/server.js",
     "dev": "nodemon node src/server.js",
     "test": "mocha --timeout 10000 --exit"
   },
