@@ -22,6 +22,9 @@ class AuthRoutes {
 
         // middleware to check access token
         expressApp.use( async (request, response, next) => {
+            const view = new View(request, response)
+            request.view = view
+
             console.log(`Token middleware : load access token for request ${request.url} ...`)
             assert(authModel !== null)
             let userId = null
@@ -72,7 +75,7 @@ class AuthRoutes {
 
         // public route
         expressApp.post('/api/v1/auth/register', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 let email = request.body.email
                 if (email === undefined)
@@ -166,7 +169,7 @@ class AuthRoutes {
 
         // this route is public for registration, and private for email change
         expressApp.post('/api/v1/auth/validate', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 // get IDs from access token
                 let userId = request.userId
@@ -218,7 +221,7 @@ class AuthRoutes {
         expressApp.post('/api/v1/auth/resendCode', requireUserAuth, async (request, response) => {
             const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ? 
                 request.body.sendCodeByEmail : true
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null) // due to requireUserAuth
@@ -240,7 +243,7 @@ class AuthRoutes {
 
         // public route
         expressApp.post('/api/v1/auth/login', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 if (request.userConnected)
                     throw new ComaintApiErrorUnauthorized('error.already_logged_in')
@@ -290,7 +293,7 @@ class AuthRoutes {
 
         // public route (user not logged in are detected insight this function)
         expressApp.post('/api/v1/auth/logout', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId // HTTP token header
                 if (userId === null)
@@ -313,7 +316,7 @@ class AuthRoutes {
         // public route
         expressApp.post('/api/v1/auth/refresh', async (request, response) => {
             // do not control HTTP header access/refresh tokens : they may be null
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const refreshToken = request.body.token
                 if (refreshToken === undefined)

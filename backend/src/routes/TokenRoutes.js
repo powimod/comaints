@@ -18,14 +18,14 @@ class TokenRoutes {
 
         // TODO ajouter withAuth
 	    expressApp.get('/api/v1/token/list', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
 			const tokenList = await tokenModel.findTokenList()
             view.json({ tokenList })
         })
 
         // TODO ajouter withAuth
         expressApp.post('/api/v1/token', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 let token = request.body.token
                 if (token === undefined)

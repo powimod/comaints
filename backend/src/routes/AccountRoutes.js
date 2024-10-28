@@ -19,7 +19,7 @@ class AccountRoutes {
         const accountModel = model.getAccountModel()
 
         expressApp.get('/api/v1/account/profile', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null)
@@ -33,7 +33,7 @@ class AccountRoutes {
         })
 
         expressApp.post('/api/v1/account/change-password', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null)
@@ -77,7 +77,7 @@ class AccountRoutes {
 
 
         expressApp.post('/api/v1/account/change-email', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null)
@@ -131,7 +131,7 @@ class AccountRoutes {
         })
 
         expressApp.post('/api/v1/account/delete', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null)
@@ -173,7 +173,7 @@ class AccountRoutes {
         })
 
         expressApp.post('/api/v1/account/unlock', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null)

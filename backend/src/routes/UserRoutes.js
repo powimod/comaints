@@ -18,14 +18,14 @@ class UserRoutes {
 
         // TODO ajouter withAuth
         expressApp.get('/api/v1/user/list', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             const userList = await userModel.findUserList()
             view.json({ userList })
         })
 
         // TODO ajouter withAuth
         expressApp.post('/api/v1/user', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 let user = request.body.user
                 if (user === undefined)

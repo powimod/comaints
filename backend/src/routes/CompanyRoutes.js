@@ -18,14 +18,14 @@ class CompanyRoutes {
 
         // TODO ajouter withAuth
 	    expressApp.get('/api/v1/company/list', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
 			const companyList = await companyModel.findCompanyList()
             view.json({ companyList })
         })
 
         // TODO ajouter withAuth
         expressApp.post('/api/v1/company', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 let company = request.body.company
                 if (company === undefined)
