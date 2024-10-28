@@ -58,6 +58,7 @@ const main = async () => {
             user: env.DB_USER || 'admin',
             retry_interval: env.DB_RETRY_INTERVAL || 10, // seconds
             max_retries: env.DB_MAX_RETRIES || -1, // -1:infinity
+            ping_interval: env.DB_PING_INTERVAL || 600, // 10 minutes 
             password: dbPassword
         },
         security: {

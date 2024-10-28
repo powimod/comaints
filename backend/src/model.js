@@ -19,6 +19,7 @@ class Model {
     #tokenModel = null
 
     async initialize(config) {
+        this.#config = config
 
         // check «database» configuration section 
         const dbConfig = config.database
@@ -26,7 +27,7 @@ class Model {
             throw new Error(`Config «database» section not defined`)
         const dbParameterNames = [ 
             'name', 'host', 'port', 'user', 'password', 
-            'retry_interval', 'max_retries'
+            'retry_interval', 'max_retries', 'ping_interval'
         ]
         for (const parameterName of dbParameterNames ) {
             if (dbConfig[parameterName] === undefined)
@@ -67,6 +68,19 @@ class Model {
 		}
         if (dbConnection === null)
             throw new Error(`Can not connect database`)
+        this.#dbConnection = dbConnection
+
+		// setting regular database ping to keep connection alive
+		const pingInterval = dbConfig.ping_interval
+		console.log(`Database ping interval : ${pingInterval}s`)
+		setInterval( () => {
+			try {
+				dbConnection.query('SELECT 1')
+			} catch(error) {
+				console.log(`Database ping error : ${error.message}`)
+			}
+		}, pingInterval * 1000)
+
 
         // IMPORTANT : do not change modele declaration order because of module dependencies
         this.#userModel = UserModelSingleton.getInstance()
@@ -85,9 +99,6 @@ class Model {
 
         this.#companyModel = CompanyModelSingleton.getInstance()
         this.#companyModel.initialize(dbConnection)
-
-        this.#dbConnection = dbConnection
-        this.#config = config
     }
 
     async terminate() {
