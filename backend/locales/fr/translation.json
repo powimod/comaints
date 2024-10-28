@@ -4,6 +4,7 @@
         "hello": "Bonjour {{firstname}} {{lastname}}"
     },
     "error": {
+        "unauthorized_access": "Accès non autorisé",
         "request_param_not_found": "Paramètre «{{parameter}}» non trouvé dans le corps de la requête",
         "request_param_invalid": "Paramètre «{{parameter}}» invalide dans le corps de la requête", 
         "not_found_error": "TODO change message",

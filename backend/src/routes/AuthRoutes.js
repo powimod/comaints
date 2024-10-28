@@ -21,6 +21,7 @@ class AuthRoutes {
         // middleware to check access token
         expressApp.use( async (request, response, next) => {
             assert(request.view !== undefined) // view middleware must have been called first
+            const view = request.view
             console.log(`Token middleware : load access token for request ${request.url} ...`)
             assert(authModel !== null)
             let userId = null
@@ -377,16 +378,17 @@ class AuthRoutesSingleton {
 }
 
 const requireUserAuth = (request, response, next) => {
+    const view = request.view
+    assert(view !== undefined)
     const userId = request.userId
     const connected = request.userConnected
     assert(userId !== undefined)
     assert(connected !== undefined)
     console.log(`require user auth, userId:${userId}, connected:${connected}`)
-    if (userId === null || connected !== true)
-        return response.status(401).json({ 
-            error: comaintErrors.UNAUTHORIZED_ERROR,
-            message: 'Unauthorized' // FIXME translation
-        })
+    if (userId === null || connected !== true) {
+        view.error(new ComaintApiErrorUnauthorized(view.translation('error.unauthorized_access')))
+        return
+    }
     next()
 }
 

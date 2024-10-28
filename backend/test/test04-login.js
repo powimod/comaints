@@ -157,7 +157,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Unauthorized')
+                expect(error.message).to.equal('Unauthorized access')
             }
         })
 
@@ -240,7 +240,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Unauthorized')
+                expect(error.message).to.equal('Unauthorized access')
             }
         })
 
