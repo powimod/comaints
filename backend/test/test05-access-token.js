@@ -72,7 +72,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Expired access token')
+                expect(error.message).to.equal('Invalid access token (Expired access token)')
                 expect(accessToken).to.equal(null)
                 expect(refreshToken).to.equal(null)
             }

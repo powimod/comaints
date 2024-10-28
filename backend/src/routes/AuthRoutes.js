@@ -49,16 +49,15 @@ class AuthRoutes {
                     console.log(`Token middleware -> connected = ${connected}`)
                 }
                 catch (error) {
+                    // TODO add selftest to check invalid token 
                     const errorMessage = error.message ? error.message : error
                     console.log(`Token middleware -> error : ${errorMessage}`)
-                    // TODO View.sendJsonError(response, error)
-                    // TODO add selftest to check invalid token 
-                    return response.status(401).json({
-                        error: comaintErrors.UNAUTHORIZED_ERROR,
-                        message: errorMessage, // FIXME translation
-                        'refresh-token': null,
-                        'access-token': null
-                    })
+                    // FIXME how to reset access and refresh tokens
+                    view.error(
+                        new ComaintApiErrorUnauthorized(view.translation('error.access_token_error', {error: errorMessage})),
+                        { resetTokens: true }
+                    )
+                    return
                 }
             }
             console.log(`Token middleware : userId=${userId}, companyId=${companyId}, connected=${connected}`)

@@ -5,6 +5,7 @@
     },
     "error": {
         "unauthorized_access": "Unauthorized access",
+        "access_token_error": "Invalid access token ({{error}})",
         "request_param_not_found": "Parameter «{{parameter}}» not found in request body",
         "request_param_invalid": "Invalid value for «{{parameter}}» parameter in request body",
         "not_found_error": "TODO change message",

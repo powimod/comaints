@@ -31,7 +31,8 @@ class View {
         this.response.send(JSON.stringify(jsonContent) + '\n')
     }
 
-    error(error) {
+    error(error, options = {}) {
+        const resetTokens = options.resetTokens || false
         if (error === undefined)
             throw new Error('Error parameter is not defined')
         if (error === null)
@@ -49,10 +50,18 @@ class View {
             throw new Error(`Invalid error parameter`)
         this.response.set('Content-Type', 'application/json')
         const errorId = error.errorId || comaintErrors.INTERNAL_ERROR
-        this.response.status(error.httpStatus || 500).send({
+
+        const jsonBody = {
             error: errorId,
             message: errorMessage
-        })
+        }
+
+        if (resetTokens) {
+            jsonBody['access-token'] = null
+            jsonBody['refresh-token'] = null
+        }
+
+        this.response.status(error.httpStatus || 500).send(jsonBody)
     }
 }
 
