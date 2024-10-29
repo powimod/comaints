@@ -19,7 +19,6 @@ class ComaintBackendApi {
             throw new Error('Parameter «serializeFunction» is not a function')
         this.#context = new Context(backendUrl, serializeFunction)
         this.#auth = new AuthApi(this.#context)
-
     }
 
     get auth() {
@@ -42,46 +41,35 @@ class ComaintBackendApi {
         }
     }
 
+
     async getApiVersion() {
         const API_VERSION_ROUTE = '/api/version'
         // TODO catch errors
         let json = await this.#context.jsonGet(API_VERSION_ROUTE)
-        return {success: true, version: json.version}
+        return json.version
     }
 
     async getBackendVersion() {
         const BACKEND_VERSION_ROUTE = '/api/v1/backend-version'
         let json = await this.#context.jsonGet(BACKEND_VERSION_ROUTE)
-        return {success: true, version: json.version}
+        return json.version
     }
 
 
-    async welcome(args) {
-        const WELCOME_ROUTE = '/api/welcome'
-        try  {
-            let ret
-            if (args !== undefined) {
-                if (typeof(args) !== 'object')
-                    throw new Error('Argument is not an object')
-                /*
-                if (! args.firstname)
-                    throw new Error('Argument «firstname» not defined')
-                if (! args.lastname)
-                    throw new Error('Argument «firstname» not defined')
-                */
-                ret = await this.#context.jsonPost(WELCOME_ROUTE, args)
-            }
-            else {
-                ret = await this.#context.jsonGet(WELCOME_ROUTE)
-            }
-            console.log("dOm retour", ret)
-            return {success: true, message: ret.message} 
+    async checkWelcome(who) {
+        const API_VERSION_ROUTE = '/api/welcome'
+        if (who === undefined) {
+            const ret = await this.#context.jsonGet(API_VERSION_ROUTE)
+            return ret.response
         }
-        catch (error) {
-            const message = error.message === undefined ? error : error.message
-            return {success: false, message }
+        else {
+            if (typeof(who) !== 'object')
+                throw new Error('Invalid argument')
+            const firstname = who.firstname || '?'
+            const lastname = who.lastname || '?'
+            const ret = await this.#context.jsonPost(API_VERSION_ROUTE, {firstname, lastname})
+            return ret.response
         }
-
     }
 
 }

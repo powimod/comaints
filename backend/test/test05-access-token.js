@@ -56,8 +56,8 @@ describe('Test user login', () => {
         it('Check profile access', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user1 = json.user
+            expect(json).to.have.property('profile')
+            const user1 = json.profile
             expect(user1).to.be.instanceOf(Object)
             expect(user1).to.have.keys(userPublicProperties)
             expect(user1.email).to.be.a('string').and.to.equal(userEmail1)
@@ -138,8 +138,8 @@ describe('Test user login', () => {
         it('Check profile access', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user1 = json.user
+            expect(json).to.have.property('profile')
+            const user1 = json.profile
             expect(user1).to.be.instanceOf(Object)
             expect(user1).to.have.keys(userPublicProperties)
             expect(user1.email).to.be.a('string').and.to.equal(userEmail1)
@@ -150,8 +150,8 @@ describe('Test user login', () => {
         it('Check profile access with new token', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user1 = json.user
+            expect(json).to.have.property('profile')
+            const user1 = json.profile
             expect(user1).to.be.instanceOf(Object)
             expect(user1).to.have.keys(userPublicProperties)
             expect(user1.email).to.be.a('string').and.to.equal(user1.email)

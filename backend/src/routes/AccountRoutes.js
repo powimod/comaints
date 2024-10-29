@@ -23,7 +23,7 @@ class AccountRoutes {
                 assert(userId !== null)
                 let user = await accountModel.getUserProfile(userId)
                 user = buildPublicObjectVersion(userObjectDef, user)
-                view.json({ user })
+                view.json({ profile:user })
             }
             catch(error) {
                 view.error(error)

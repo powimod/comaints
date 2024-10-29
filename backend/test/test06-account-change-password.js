@@ -33,11 +33,11 @@ describe('Test change password route', () => {
     it('Check profile access', async () => {
         const json = await jsonGet(ROUTE_PROFILE)
         expect(json).to.be.instanceOf(Object)
-        expect(json).to.have.property('user')
-        const user = json.user
-        expect(user).to.be.instanceOf(Object)
-        expect(user).to.have.keys(userPublicProperties)
-        expect(user.email).to.be.a('string').and.to.equal(user.email)
+        expect(json).to.have.property('profile')
+        const profile= json.profile
+        expect(profile).to.be.instanceOf(Object)
+        expect(profile).to.have.keys(userPublicProperties)
+        expect(profile.email).to.be.a('string').and.to.equal(user.email)
     })
 
 
@@ -175,11 +175,11 @@ describe('Test change password route', () => {
         it('Get profile', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            expect(json).to.have.property('profile')
+            const profile = json.profile
+            expect(profile).to.be.instanceOf(Object)
+            expect(profile).to.have.keys(userPublicProperties)
+            expect(profile.email).to.be.a('string').and.to.equal(user.email)
         })
 
     })

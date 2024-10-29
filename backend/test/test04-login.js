@@ -193,16 +193,16 @@ describe('Test user login', () => {
         it('Get user profile', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.property('id')
-            expect(user.id).to.equal(user.id)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
-            expect(user.state).to.be.a('number').and.to.equal(1) // active
-            expect(user.administrator).to.be.a('boolean').and.to.equal(false)
-            expect(user.companyId).to.equal(null)
+            expect(json).to.have.property('profile')
+            const profile = json.profile
+            expect(profile).to.have.keys(userPublicProperties)
+            expect(profile).to.be.instanceOf(Object)
+            expect(profile).to.have.property('id')
+            expect(profile.id).to.equal(user.id)
+            expect(profile.email).to.be.a('string').and.to.equal(user.email)
+            expect(profile.state).to.be.a('number').and.to.equal(1) // active
+            expect(profile.administrator).to.be.a('boolean').and.to.equal(false)
+            expect(profile.companyId).to.equal(null)
         })
 
         it('Try to login when already logged', async () => {
@@ -262,15 +262,15 @@ describe('Test user login', () => {
         it('Get user profile', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.id).to.equal(user.id)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
-            expect(user.state).to.be.a('number').and.to.equal(1) // active
-            expect(user.administrator).to.be.a('boolean').and.to.equal(false)
-            expect(user.companyId).to.equal(null)
+            expect(json).to.have.property('profile')
+            const profile = json.profile
+            expect(profile).to.be.instanceOf(Object)
+            expect(profile).to.have.keys(userPublicProperties)
+            expect(profile.id).to.equal(user.id)
+            expect(profile.email).to.be.a('string').and.to.equal(user.email)
+            expect(profile.state).to.be.a('number').and.to.equal(1) // active
+            expect(profile.administrator).to.be.a('boolean').and.to.equal(false)
+            expect(profile.companyId).to.equal(null)
         })
 
         it('Call logout route', async () => {

@@ -336,13 +336,13 @@ describe('Test user registration', () => {
         it('Check profile access when connected', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.id).to.be.a('number')
-            expect(user.email).to.be.a('string').and.to.equal(userEmail)
-            expect(user.state).to.be.a('number').and.to.equal(1) // active
+            expect(json).to.have.property('profile')
+            const profile = json.profile
+            expect(profile).to.be.instanceOf(Object)
+            expect(profile).to.have.keys(userPublicProperties)
+            expect(profile.id).to.be.a('number')
+            expect(profile.email).to.be.a('string').and.to.equal(userEmail)
+            expect(profile.state).to.be.a('number').and.to.equal(1) // active
         })
 
     })

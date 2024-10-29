@@ -56,7 +56,8 @@ describe('Check login', () => {
             }
             catch (error) {
                 expect(error).to.be.an('error')
-                    .with.property('message', 'Property «email» is not a valid email')
+                expect(error).to.have.property('message', 'Property «email» is not a valid email')
+                expect(error).to.have.property('errorId', 'InvalidRequestError')
             }
         })
         it ('Check login with bad email argument', async () => {
