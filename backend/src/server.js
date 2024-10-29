@@ -59,6 +59,7 @@ const main = async () => {
             retry_interval: env.DB_RETRY_INTERVAL || 10, // seconds
             max_retries: env.DB_MAX_RETRIES || -1, // -1:infinity
             ping_interval: env.DB_PING_INTERVAL || 600, // 10 minutes 
+            connection_limit: env.DB_CONNECTION_LIMIT || 10, // max number of connexion in pool
             password: dbPassword
         },
         security: {
@@ -115,10 +116,8 @@ const main = async () => {
 
 
 main()
-/* TODO reactivate this
 . catch (error => {
 	const message = error.message ? error.message : error
     console.error(`ERROR : Can not start Comaint backend : ${message}`)
 	process.exit(1)
 })
-*/
