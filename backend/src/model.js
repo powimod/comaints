@@ -78,11 +78,20 @@ class Model {
 		// setting regular database ping to keep connection alive
 		const pingInterval = dbConfig.ping_interval
 		console.log(`Database ping interval : ${pingInterval}s`)
+        let interrupt = false
 		setInterval( async () => {
 			try {
 				await dbPool.query('SELECT 1')
+                if (interrupt) {
+				    console.log('Database connection resumed') 
+                    interrupt = false
+                }
 			} catch(error) {
+                if (! interrupt) {
+				    console.log('Database connection lost') 
+                }
 				console.log(`Database ping error : ${error.message}`)
+                interrupt = true
 			}
 		}, pingInterval * 1000)
 

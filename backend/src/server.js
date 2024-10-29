@@ -89,12 +89,15 @@ const main = async () => {
 	await controller.initialize(config, app)
 
 
-    // catch CTRL+C interuption
-    process.on('SIGINT', async () => {
+    // catch signals to stop daemon
+    const stopService = async () => {
         console.log('Stopping Comaint backend...')
 	    await model.terminate()
         process.exit(0)
-    })
+    }
+    process.on('SIGINT' , stopService) // catch CTRL+C signal 
+    process.on('SIGTERM', stopService) // catch CTRL+D signal (sent by SystemD)
+
 
     const port = config.server.port
     
