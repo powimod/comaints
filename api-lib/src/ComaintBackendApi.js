@@ -2,11 +2,13 @@
 
 import Context from './Context.js'
 import AuthApi from './AuthApi.js'
+import AccountApi from './AccountApi.js'
 
 class ComaintBackendApi {
 
     #context = null
     #auth = null
+    #account = null
 
     constructor(backendUrl, serializeFunction) {
         if (! backendUrl)
@@ -19,10 +21,15 @@ class ComaintBackendApi {
             throw new Error('Parameter «serializeFunction» is not a function')
         this.#context = new Context(backendUrl, serializeFunction)
         this.#auth = new AuthApi(this.#context)
+        this.#account = new AccountApi(this.#context)
     }
 
     get auth() {
         return this.#auth
+    }
+
+    get account() {
+        return this.#account
     }
 
     checkApiLib() {

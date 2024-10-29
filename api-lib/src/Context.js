@@ -13,7 +13,8 @@ class Context{
         this.#loadAccount()
     }
 
-    async jsonFull(routeUrl, httpMethod, options, requestBody) {
+
+    async jsonFull(routeUrl, httpMethod, options={}, parameters=null) {
         if (routeUrl.startsWith('/'))
             routeUrl = routeUrl.substr(1)
         let url=`${this.#backendUrl}/${routeUrl}`
@@ -31,59 +32,77 @@ class Context{
         if (this.#accessToken !== null)
             fetchParam.headers['x-access-token'] = this.#accessToken
 
-        const methodsWithBody = ['POST', 'PUT', 'PATCH']
-        if (methodsWithBody.includes(httpMethod))
-            fetchParam.body = JSON.stringify(requestBody)
-
-        const response = await fetch(url, fetchParam)
-        if (! response.ok) {
-            let errorMessage = 'Unknown error'
-            try {
-                const jsonError = await response.json()
-                //console.log("JSON Error : ", jsonError)
-                errorMessage = jsonError.message
+        if (parameters !== null) {
+            const methodsWithBody = ['POST', 'PUT', 'PATCH']
+            if (methodsWithBody.includes(httpMethod)) {
+                fetchParam.body = JSON.stringify(parameters)
             }
-            catch(error) {
-                const text = await response.text()
-                errorMessage = text
+            else {
+                const queryString = new URLSearchParams(parameters).toString()
+                url += `?${queryString}`
             }
-            throw new Error(errorMessage)
         }
 
-        const jsonResponse = await response.json()
 
-        let tokenFound = false
-        const accessToken = jsonResponse['access-token']
-        if (accessToken !== undefined) {
-            this.#accessToken = accessToken
-            tokenFound = true
+
+        let response = null
+        try {
+            response = await fetch(url, fetchParam)
+
+            // interpret response as JSON or as text
+            let jsonResponse = null
+            const contentType = response.headers.get("content-type") || ''
+            if (contentType.includes("application/json")) {
+                jsonResponse = await response.json()
+            }
+            else {
+                const texte = await response.text()
+                jsonResponse = { message: texte }
+            }
+
+            if (! response.ok) {
+                const error = new Error(jsonResponse.message)
+                error.errorId = jsonResponse.error || '?'
+                throw error
+            }
+
+            let tokenFound = false
+            const accessToken = jsonResponse['access-token']
+            if (accessToken !== undefined) {
+                this.#accessToken = accessToken
+                tokenFound = true
+            }
+            const refreshToken = jsonResponse['refresh-token']
+            if (refreshToken !== undefined) {
+                this.#refreshToken = refreshToken
+                tokenFound = true
+            }
+            if (tokenFound)
+                this.#saveAccount()
+            return jsonResponse
         }
-        const refreshToken = jsonResponse['refresh-token']
-        if (refreshToken !== undefined) {
-            this.#refreshToken = refreshToken
-            tokenFound = true
+        catch (error) {
+            // fetch error : code="ECONNREFUSED"
+            throw error
         }
-        if (tokenFound)
-            this.#saveAccount()
 
-        return jsonResponse
     }
 
 
-    async jsonGet(routeUrl, options={}) {
-        return await this.jsonFull(routeUrl, 'GET', options)
+    async jsonGet(routeUrl, parameters, options) {
+        return await this.jsonFull(routeUrl, 'GET', options, parameters)
     }
 
-    async jsonPost(routeUrl, body, options={}) {
-        return await this.jsonFull(routeUrl, 'POST', options, body)
+    async jsonPost(routeUrl, parameters, options={}) {
+        return await this.jsonFull(routeUrl, 'POST', options, parameters)
     }
 
-    async jsonPut(routeUrl, body, options={}) {
-        return await this.jsonFull(routeUrl, 'PUT', options, body)
+    async jsonPut(routeUrl, parameters, options={}) {
+        return await this.jsonFull(routeUrl, 'PUT', options, parameters)
     }
 
-    async jsonPatch(routeUrl, body, options={}) {
-        return await this.jsonFull(routeUrl, 'PATCH', options, body)
+    async jsonPatch(routeUrl, parameters, options={}) {
+        return await this.jsonFull(routeUrl, 'PATCH', options, parameters)
     }
 
     async jsonDelete(routeUrl, options={}) {
