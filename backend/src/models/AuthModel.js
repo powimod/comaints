@@ -292,8 +292,9 @@ class AuthModel {
     }
 
 
-    async generateRefreshToken(userId, companyId) {
+    async generateRefreshToken(userId, companyId, connected) {
         assert(companyId !== undefined)
+        assert(connected !== undefined)
         assert(this.#tokenSecret !== undefined)
         assert(this.#refreshTokenLifespan !== undefined)
 
@@ -306,7 +307,8 @@ class AuthModel {
             type: 'refresh',
             token_id: tokenId,
             user_id: userId,
-            company_id: companyId
+            company_id: companyId,
+            connected: connected
         }
         const jwtToken = jwt.sign(payload, this.#tokenSecret, { expiresIn: `${refreshTokenLifespan}days` })
         return [ jwtToken, tokenId ]
@@ -324,7 +326,7 @@ class AuthModel {
                     if (err.constructor.name === 'TokenExpiredError')
                         reject(expiredTokenErrorMessage)
                     else
-                        reject('Invalid tOken')
+                        reject('Invalid token')
                     return
                 }
                 if (payload.type !== 'refresh') {
@@ -335,13 +337,13 @@ class AuthModel {
                     reject(`Invalid token content`)
                     return
                 }
-                resolve([payload.token_id, payload.user_id, payload.company_id])
+                resolve([payload.token_id, payload.user_id, payload.connected, payload.company_id])
             })
         })
 
-        let tokenId, userId, companyId
+        let tokenId, userId, companyId, connected
         try {
-            [tokenId, userId, companyId] = await decodeRefreshTokenPromise
+            [tokenId, userId, connected, companyId] = await decodeRefreshTokenPromise
         }
         catch(error) {
             throw new ComaintApiErrorInvalidToken()
@@ -350,12 +352,13 @@ class AuthModel {
         assert(tokenId !== undefined)
         assert(userId !== undefined)
         assert(companyId !== undefined)
+        assert(connected !== undefined)
 
         // token must be present in database to be valid (detect token usurpation)
         token = await this.#tokenModel.getTokenById(tokenId)
         const tokenFound = (token !== null)
 
-        return [tokenFound, tokenId, userId, companyId]
+        return [tokenFound, tokenId, userId, connected, companyId]
     }
 
 

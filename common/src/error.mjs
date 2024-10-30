@@ -48,7 +48,7 @@ class ComaintApiErrorInvalidRequest extends ComaintApiError {
 
 class ComaintApiErrorUnauthorized extends ComaintApiError {
     constructor(msgId, msgParams) {
-        super(msgId, msgParams, comaintErrors.INVALID_REQUEST_ERROR, 401)
+        super(msgId, msgParams, comaintErrors.UNAUTHORIZED_ERROR, 401)
     }
 }
 

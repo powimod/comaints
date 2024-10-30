@@ -7,6 +7,8 @@ import { ComaintTranslatedError, comaintErrors } from '../../common/src/error.mj
 class View {
     #request = null
     #response = null
+    #renewedAccessToken = null
+    #renewedRefreshToken = null
 
     constructor(request, response) {
         this.request = request
@@ -48,7 +50,9 @@ class View {
             throw new Error(`Invalid error parameter (${error.constructor.name})`)
         else
             throw new Error(`Invalid error parameter`)
+
         this.response.set('Content-Type', 'application/json')
+
         const errorId = error.errorId || comaintErrors.INTERNAL_ERROR
 
         const jsonBody = {
@@ -60,8 +64,19 @@ class View {
             jsonBody['access-token'] = null
             jsonBody['refresh-token'] = null
         }
+        else {
+            if (this.#renewedAccessToken !== null)
+                jsonBody['access-token'] = this.#renewedAccessToken
+            if (this.#renewedRefreshToken !== null)
+                jsonBody['refresh-token'] = this.#renewedRefreshToken
+        }
 
         this.response.status(error.httpStatus || 500).send(jsonBody)
+    }
+
+    storeRenewedTokens(accessToken, refreshToken) {
+        this.#renewedAccessToken = accessToken
+        this.#renewedRefreshToken = refreshToken
     }
 }
 

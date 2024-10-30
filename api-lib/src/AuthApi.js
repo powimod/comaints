@@ -19,7 +19,7 @@ class AuthApi {
 
     async logout() {
         const LOGOUT_ROUTE = '/api/v1/auth/logout'
-        const response = await this.#context.jsonPost(LOGOUT_ROUTE)
+        const response = await this.#context.jsonPost(LOGOUT_ROUTE, null, {token:true})
         return response
     }
 
@@ -44,7 +44,8 @@ class AuthApi {
         if (code === undefined)
             throw new Error('Argument «code» not defined')
         const VALIDATE_ROUTE = 'api/v1/auth/validate'
-        const response = await this.#context.jsonPost(VALIDATE_ROUTE, {code}, {token:false})
+        // access token must be send because it contains user ID
+        const response = await this.#context.jsonPost(VALIDATE_ROUTE, {code}, {token:true})
         return response
     }
 

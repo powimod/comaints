@@ -19,7 +19,7 @@ let dbPassword
 const accountSerializeFunction = (data) => {
     if (data === undefined)
         data = JSON.parse(accountData)
-    else
+    else 
         accountData = JSON.stringify(data)
     return data
 }

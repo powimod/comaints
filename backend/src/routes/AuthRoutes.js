@@ -5,7 +5,7 @@ import assert from 'assert'
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, 
-    ComaintApiError, comaintErrors } from '../../../common/src/error.mjs'
+    ComaintApiErrorInvalidToken, ComaintApiError, comaintErrors } from '../../../common/src/error.mjs'
 import { AccountState } from '../../../common/src/global.mjs'
 import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
@@ -18,11 +18,59 @@ class AuthRoutes {
 
         const authModel = model.getAuthModel()
 
-        // middleware to check access token
+        const _renewTokens = async(refreshToken) => {
+            if (typeof(refreshToken) !== 'string')
+                throw new Error('Invalid refresh token')
+            console.log("dOm renew tokens - check refresh token ...")
+            let tokenFoundInDatabase, tokenId, userId, connected, companyId
+            try {
+                [tokenFoundInDatabase, tokenId, userId, connected, companyId] = await authModel.checkRefreshToken(refreshToken)
+            }
+            catch (error) {
+                console.log("dOm renew tokens - error while checking refresh token", error)
+                throw error
+            }
+            console.log("dOm renew tokens : connected", connected)
+            assert(typeof(connected) === 'boolean')
+
+            if (! tokenFoundInDatabase) {
+                console.log("dOm renew tokens : not token found in database")
+                // if a token is not found in database, it should be an attempt to usurp token :
+                // since a refresh token is deleted when used, it will not be found with a second attempt to use it.
+                console.log(`Token renew - detection of an attempt to reuse a refresh token : lock account userId = ${userId}`)
+                await authModel.lockAccount(userId)
+                // TODO send an email 
+                throw new Error('Attempt to reuse a refresh token') // TODO send a ComaintError
+            }
+
+            // remove refresh token from database
+            console.log("dOm renew tokens : remove refresh token from database")
+            await authModel.deleteRefreshToken(tokenId)
+
+            const isLocked = await authModel.isAccountLocked(userId)
+            if (await authModel.isAccountLocked(userId)) {
+                console.log(`Token renew - account locked userId = ${userId}`)
+                throw new Error('Account locked') // TODO send a ComaintError
+            }
+
+            const user = await authModel.getUserProfile(userId)
+            if (user === null)
+                throw new Error('User account does not exist')
+            if (companyId !== user.companyId)
+                throw new Error('Invalid company ID in refresh token')
+
+            console.log("dOm renew tokens : generate new tokens")
+            const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, connected)
+            const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
+
+            return [ userId, companyId, newAccessToken, newRefreshToken, connected ]
+        }
+
+        // middleware to manage access and refresh tokens
         expressApp.use( async (request, response, next) => {
             assert(request.view !== undefined) // view middleware must have been called first
             const view = request.view
-            console.log(`Token middleware : load access token for request ${request.url} ...`)
+            console.log(`Token middleware : token management for request ${request.url} ...`)
             assert(authModel !== null)
             let userId = null
             let companyId = null
@@ -36,28 +84,46 @@ class AuthRoutes {
             if (request.body.expiredAccessTokenEmulation === true)
                 expiredAccessTokenEmulation = true
 
-            const token = request.headers['x-access-token']
-            if (token === undefined) {
-                console.log(`Token middleware -> access token absent (anonymous request)`)
-            }
-            else {
+            const refreshToken = request.headers['x-refresh-token']
+            const accessToken  = request.headers['x-access-token']
+
+            if (refreshToken !== undefined) {
+                // FIXME gérer les exceptions ici ?
                 try {
-                    [userId, companyId, refreshTokenId, connected] = await authModel.checkAccessToken(token, expiredAccessTokenEmulation)
-                    console.log(`Token middleware -> userId = ${userId}`)
-                    console.log(`Token middleware -> companyId = ${companyId}`)
-                    console.log(`Token middleware -> refreshTokenId = ${refreshTokenId}`)
-                    console.log(`Token middleware -> connected = ${connected}`)
+                    console.log("dOm ================ call renewTokens")
+                    const [ tokenUserId, tokenCompanyId, newAccessToken, newRefreshToken, connected ] = await _renewTokens(refreshToken)
+                    console.log("dOm ================ renewed tokens userID =", userId)
+                    userId = tokenUserId
+                    companyId = tokenCompanyId
+                    view.storeRenewedTokens(newAccessToken, newRefreshToken)
                 }
                 catch (error) {
-                    // TODO add selftest to check invalid token 
-                    const errorMessage = error.message ? error.message : error
-                    console.log(`Token middleware -> error : ${errorMessage}`)
-                    // FIXME how to reset access and refresh tokens
-                    view.error(
-                        new ComaintApiErrorUnauthorized(view.translation('error.access_token_error', {error: errorMessage})),
-                        { resetTokens: true }
-                    )
-                    return
+                        view.error(error) // FIXME send a ComaintError
+                }
+            }
+            else {
+                if (accessToken === undefined) {
+                    console.log(`Token middleware -> access token absent (anonymous request)`)
+                }
+                else {
+                    try {
+                        [userId, companyId, refreshTokenId, connected] = await authModel.checkAccessToken(accessToken, expiredAccessTokenEmulation)
+                        console.log(`Token middleware -> userId = ${userId}`)
+                        console.log(`Token middleware -> companyId = ${companyId}`)
+                        console.log(`Token middleware -> refreshTokenId = ${refreshTokenId}`)
+                        console.log(`Token middleware -> connected = ${connected}`)
+                    }
+                    catch (error) {
+                        // TODO add selftest to check invalid token 
+                        const errorMessage = error.message ? error.message : error
+                        console.log(`Token middleware -> error : ${errorMessage}`)
+                        // FIXME how to reset access and refresh tokens
+                        view.error(
+                            new ComaintApiErrorInvalidToken(view.translation('error.access_token_error', {error: errorMessage})),
+                            { resetTokens: true }
+                        )
+                        return
+                    }
                 }
             }
             console.log(`Token middleware : userId=${userId}, companyId=${companyId}, connected=${connected}`)
@@ -147,9 +213,9 @@ class AuthRoutes {
                 }
 
 
-                // access token with userConnected = false
-                const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId)
-                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , false)
+                // generate new tokens with userConnected = false
+                const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, false)
+                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId, false)
 
                 view.json({
                     message: 'User registration done, waiting for validation code',
@@ -199,6 +265,7 @@ class AuthRoutes {
                         // generate a new access token with userConnected = true
                         userId = user.id
                         const newAccessToken  = await authModel.generateAccessToken(userId, companyId, refreshTokenId, true)
+                        const newRefreshToken  = await authModel.generateRefreshToken(userId, companyId, refreshTokenId, true)
                         jsonResponse['access-token'] = newAccessToken
                     }
                 }
@@ -274,7 +341,7 @@ class AuthRoutes {
                 const user = await authModel.login(email, password)
                 const userId = user.id
                 const companyId = user.companyId
-                const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId)
+                const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, true)
                 const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
 
                 view.json({
@@ -309,6 +376,8 @@ class AuthRoutes {
             }
         })
 
+
+
         // public route
         expressApp.post('/api/v1/auth/refresh', async (request, response) => {
             // do not control HTTP header access/refresh tokens : they may be null
@@ -320,35 +389,12 @@ class AuthRoutes {
                 if (typeof(refreshToken) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'token'})
 
-                const [tokenFound, tokenId, userId, companyId] = await authModel.checkRefreshToken(refreshToken)
-                if (! tokenFound) {
-                    // if a token is not found, it should be an attempt to usurp token :
-                    // since a refresh token is deleted when used, it will not be found with a second attempt to use it.
-                    console.log(`auth/refresh - detect an attempt to reuse a token : lock account userId = ${userId}`)
-                    await authModel.lockAccount(userId)
-                    throw new Error('Attempt to reuse a token')
-                }
-
-                await authModel.deleteRefreshToken(tokenId)
-
-                const isLocked = await authModel.isAccountLocked(userId)
-                if (await authModel.isAccountLocked(userId)) {
-                    console.log(`auth/refresh - account locked userId = ${userId}`)
-                    throw new Error('Account locked')
-                }
-
-                const user = await authModel.getUserProfile(userId)
-                if (user === null)
-                    throw new Error('User account does not exist')
-                if (companyId !== user.companyId)
-                    throw new Error('Invalid company ID in refresh token')
-
-                const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId)
-                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
-
+                const [ userId, companyId, newAccessToken, newRefreshToken, connected ] = await _renewTokens(refreshToken)
+                
                 console.log(`auth/refresh - send new tokens userId ${userId}`)
                 view.json({
                     'userId' : userId,
+                    'connected': connected,
                     'access-token': newAccessToken,
                     'refresh-token': newRefreshToken
                 })

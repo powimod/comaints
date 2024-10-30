@@ -8,12 +8,12 @@ class AccountApi {
         this.#context = context
     }
 
-    async getProfile(parameters, options) {
+    // parameters argument is used by self-test to send «expiredAccessTokenEmulation» option
+    async getProfile(parameters = {}) {
         const PROFILE_ROUTE = '/api/v1/account/profile'
-        const result = await this.#context.jsonGet(PROFILE_ROUTE, parameters, options)
+        const result = await this.#context.jsonGet(PROFILE_ROUTE, parameters, {token:true})
         return result.profile
     }
-
 
 }
 export default AccountApi
