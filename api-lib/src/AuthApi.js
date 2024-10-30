@@ -14,7 +14,7 @@ class AuthApi {
         if (password === undefined)
             throw new Error('Argument «password» not defined')
         const LOGIN_ROUTE = '/api/v1/auth/login'
-        await this.#context.jsonPost(LOGIN_ROUTE, {email, password})
+        await this.#context.jsonPost(LOGIN_ROUTE, {email, password}, {token:false})
     }
 
     async logout() {
@@ -34,6 +34,8 @@ class AuthApi {
             email,
             password,
             sendCodeByEmail: sendMail
+        }, {
+            token:false
         })
         return response
     }
@@ -42,7 +44,7 @@ class AuthApi {
         if (code === undefined)
             throw new Error('Argument «code» not defined')
         const VALIDATE_ROUTE = 'api/v1/auth/validate'
-        const response = await this.#context.jsonPost(VALIDATE_ROUTE, { code })
+        const response = await this.#context.jsonPost(VALIDATE_ROUTE, {code}, {token:false})
         return response
     }
 

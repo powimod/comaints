@@ -39,7 +39,7 @@ class ComaintBackendApi {
     async checkBackend() {
         const API_VERSION_ROUTE = '/api/welcome'
         try {
-            const ret = await this.#context.jsonGet(API_VERSION_ROUTE)
+            const ret = await this.#context.jsonGet(API_VERSION_ROUTE, null, {token:false})
             return {success: true, message: 'Comaint backend communication is working !'}
         }
         catch (error) {
@@ -52,13 +52,13 @@ class ComaintBackendApi {
     async getApiVersion() {
         const API_VERSION_ROUTE = '/api/version'
         // TODO catch errors
-        let json = await this.#context.jsonGet(API_VERSION_ROUTE)
+        let json = await this.#context.jsonGet(API_VERSION_ROUTE, null, {token:false})
         return json.version
     }
 
     async getBackendVersion() {
         const BACKEND_VERSION_ROUTE = '/api/v1/backend-version'
-        let json = await this.#context.jsonGet(BACKEND_VERSION_ROUTE)
+        let json = await this.#context.jsonGet(BACKEND_VERSION_ROUTE, null, {token:false})
         return json.version
     }
 
@@ -66,7 +66,7 @@ class ComaintBackendApi {
     async checkWelcome(who) {
         const API_VERSION_ROUTE = '/api/welcome'
         if (who === undefined) {
-            const ret = await this.#context.jsonGet(API_VERSION_ROUTE)
+            const ret = await this.#context.jsonGet(API_VERSION_ROUTE, null, {token:false})
             return ret.response
         }
         else {
@@ -74,7 +74,7 @@ class ComaintBackendApi {
                 throw new Error('Invalid argument')
             const firstname = who.firstname || '?'
             const lastname = who.lastname || '?'
-            const ret = await this.#context.jsonPost(API_VERSION_ROUTE, {firstname, lastname})
+            const ret = await this.#context.jsonPost(API_VERSION_ROUTE, {firstname, lastname}, {token:false})
             return ret.response
         }
     }

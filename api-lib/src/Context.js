@@ -1,5 +1,7 @@
 'use strict'
 
+import { comaintErrors, ComaintApiErrorInvalidResponse } from '../../common/src/error.mjs' 
+
 class Context{
     #backendUrl = null
     #accountSerializeFunction = null
@@ -21,6 +23,9 @@ class Context{
 
         const lang = options.lang ?? 'en'
 
+        // par défaut, envoyer gérer l'envoi des jetons
+        const sendToken = options.token ?? false
+
         const fetchParam = {
             method : httpMethod,
             headers:  {
@@ -29,8 +34,13 @@ class Context{
                 'Accept-Language': lang
             }
         }
-        if (this.#accessToken !== null)
-            fetchParam.headers['x-access-token'] = this.#accessToken
+
+        if (sendToken) {
+            if (this.#accessToken !== null)
+                throw new Error('Access token not found')
+            if (this.#refreshToken !== null)
+                throw new Error('Refresh token not found')
+        }
 
         if (parameters !== null) {
             const methodsWithBody = ['POST', 'PUT', 'PATCH']
@@ -43,29 +53,101 @@ class Context{
             }
         }
 
+        let globalResult = null
+        let globalError = null
 
+        // Déterminer le nombre de tentatives d'envoi de requête HTTP : 
+        // • une seule tentative pour les routes publiques (pas de gestion de jeton)
+        // • deux tentatives maximum pour les routes privées :
+        //      • une première tentative avec le jeton d'accès (éventuellement périmé)
+        //      • une seconde tentative avec le jeton de rafraîchissement (pour renouveler un jeton d'accès périmé)
+        const maxRetryCount = sendToken ? 2 : 1
 
-        let response = null
-        try {
-            response = await fetch(url, fetchParam)
+        // Faire une ou deux tentatives d'envoi de la requête
+        for (const retry = 1 ; retry <= maxRetryCount; retry++)
+        {
+            if (sendToken) {
+                if (retry === 1) {
+                    // première tentative : envoyer le jeton d'accès (même s'il est périmé)
+                    fetchParam.headers['x-access-token'] = this.#accessToken
+                }
+                else {
+                    // deuxième tentative : envoyer le jeton de renouvellement 
+                    // (le jeton d'accès avait été détecté comme périmé à la première tentative)
+                    fetchParam.headers['x-refresh-token'] = this.#refreshToken
+                }
+            }
 
-            // interpret response as JSON or as text
+            // envoyer la requête au backend
+            let response = null
+            try {
+                response = await fetch(url, fetchParam)
+            }
+            catch (error) {
+                // le messsage d'erreur error.message contient l'erreur générique «fetch failed» 
+                // la cause véritable se trouve dans error.cause.message.
+                const errorMessage = error.cause?.message || error.message
+                // en cas d'erreur fetch, sortir immédiatement en erreur en transmettant l'erreur
+                globalError = new Error(errorMessage)
+                globalError.errorId = 'communicationError'
+                break
+            }
+
+            // Interpréter la réponse en fonction du type MIME de l'entête HTTP
             let jsonResponse = null
             const contentType = response.headers.get("content-type") || ''
             if (contentType.includes("application/json")) {
+                // Inteprétation en tant que JSON (normalement toutes les erreurs renvoyées par le backend sont en JSON)
                 jsonResponse = await response.json()
             }
             else {
+                // Inteprétation en tant que texte (ne devrait jamais se produire)
                 const texte = await response.text()
-                jsonResponse = { message: texte }
+                jsonResponse = { 
+                    message: texte,
+                    errorId: 'UnknownError'
+                }
             }
 
+            // Cas où la requête HTTP a échoué
             if (! response.ok) {
+
+                // Sortir en erreur si la réponse du backend ne contient pas les propriétés «message» et «error»
+                // (ne devrait jamais se produire)
+                if (jsonResponse.message === undefined || jsonResponse.error === undefined) {
+                    console.log("dOm invalid response", jsonResponse)
+                    globalError = new ComaintApiErrorInvalidResponse()
+                    break
+                }
+
+                // Construire une erreur à partir de la réponse JSON
                 const error = new Error(jsonResponse.message)
-                error.errorId = jsonResponse.error || '?'
-                throw error
+                error.errorId = jsonResponse.error
+
+                // Sortir en erreur si l'erreur rencontrée n'est pas liée à un problème de jeton
+                if (! sendToken) {
+                    globalError = error
+                    break
+                }
+
+                // Sortir en erreur si c'est la seconde tentative
+                if (retry === 2) {
+                    globalError = error
+                    break
+                }
+
+                // Sortir en erreur si l'erreur ne vient pas d'un jeton d'accès périmé
+                if (jsonResponse = comaintErrors.INVALID_TOKEN) {
+                    globalError = error
+                    break
+                }
+
+                // Arrivé ici, le problème vient du jeton d'accès qui est périmé :
+                // dans ce cas, il faut boucler sur une seconde tentative qui enverra le jeton de rafraîchissement
+                continue
             }
 
+            // si la réponse contient des jetons, les récupérer
             let tokenFound = false
             const accessToken = jsonResponse['access-token']
             if (accessToken !== undefined) {
@@ -77,15 +159,18 @@ class Context{
                 this.#refreshToken = refreshToken
                 tokenFound = true
             }
+
+            // demander au client de sauver les jetons
             if (tokenFound)
                 this.#saveAccount()
-            return jsonResponse
-        }
-        catch (error) {
-            // fetch error : code="ECONNREFUSED"
-            throw error
-        }
 
+            // la requête HTTP a réussi : sortir
+            globalResult = jsonResponse
+            break
+        }
+        if (globalError !== null)
+            throw globalError
+        return globalResult
     }
 
 

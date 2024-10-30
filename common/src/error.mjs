@@ -7,7 +7,8 @@ const comaintErrors = {
     INVALID_EMAIL_OR_PASSWORD: 'InvalidEmailOrPassword',
     CONFLICT_ERROR: 'ConflictError',
     INTERNAL_ERROR: 'InternalError',
-    INVALID_TOKEN: 'InvalidToken'
+    INVALID_TOKEN: 'InvalidToken',
+    INVALID_RESPONSE: 'InvalidResponse'
 }
 
 class ComaintTranslatedError extends Error {
@@ -70,6 +71,11 @@ class ComaintApiErrorInvalidToken extends ComaintApiError {
     }
 }
 
+class ComaintApiErrorInvalidResponse extends ComaintApiError {
+    constructor() {
+        super('error.invalid_response', {}, comaintErrors.INVALID_RESPONSE, 500)
+    }
+}
 
 
 const buildComaintError = (comaintErrorCode, params = {}) => {
@@ -88,6 +94,8 @@ const buildComaintError = (comaintErrorCode, params = {}) => {
             return new ComaintApiErrorInternalError('error.internal_error', params)
         case comaintErrors.INVALID_TOKEN:
             return new ComaintApiErrorInvalidToken()
+        case comaintErrors.INVALID_RESPONSE:
+            return new ComaintApiErrorInvalidResponse()
         default:
             throw new Error(`Invalid comaint error code «${comaintErrorCode}»`)
     }
@@ -103,5 +111,6 @@ export {
     ComaintApiErrorConflict,
     ComaintApiErrorInternalError,
     ComaintApiErrorInvalidToken,
+    ComaintApiErrorInvalidResponse,
     buildComaintError
 }
