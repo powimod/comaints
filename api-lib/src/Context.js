@@ -10,6 +10,18 @@ class Context{
     #accessToken = null
 
     constructor(backendUrl, accountSerializeFunction) {
+
+        if (accountSerializeFunction === null) {
+            let accountData = null
+            // default serialize function with in memory storage
+            accountSerializeFunction = (data) => {
+                if (data === undefined)
+                    data = JSON.parse(accountData)
+                else
+                    accountData = JSON.stringify(data)
+                return data
+            }
+        }
         this.#backendUrl = backendUrl
         this.#accountSerializeFunction = accountSerializeFunction
         this.#loadAccount()

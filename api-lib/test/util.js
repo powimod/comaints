@@ -16,19 +16,11 @@ let dbDatabase
 let dbUser
 let dbPassword
 
-const accountSerializeFunction = (data) => {
-    if (data === undefined)
-        data = JSON.parse(accountData)
-    else 
-        accountData = JSON.stringify(data)
-    return data
-}
-
 const initializeApi = () => {
     const backendUrl = process.env.BACKEND_URL
     if (! backendUrl)
         throw new Error('Env variable «BACKEND_URL» is not defined')
-    api = new ComaintBackendApi(backendUrl, accountSerializeFunction)
+    api = new ComaintBackendApi(backendUrl)
 }
 
 const terminateApi = () => {
