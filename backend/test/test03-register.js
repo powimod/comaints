@@ -352,7 +352,7 @@ describe('Test user registration', () => {
         it('Call logout route being connected', async () => {
             const json = await jsonPost(ROUTE_LOGOUT, {})
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.keys('access-token', 'refresh-token', 'userId')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'userId', 'context')
             expect(json).to.have.property('userId')
             expect(json.userId).to.equal(null)
             expect(json).to.have.property('access-token')

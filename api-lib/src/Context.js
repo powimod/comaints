@@ -183,10 +183,13 @@ class Context{
             throw globalError
         }
 
-        // transmit context information
+        // intercept context information
         const context = globalResult.context
-        if (context !== undefined && this.#contextInfoCallback !== null)
+        if (context !== undefined && this.#contextInfoCallback !== null) {
             this.#contextInfoCallback(context)
+            // do not transmit context to API client
+            delete globalResult.context
+        }
 
         return globalResult
     }

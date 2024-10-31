@@ -15,16 +15,23 @@ let dbPort
 let dbDatabase
 let dbUser
 let dbPassword
+let context = null
+
+const contextInfoCallback = (updatedContext) => {
+    context = {... updatedContext}
+}
 
 const initializeApi = () => {
     const backendUrl = process.env.BACKEND_URL
     if (! backendUrl)
         throw new Error('Env variable «BACKEND_URL» is not defined')
-    api = new ComaintBackendApi(backendUrl)
+    api = new ComaintBackendApi(backendUrl, contextInfoCallback )
+    context = null
 }
 
 const terminateApi = () => {
     api = null
+    context = null
     accountData = null
 }
 
@@ -72,4 +79,5 @@ export {
     connectDb,
     disconnectDb,
     requestDb,
+    context
 }

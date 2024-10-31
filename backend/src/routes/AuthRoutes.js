@@ -4,7 +4,7 @@ import assert from 'assert'
 
 import View from '../view.js'
 import ModelSingleton from '../model.js'
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, 
+import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized,
     ComaintApiErrorInvalidToken, ComaintApiError, comaintErrors } from '../../../common/src/error.mjs'
 import { AccountState } from '../../../common/src/global.mjs'
 import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
@@ -29,7 +29,8 @@ class AuthRoutes {
                 // since a refresh token is deleted when used, it will not be found with a second attempt to use it.
                 console.log(`Token renew - detection of an attempt to reuse a refresh token : lock account userId = ${userId}`)
                 await authModel.lockAccount(userId)
-                // TODO send an email 
+                // TODO send an email
+                // TODO renvoyer un context avec {email:null, connected:false}
                 throw new Error('Attempt to reuse a refresh token') // TODO send a ComaintError
             }
 
@@ -39,6 +40,7 @@ class AuthRoutes {
             const isLocked = await authModel.isAccountLocked(userId)
             if (await authModel.isAccountLocked(userId)) {
                 console.log(`Token renew - account locked userId = ${userId}`)
+                // TODO renvoyer un context avec {email:null, connected:false}
                 throw new Error('Account locked') // TODO send a ComaintError
             }
 
@@ -101,7 +103,7 @@ class AuthRoutes {
                         console.log(`Token middleware -> connected = ${connected}`)
                     }
                     catch (error) {
-                        // TODO add selftest to check invalid token 
+                        // TODO add selftest to check invalid token
                         const errorMessage = error.message ? error.message : error
                         console.log(`Token middleware -> error : ${errorMessage}`)
                         // FIXME how to reset access and refresh tokens
@@ -153,10 +155,10 @@ class AuthRoutes {
                     throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
 
                 // self-test does not send validation code by email
-                const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ? 
+                const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
                     request.body.sendCodeByEmail : true
 
-                const invalidateCodeImmediately = (request.body.invalidateCodeImmediately !== undefined) ? 
+                const invalidateCodeImmediately = (request.body.invalidateCodeImmediately !== undefined) ?
                     request.body.invalidateCodeImmediately : false
 
                 const authCode = authModel.generateRandomAuthCode()
@@ -168,7 +170,7 @@ class AuthRoutes {
                 // Si le compte existe déjà pour cet email alors on va tester si le compte est en cours
                 // d'enregistrement ou s'il est opérationnel.
                 // S'il est déjà opérationnel, on envoie un mail à l'utilisateur pour l'informer d'une tentative de
-                // création d'un compte avec son email et on ne signale pas que le compte est déjà utilisé 
+                // création d'un compte avec son email et on ne signale pas que le compte est déjà utilisé
                 // car ça donne des informations à un pirate que le compte existe.
                 // Si le compte existe déjà mais qu'il est en cours d'enregistrement, on va juste générer
                 // un nouveau code d'authentification.
@@ -216,7 +218,7 @@ class AuthRoutes {
         })
 
 
-        // this route is public for registration, and private for email change
+        // this route is public for registration, and private for email change, account unlock and account deletion
         expressApp.post('/api/v1/auth/validate', async (request, response) => {
             const view = request.view
             try {
@@ -247,6 +249,10 @@ class AuthRoutes {
                         userId = null
                         jsonResponse['access-token'] = null
                         jsonResponse['refresh-token'] = null
+                        jsonResponse.context = {
+                            email: null,
+                            connected: false
+                        }
                     }
                     else {
                         // generate a new access token with userConnected = true
@@ -255,6 +261,10 @@ class AuthRoutes {
                         const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId, true)
                         jsonResponse['refresh-token'] = newRefreshToken
                         jsonResponse['access-token'] = newAccessToken
+                        jsonResponse.context = {
+                            email: user.email,
+                            connected: true
+                        }
                     }
                 }
 
@@ -270,7 +280,7 @@ class AuthRoutes {
 
         // public auth
         expressApp.post('/api/v1/auth/resendCode', requireUserAuth, async (request, response) => {
-            const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ? 
+            const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
                 request.body.sendCodeByEmail : true
             const view = request.view
             try {
@@ -334,7 +344,11 @@ class AuthRoutes {
 
                 view.json({
                     'refresh-token': newRefreshToken,
-                    'access-token': newAccessToken
+                    'access-token': newAccessToken,
+                    context: {
+                        email: user.email,
+                        connected: true
+                    }
                 })
             }
             catch(error) {
@@ -355,7 +369,11 @@ class AuthRoutes {
                 const jsonResponse = {
                     userId: null,
                     'access-token': null,
-                    'refresh-token': null
+                    'refresh-token': null,
+                    context: {
+                        email: null,
+                        connected: false
+                    }
                 }
                 view.json(jsonResponse)
             }
@@ -378,7 +396,7 @@ class AuthRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'token'})
 
                 const [ userId, companyId, newAccessToken, newRefreshToken, connected ] = await _renewTokens(refreshToken)
-                
+
                 console.log(`auth/refresh - send new tokens userId ${userId}`)
                 view.json({
                     'userId' : userId,

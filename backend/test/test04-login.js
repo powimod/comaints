@@ -182,7 +182,7 @@ describe('Test user login', () => {
                     password: PASSWORD
                 })
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.keys('access-token', 'refresh-token')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'context')
             expect(json['access-token']).to.be.a('string')
             expect(json['refresh-token']).to.be.a('string')
             // check token in util.js
@@ -220,7 +220,7 @@ describe('Test user login', () => {
 
         it('Call logout route being connected', async () => {
             const json = await jsonPost(ROUTE_LOGOUT, {})
-            expect(json).to.have.keys('access-token', 'refresh-token', 'userId')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'userId', 'context')
             expect(json).to.be.instanceOf(Object)
             expect(json.userId).to.equal(null)
             expect(json['access-token']).to.equal(null)
@@ -247,7 +247,7 @@ describe('Test user login', () => {
                     password: PASSWORD
                 })
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.keys('access-token', 'refresh-token')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'context')
             expect(json['access-token']).to.be.a('string')
             expect(json['refresh-token']).to.be.a('string')
             // check token in util.js
@@ -272,7 +272,7 @@ describe('Test user login', () => {
         it('Call logout route', async () => {
             const json = await jsonPost(ROUTE_LOGOUT, {})
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.keys('access-token', 'refresh-token', 'userId')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'userId', 'context')
             expect(json.userId).to.equal(null)
             expect(json['access-token']).to.equal(null)
             expect(json['refresh-token']).to.equal(null)

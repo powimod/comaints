@@ -49,7 +49,7 @@ describe('Test delete account route', () => {
                 password: PASSWORD
             })
         expect(json).to.be.instanceOf(Object)
-        expect(json).to.have.keys('access-token', 'refresh-token')
+        expect(json).to.have.keys('access-token', 'refresh-token', 'context')
         expect(json).to.have.property('access-token')
         expect(json).to.have.property('refresh-token')
         // check token in util.js
