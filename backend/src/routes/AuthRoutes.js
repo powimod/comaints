@@ -21,20 +21,10 @@ class AuthRoutes {
         const _renewTokens = async(refreshToken) => {
             if (typeof(refreshToken) !== 'string')
                 throw new Error('Invalid refresh token')
-            console.log("dOm renew tokens - check refresh token ...")
             let tokenFoundInDatabase, tokenId, userId, connected, companyId
-            try {
-                [tokenFoundInDatabase, tokenId, userId, connected, companyId] = await authModel.checkRefreshToken(refreshToken)
-            }
-            catch (error) {
-                console.log("dOm renew tokens - error while checking refresh token", error)
-                throw error
-            }
-            console.log("dOm renew tokens : connected", connected)
-            assert(typeof(connected) === 'boolean')
+            [tokenFoundInDatabase, tokenId, userId, connected, companyId] = await authModel.checkRefreshToken(refreshToken)
 
             if (! tokenFoundInDatabase) {
-                console.log("dOm renew tokens : not token found in database")
                 // if a token is not found in database, it should be an attempt to usurp token :
                 // since a refresh token is deleted when used, it will not be found with a second attempt to use it.
                 console.log(`Token renew - detection of an attempt to reuse a refresh token : lock account userId = ${userId}`)
@@ -44,7 +34,6 @@ class AuthRoutes {
             }
 
             // remove refresh token from database
-            console.log("dOm renew tokens : remove refresh token from database")
             await authModel.deleteRefreshToken(tokenId)
 
             const isLocked = await authModel.isAccountLocked(userId)
@@ -59,12 +48,13 @@ class AuthRoutes {
             if (companyId !== user.companyId)
                 throw new Error('Invalid company ID in refresh token')
 
-            console.log("dOm renew tokens : generate new tokens")
+            assert(typeof(connected) === 'boolean')
             const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, connected)
             const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
 
             return [ userId, companyId, newAccessToken, newRefreshToken, connected ]
         }
+
 
         // middleware to manage access and refresh tokens
         expressApp.use( async (request, response, next) => {
@@ -88,17 +78,14 @@ class AuthRoutes {
             const accessToken  = request.headers['x-access-token']
 
             if (refreshToken !== undefined) {
-                // FIXME gérer les exceptions ici ?
                 try {
-                    console.log("dOm ================ call renewTokens")
-                    const [ tokenUserId, tokenCompanyId, newAccessToken, newRefreshToken, connected ] = await _renewTokens(refreshToken)
-                    console.log("dOm ================ renewed tokens userID =", userId)
-                    userId = tokenUserId
-                    companyId = tokenCompanyId
+                    let newAccessToken, newRefreshToken
+                    [ userId, companyId, newAccessToken, newRefreshToken, connected ] = await _renewTokens(refreshToken)
                     view.storeRenewedTokens(newAccessToken, newRefreshToken)
                 }
                 catch (error) {
-                        view.error(error) // FIXME send a ComaintError
+                    view.error(error) // FIXME send a ComaintError
+                    return
                 }
             }
             else {
@@ -264,8 +251,9 @@ class AuthRoutes {
                     else {
                         // generate a new access token with userConnected = true
                         userId = user.id
-                        const newAccessToken  = await authModel.generateAccessToken(userId, companyId, refreshTokenId, true)
-                        const newRefreshToken  = await authModel.generateRefreshToken(userId, companyId, refreshTokenId, true)
+                        const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, true)
+                        const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId, true)
+                        jsonResponse['refresh-token'] = newRefreshToken
                         jsonResponse['access-token'] = newAccessToken
                     }
                 }

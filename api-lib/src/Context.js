@@ -20,15 +20,11 @@ class Context{
         if (routeUrl.startsWith('/'))
             routeUrl = routeUrl.substr(1)
         let url=`${this.#backendUrl}/${routeUrl}`
-        console.log("dOm =============================================")
-        console.log("dOm url", url)
 
         const lang = options.lang ?? 'en'
 
         // par défaut, envoyer gérer l'envoi des jetons
-        console.log("dOm option jsonFull", options)
         const sendToken = options.token ?? false
-        console.log("dOm sendToken", sendToken)
 
         const fetchParam = {
             method : httpMethod,
@@ -66,21 +62,16 @@ class Context{
         //      • une première tentative avec le jeton d'accès (éventuellement périmé)
         //      • une seconde tentative avec le jeton de rafraîchissement (pour renouveler un jeton d'accès périmé)
         const maxRetryCount = sendToken ? 2 : 1
-        console.log("dOm max retry count", maxRetryCount)
 
         // Faire une ou deux tentatives d'envoi de la requête
         for (let retry = 1 ; retry <= maxRetryCount; retry++)
         {
-            console.log("dOm retry", retry, "sendToken", sendToken)
             if (sendToken) {
-                console.log("dOm retry", retry, "Envoi de token demandé")
                 if (retry === 1) {
-                    console.log("dOm retry", retry, "Envoi access-token")
                     // première tentative : envoyer le jeton d'accès (même s'il est périmé)
                     fetchParam.headers['x-access-token'] = this.#accessToken
                 }
                 else {
-                    console.log("dOm retry", retry, "Envoi refresh-token")
                     // deuxième tentative : envoyer le jeton de renouvellement 
                     // (le jeton d'accès avait été détecté comme périmé à la première tentative)
                     fetchParam.headers['x-refresh-token'] = this.#refreshToken
@@ -120,12 +111,10 @@ class Context{
 
             // Cas où la requête HTTP a échoué
             if (! response.ok) {
-                console.log("dOm retry", retry, "not OK retry")
 
                 // Sortir en erreur si la réponse du backend ne contient pas les propriétés «message» et «error»
                 // (ne devrait jamais se produire)
                 if (jsonResponse.message === undefined || jsonResponse.error === undefined) {
-                    console.log("dOm retry", retry, "cas 1")
                     globalError = new ComaintApiErrorInvalidResponse()
                     break
                 }
@@ -135,31 +124,25 @@ class Context{
                 error.errorId = jsonResponse.error
 
                 // Sortir en erreur si l'erreur rencontrée n'est pas liée à un problème de jeton
-                console.log("dOm retry", retry, "sendToken", sendToken)
                 if (! sendToken) {
-                    console.log("dOm retry", retry, "cas 2")
                     globalError = error
                     break
                 }
 
                 // Sortir en erreur si c'est la seconde tentative
                 if (retry === 2) {
-                    console.log("dOm retry", retry, "error", error.message)
-                    console.log("dOm retry", retry, "abandon après la 2ème tentative")
                     globalError = error
                     break
                 }
 
                 // Sortir en erreur si l'erreur ne vient pas d'un jeton d'accès périmé
                 if (jsonResponse.error !== comaintErrors.INVALID_TOKEN) {
-                    console.log("dOm retry", retry, "cas 4")
                     globalError = error
                     break
                 }
 
                 // Arrivé ici, le problème vient du jeton d'accès qui est périmé :
                 // dans ce cas, il faut boucler sur une seconde tentative qui enverra le jeton de rafraîchissement
-                console.log("dOm retry", retry, "faire la 2ème tentative")
                 continue
             }
 
@@ -181,16 +164,12 @@ class Context{
                 this.#saveAccount()
 
             // la requête HTTP a réussi : sortir
-            console.log("dOm ============= fin de boucle")
             globalResult = jsonResponse
             break
         }
-        console.log("dOm ============= fin de boucle")
         if (globalError !== null) {
-            console.log("dOm request error", globalError.message)
             throw globalError
         }
-        console.log("dOm request success", globalResult)
         return globalResult
     }
 

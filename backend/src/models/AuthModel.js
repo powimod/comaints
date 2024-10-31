@@ -295,6 +295,7 @@ class AuthModel {
     async generateRefreshToken(userId, companyId, connected) {
         assert(companyId !== undefined)
         assert(connected !== undefined)
+        assert(typeof(connected) === 'boolean') 
         assert(this.#tokenSecret !== undefined)
         assert(this.#refreshTokenLifespan !== undefined)
 
@@ -353,6 +354,7 @@ class AuthModel {
         assert(userId !== undefined)
         assert(companyId !== undefined)
         assert(connected !== undefined)
+        assert(typeof(connected) === 'boolean')
 
         // token must be present in database to be valid (detect token usurpation)
         token = await this.#tokenModel.getTokenById(tokenId)

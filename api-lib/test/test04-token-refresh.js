@@ -24,7 +24,6 @@ describe('Check token refresh', () => {
         await terminateApi()
     })
 
-    /* TODO à réactiver
     it ('Get profile with valid access token', async () => {
         const result = await api.account.getProfile()
         expect(result).to.be.instanceOf(Object)
@@ -34,18 +33,19 @@ describe('Check token refresh', () => {
         expect(result.email).to.be.a('string')
         expect(result.state).to.be.a('number').and.to.equal(1) // ACTIVE
     })
-    */
 
     it ('Get profile with expired access token', async () => {
-        try {
-            const result = await api.account.getProfile({expiredAccessTokenEmulation:true})
-            expect.fail('Expired token not detected')
-        }
-        catch(error) {
-            expect(error).to.be.an('error')
-            expect(error).to.have.property('message', 'x')
-            expect(error).to.have.property('errorId', 'InvalidRequestError')
-        }
+        const result = await api.account.getProfile({expiredAccessTokenEmulation:true})
+        expect(result).to.be.instanceOf(Object)
+        expect(result).to.have.keys('id', 'email', 'firstname', 'lastname', 'state', 'lastUse', 'administrator', 'companyId')
+        expect(result.id).to.be.a('number')
+        expect(result.email).to.be.a('string').and.to.equal(userEmail)
+        expect(result.firstname).to.equal(null)
+        expect(result.lastname).to.equal(null)
+        expect(result.state).to.equal(1) // ACTIVE
+        expect(result.lastUse).to.equal(null)
+        expect(result.administrator).to.be.a('boolean').and.to.equal(false)
+        expect(result.companyId).to.equal(null)
     })
 
 })

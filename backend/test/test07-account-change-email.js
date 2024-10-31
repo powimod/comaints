@@ -199,11 +199,9 @@ describe('Test change password route', () => {
         it('Call logout route', async () => {
             const json = await jsonPost(ROUTE_LOGOUT, {})
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('userId')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'userId')
             expect(json.userId).to.equal(null)
-            expect(json).to.have.property('access-token')
             expect(json['access-token']).to.equal(null)
-            expect(json).to.have.property('refresh-token')
             expect(json['refresh-token']).to.equal(null)
             // check token in util.js
             expect(accessToken).to.equal(null)
@@ -224,9 +222,8 @@ describe('Test change password route', () => {
         it('Check login with new email', async () => {
             let json = await jsonPost(ROUTE_LOGIN, { email: newEmail, password: PASSWORD })
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('access-token')
+            expect(json).to.have.keys('access-token', 'refresh-token')
             expect(json['access-token']).to.be.a('string')
-            expect(json).to.have.property('refresh-token')
             expect(json['refresh-token']).to.be.a('string')
             // check token in util.js
             expect(accessToken).not.to.equal(null)

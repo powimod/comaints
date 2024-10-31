@@ -68,15 +68,11 @@ describe('Test delete account route', () => {
 
         it('Send validation code', async () => {
             const json = await jsonPost(ROUTE_VALIDATE, { code: authCode })
+            expect(json).to.have.keys('validated', 'access-token', 'refresh-token', 'userId')
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(true)
-            expect(json).to.have.property('userId')
             expect(json.userId).and.to.equal(null)
-
-            expect(json).to.have.property('access-token')
             expect(json['access-token']).to.equal(null)
-            expect(json).to.have.property('refresh-token')
             expect(json['refresh-token']).to.equal(null)
             // check token in util.js
             expect(accessToken).to.equal(null)

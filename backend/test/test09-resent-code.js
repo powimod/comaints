@@ -49,10 +49,9 @@ describe('Test delete account route', () => {
                 password: PASSWORD
             })
         expect(json).to.be.instanceOf(Object)
+        expect(json).to.have.keys('access-token', 'refresh-token')
         expect(json).to.have.property('access-token')
-        expect(json['access-token']).to.be.a('string')
         expect(json).to.have.property('refresh-token')
-        expect(json['refresh-token']).to.be.a('string')
         // check token in util.js
         expect(accessToken).not.to.equal(null)
         expect(refreshToken).not.to.equal(null)
@@ -90,7 +89,7 @@ describe('Test delete account route', () => {
     it ('Call route to resend auth code', async () => {
         const json = await jsonPost(ROUTE_RESEND_CODE, {sendCodeByEmail: false})
         expect(json).to.be.instanceOf(Object)
-        expect(json).to.have.property('message')
+        expect(json).to.have.keys('message')
         expect(json.message).to.be.a('string').and.to.equal('Code resent')
     })
 
