@@ -4,17 +4,16 @@ import { comaintErrors, ComaintApiErrorInvalidResponse } from '../../common/src/
 
 class Context{
     #backendUrl = null
-    #accountSerializeFunction = null
-   
+    #accountSerializeCallback = null
+    #contextInfoCallback = null
     #refreshToken = null
     #accessToken = null
 
-    constructor(backendUrl, accountSerializeFunction) {
-
-        if (accountSerializeFunction === null) {
+    constructor(backendUrl, contextInfoCallback, accountSerializeCallback) {
+        if (accountSerializeCallback === null) {
             let accountData = null
             // default serialize function with in memory storage
-            accountSerializeFunction = (data) => {
+            accountSerializeCallback = (data) => {
                 if (data === undefined)
                     data = JSON.parse(accountData)
                 else
@@ -23,7 +22,8 @@ class Context{
             }
         }
         this.#backendUrl = backendUrl
-        this.#accountSerializeFunction = accountSerializeFunction
+        this.#contextInfoCallback = contextInfoCallback 
+        this.#accountSerializeCallback = accountSerializeCallback
         this.#loadAccount()
     }
 
@@ -182,6 +182,12 @@ class Context{
         if (globalError !== null) {
             throw globalError
         }
+
+        // transmit context information
+        const context = globalResult.context
+        if (context !== undefined && this.#contextInfoCallback !== null)
+            this.#contextInfoCallback(context)
+
         return globalResult
     }
 
@@ -207,7 +213,7 @@ class Context{
     }
 
     #loadAccount() {
-        let result = this.#accountSerializeFunction()
+        let result = this.#accountSerializeCallback()
         if (result === null)
             result = {refreshToken:null, accessToken: null}
         if (! (result instanceof Object))
@@ -224,7 +230,7 @@ class Context{
     #saveAccount() {
         const accessToken = this.#accessToken
         const refreshToken = this.#refreshToken
-        this.#accountSerializeFunction({ accessToken, refreshToken})
+        this.#accountSerializeCallback({ accessToken, refreshToken})
     }
 }
 

@@ -10,16 +10,18 @@ class ComaintBackendApi {
     #auth = null
     #account = null
 
-    constructor(backendUrl, accountSerializeFunction = null) {
+    constructor(backendUrl, contextInfoCallback = null, accountSerializeCallback = null) {
         if (! backendUrl)
             throw new Error('Parameter «backendUrl» is not defined')
         if (typeof(backendUrl) !== 'string')
             throw new Error('Parameter «backendUrl» is not a string')
 
-        if (accountSerializeFunction !== null && typeof(accountSerializeFunction) !== 'function')
-            throw new Error('Parameter «accountSerializeFunction» is not a function')
+        if (contextInfoCallback !== null && typeof(contextInfoCallback ) !== 'function')
+            throw new Error('Parameter «contextInfoCallback » is not a function')
+        if (accountSerializeCallback !== null && typeof(accountSerializeCallback) !== 'function')
+            throw new Error('Parameter «accountSerializeCallback» is not a function')
 
-        this.#context = new Context(backendUrl, accountSerializeFunction)
+        this.#context = new Context(backendUrl, contextInfoCallback, accountSerializeCallback)
         this.#auth = new AuthApi(this.#context)
         this.#account = new AccountApi(this.#context)
     }
