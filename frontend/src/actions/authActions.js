@@ -5,7 +5,7 @@ const useAuthActions = () => {
     const dispatch = useDispatch()
     const authState = useSelector((state) => state.auth)
 
-    const getAuthState = () => {
+    const getAuth = () => {
         return authState
     }
 
@@ -26,7 +26,7 @@ const useAuthActions = () => {
     }
 
     return {
-        getAuthState,
+        getAuth,
         register,
         login,
         logout,
