@@ -5,13 +5,11 @@ const ApiContext = createContext(null)
 
 const useComaintApi = () => useContext(ApiContext)
 
-const initializeComaintApi = () => {
-
-    let comaintContext = null
+const initializeComaintApi = (setComaintContext) => {
 
     const contextInfoCallback = (context) => {
         console.log("Context update", context)
-        comaintContext = context
+        setComaintContext(context) // update commaint context state in main.jsx
     }
 
     const accountSerializeFunction = (data) => {
@@ -30,7 +28,7 @@ const initializeComaintApi = () => {
     }
     const apiUrl = window.location.origin
     const comaintApi = new ComaintBackendApi(apiUrl, contextInfoCallback, accountSerializeFunction)
-    return [ comaintApi, comaintContext ]
+    return comaintApi
 }
 
 const ComaintApiProvider = ({comaintApi, comaintContext, children}) => {
