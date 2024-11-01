@@ -34,9 +34,9 @@ describe('Check API version', () => {
     })
 
     it('Check welcome message', async () => {
-        let response = await api.checkWelcome()
+        let response = await api.welcome()
         expect(response).to.be.a('string').and.to.equal('Welcome')
-        response = await api.checkWelcome({firstname:'Bonnie', lastname:'Parker'})
+        response = await api.welcome({firstname:'Bonnie', lastname:'Parker'})
         expect(response).to.be.a('string').and.to.equal('Hello Bonnie Parker')
     })
 

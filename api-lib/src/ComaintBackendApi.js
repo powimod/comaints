@@ -53,19 +53,22 @@ class ComaintBackendApi {
 
     async getApiVersion() {
         const API_VERSION_ROUTE = '/api/version'
-        // TODO catch errors
         let json = await this.#context.jsonGet(API_VERSION_ROUTE, null, {token:false})
+        if (json.version === undefined)
+            throw new Error('Version not found in backend response')
         return json.version
     }
 
     async getBackendVersion() {
         const BACKEND_VERSION_ROUTE = '/api/v1/backend-version'
         let json = await this.#context.jsonGet(BACKEND_VERSION_ROUTE, null, {token:false})
+        if (json.version === undefined)
+            throw new Error('Version not found in backend response')
         return json.version
     }
 
 
-    async checkWelcome(who) {
+    async welcome(who) {
         const API_VERSION_ROUTE = '/api/welcome'
         if (who === undefined) {
             const ret = await this.#context.jsonGet(API_VERSION_ROUTE, null, {token:false})
