@@ -43,10 +43,12 @@ describe('Test user login', () => {
                     email:userEmail1,
                     password: PASSWORD
                 })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.keys('access-token', 'refresh-token', 'context')
-            expect(json['access-token']).to.be.a('string')
-            expect(json['refresh-token']).to.be.a('string')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'message', 'access-token', 'refresh-token')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.be.a('string').and.to.equal(userEmail1)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+            expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
+            expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
             // check token in util.js
             expect(accessToken).not.to.equal(null)
             expect(refreshToken).not.to.equal(null)
@@ -113,22 +115,20 @@ describe('Test user login', () => {
         })
 
 
-
         it('Refresh access token', async () => {
             const json = await jsonPost(ROUTE_REFRESH, {token: cpyRefreshToken})
             expect(json).to.be.instanceOf(Object)
 
-            expect(json).to.have.keys('access-token', 'refresh-token', 'userId', 'connected')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
+            expect(json.message).to.be.a('string').and.to.equal('token refresh done')
+
             const newAccessToken = json['access-token']
-            expect(newAccessToken).to.be.a('string')
+            expect(newAccessToken).to.be.a('string').and.to.have.length.above(0)
             expect(newAccessToken !== cpyAccessToken)
 
             const newRefreshToken = json['refresh-token']
-            expect(newRefreshToken).to.be.a('string')
+            expect(newRefreshToken).to.be.a('string').and.to.have.length.above(0)
             expect(newRefreshToken !== cpyRefreshToken)
-
-            expect(json.userId).to.be.a('number')
-            expect(json.connected).to.be.a('boolean').and.to.equal(true)
 
             // check HTTP header tokens
             expect(accessToken === newAccessToken)
@@ -163,11 +163,13 @@ describe('Test user login', () => {
 
         it('Call logout route being connected', async () => {
             let json = await jsonPost(ROUTE_LOGOUT)
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.keys('access-token', 'refresh-token', 'userId', 'context')
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.equal(null)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(false)
+            expect(json.message).to.be.a('string').and.to.equal('logout success')
             expect(json['access-token']).to.equal(null)
             expect(json['refresh-token']).to.equal(null)
-            expect(json.userId).to.equal(null)
             // check token in util.js
             expect(accessToken).to.equal(null)
             expect(refreshToken).to.equal(null)

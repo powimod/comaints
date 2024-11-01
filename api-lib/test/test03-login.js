@@ -83,7 +83,6 @@ describe('Check login', () => {
                 expect(error).to.be.an('error')
                     .with.property('message', 'Invalid EMail or password')
             }
-
         })
 
         it ('Check login with valid credentials', async () => {

@@ -48,10 +48,12 @@ describe('Test delete account route', () => {
                 email:user.email,
                 password: PASSWORD
             })
-        expect(json).to.be.instanceOf(Object)
-        expect(json).to.have.keys('access-token', 'refresh-token', 'context')
-        expect(json).to.have.property('access-token')
-        expect(json).to.have.property('refresh-token')
+        expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'message', 'access-token', 'refresh-token')
+        expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+        expect(json.context.email).to.be.a('string').and.to.equal(user.email)
+        expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+        expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
+        expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
         // check token in util.js
         expect(accessToken).not.to.equal(null)
         expect(refreshToken).not.to.equal(null)
@@ -70,8 +72,7 @@ describe('Test delete account route', () => {
 
     it('Call route to change email', async () => {
         const json = await jsonPost(ROUTE_CHANGE_EMAIL, {email:newEmail, password:PASSWORD, sendCodeByEmail: false})
-        expect(json).to.be.instanceOf(Object)
-        expect(json).to.have.property('message')
+        expect(json).to.be.instanceOf(Object).and.to.have.keys('message')
         expect(json.message).to.be.a('string').and.to.equal('Done, waiting for validation code')
     })
 
@@ -88,8 +89,7 @@ describe('Test delete account route', () => {
 
     it ('Call route to resend auth code', async () => {
         const json = await jsonPost(ROUTE_RESEND_CODE, {sendCodeByEmail: false})
-        expect(json).to.be.instanceOf(Object)
-        expect(json).to.have.keys('message')
+        expect(json).to.be.instanceOf(Object).and.to.have.keys('message')
         expect(json.message).to.be.a('string').and.to.equal('Code resent')
     })
 
@@ -102,10 +102,5 @@ describe('Test delete account route', () => {
         expect(dbUser.auth_code).not.to.equal(authCode)
     })
 
-
     // TODO send new token
-
-
 })
-
-

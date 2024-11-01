@@ -47,18 +47,16 @@ describe('Check login', () => {
             const badAuthCode = authCode + 1
             const json = await api.auth.validate({code: badAuthCode})
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.keys('userId', 'validated')
-            expect(json.userId).to.be.a('number')
+            expect(json).to.have.keys('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(false)
         })
  
         it ('Send validation code', async () => {
             const json = await api.auth.validate({code: authCode})
             // refresh token is not present because previous refresh token is still valid
-            expect(json).to.have.keys('access-token', 'refresh-token', 'userId', 'validated')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'validated')
             expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
             expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
-            expect(json.userId).to.be.a('number')
             expect(json.validated).to.be.a('boolean').and.to.equal(true)
         })
     })

@@ -241,37 +241,31 @@ class AuthRoutes {
 
                 const isAuthCodeValid = await authModel.checkAuthCode(userId, code)
 
-                const jsonResponse = {}
+                let context = null
                 if (isAuthCodeValid) {
                     const user = await authModel.processAuthOperation(userId)
                     if (user === null) {
                         // with delete account route, user is set to null
                         userId = null
-                        jsonResponse['access-token'] = null
-                        jsonResponse['refresh-token'] = null
-                        jsonResponse.context = {
+                        view.storeRenewedTokens(null, null)
+                        view.storeRenewedContext({
                             email: null,
                             connected: false
-                        }
+                        })
                     }
                     else {
                         // generate a new access token with userConnected = true
                         userId = user.id
                         const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, true)
                         const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId, true)
-                        jsonResponse['refresh-token'] = newRefreshToken
-                        jsonResponse['access-token'] = newAccessToken
-                        jsonResponse.context = {
+                        view.storeRenewedTokens(newAccessToken, newRefreshToken)
+                        view.storeRenewedContext({
                             email: user.email,
                             connected: true
-                        }
+                        })
                     }
                 }
-
-                // send userId to make API-Lib detect context change
-                jsonResponse.userId = userId
-                jsonResponse.validated = isAuthCodeValid
-                view.json(jsonResponse)
+                view.json({ validated: isAuthCodeValid })
             }
             catch(error) {
                 view.error(error)
@@ -341,15 +335,12 @@ class AuthRoutes {
                 const companyId = user.companyId
                 const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, true)
                 const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
-
-                view.json({
-                    'refresh-token': newRefreshToken,
-                    'access-token': newAccessToken,
-                    context: {
-                        email: user.email,
-                        connected: true
-                    }
+                view.storeRenewedContext({
+                   email: user.email,
+                   connected: true
                 })
+                view.storeRenewedTokens(newAccessToken, newRefreshToken)
+                view.json({ message: 'login success'})
             }
             catch(error) {
                 view.error(error)
@@ -366,16 +357,12 @@ class AuthRoutes {
                 const refreshTokenId = request.refreshTokenId // HTTP token header
                 assert(refreshTokenId !== null)
                 await authModel.logout(userId, refreshTokenId)
-                const jsonResponse = {
-                    userId: null,
-                    'access-token': null,
-                    'refresh-token': null,
-                    context: {
-                        email: null,
-                        connected: false
-                    }
-                }
-                view.json(jsonResponse)
+                view.storeRenewedContext({
+                   email: null,
+                   connected: false
+                })
+                view.storeRenewedTokens(null, null)
+                view.json({ message: 'logout success'})
             }
             catch(error) {
                 view.error(error)
@@ -398,12 +385,8 @@ class AuthRoutes {
                 const [ userId, companyId, newAccessToken, newRefreshToken, connected ] = await _renewTokens(refreshToken)
 
                 console.log(`auth/refresh - send new tokens userId ${userId}`)
-                view.json({
-                    'userId' : userId,
-                    'connected': connected,
-                    'access-token': newAccessToken,
-                    'refresh-token': newRefreshToken
-                })
+                view.storeRenewedTokens(newAccessToken, newRefreshToken)
+                view.json({ message: 'token refresh done'})
             }
             catch (error) {
                 console.error("auth/refresh - error:", (error.message) ? error.message : error)

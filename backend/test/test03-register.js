@@ -283,20 +283,19 @@ describe('Test user registration', () => {
         it('Send incorrect validation code', async () => {
             const incorrectCode = authCode + 1
             const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(false)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.be.a('number').and.to.equal(userId)
         })
 
         it('Send validation code', async () => {
             const json = await jsonPost(ROUTE_VALIDATE, { code: authCode})
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'validated', 'access-token', 'refresh-token')
             expect(json.validated).to.be.a('boolean').and.to.equal(true)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.be.a('number').and.to.equal(userId)
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.be.a('string').and.to.equal(userEmail)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+            expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
+            expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
         })
 
         it('Check newly registered user in database', async () => {
@@ -351,13 +350,12 @@ describe('Test user registration', () => {
 
         it('Call logout route being connected', async () => {
             const json = await jsonPost(ROUTE_LOGOUT, {})
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.keys('access-token', 'refresh-token', 'userId', 'context')
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.equal(null)
-            expect(json).to.have.property('access-token')
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.equal(null)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(false)
+            expect(json.message).to.be.a('string').and.to.equal('logout success')
             expect(json['access-token']).to.equal(null)
-            expect(json).to.have.property('refresh-token')
             expect(json['refresh-token']).to.equal(null)
             // check token in util.js
             expect(accessToken).to.equal(null)
@@ -385,7 +383,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`User is not logged in`)
+                expect(error.message).to.equal('User is not logged in')
             }
         })
     })
@@ -437,11 +435,8 @@ describe('Test user registration', () => {
         it('First attempt to confirm registration with an invalid code', async () => {
             const incorrectCode = authCode + 1
             const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(false)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.be.a('number').and.to.equal(userId2)
         })
 
         it('Check user in database after first attempt', async () => {
@@ -475,11 +470,8 @@ describe('Test user registration', () => {
         it('Second attempt to confirm registration with an invalid code', async () => {
             const incorrectCode = authCode + 1
             const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(false)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.be.a('number').and.to.equal(userId2)
         })
 
         it('Check user in database after second attempt', async () => {
@@ -501,11 +493,8 @@ describe('Test user registration', () => {
         it('Third attempt to confirm registration with an invalid code', async () => {
             const incorrectCode = authCode + 1
             const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(false)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.be.a('number').and.to.equal(userId2)
         })
 
         it('Check user in database after third attempt', async () => {
@@ -640,10 +629,13 @@ describe('Test user registration', () => {
 
         it('Send validation code', async () => {
             const json = await jsonPost(ROUTE_VALIDATE, { code: authCode})
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'validated', 'access-token', 'refresh-token')
             expect(json.validated).to.be.a('boolean').and.to.equal(true)
-            expect(json).to.have.property('userId')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.be.a('string').and.to.equal(userEmail4)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+            expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
+            expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
         })
 
        it('Check user registration in database', async () => {
@@ -654,9 +646,16 @@ describe('Test user registration', () => {
 
         it('Call logout route', async () => {
             const json = await jsonPost(ROUTE_LOGOUT, {})
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.equal(null)
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.equal(null)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(false)
+            expect(json.message).to.be.a('string').and.to.equal('logout success')
+            expect(json['access-token']).to.equal(null)
+            expect(json['refresh-token']).to.equal(null)
+            // check token in util.js
+            expect(accessToken).to.equal(null)
+            expect(refreshToken).to.equal(null)
         })
 
         it('Attempt to register an already registered email', async () => {
@@ -665,7 +664,7 @@ describe('Test user registration', () => {
                 password:'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             })
-            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('access-token', 'refresh-token', 'message')
             expect(json['access-token']).to.be.a('string')
             expect(json['refresh-token']).to.be.a('string')
             // On n'a pas reçu l'information que le compte existe afin de ne pas faciliter
