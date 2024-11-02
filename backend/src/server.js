@@ -32,7 +32,7 @@ const main = async () => {
             loadPath: (lng, ns) => {
                 if (ns === 'common')
                     return `../${ns}/locales/${lng}.json`
-                return `./locales/${lng}/translation.json`
+                return `./locales/${lng}.json`
             }
         }
     })
