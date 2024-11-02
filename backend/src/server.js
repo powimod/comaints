@@ -6,10 +6,13 @@ import i18next from 'i18next'
 import Backend from 'i18next-fs-backend'
 import middleware from 'i18next-http-middleware'
 import dotenv from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url';
 
 import MailManagerModel from './MailManager.js'
 import ModelSingleton from './model.js'
 import ControllerSingleton from './controller.js'
+import View from './view.js'
 
 dotenv.config()
 
@@ -23,11 +26,30 @@ const main = async () => {
     i18next.use(Backend).use(middleware.LanguageDetector).init({
         fallbackLng: 'en',
         preload: ['en', 'fr'],
+        ns: [ 'backend', 'common'],
+        defaultNS: 'backend',
         backend: {
-            loadPath: './locales/{{lng}}/translation.json'
+            loadPath: (lng, ns) => {
+                if (ns === 'common')
+                    return `../${ns}/locales/${lng}.json`
+                return `./locales/${lng}/translation.json`
+            }
         }
     })
     app.use(middleware.handle(i18next))
+
+    // TODO remove this route
+    app.get(`/api/translation`, (request, response) => {
+        const view = new View(request, response)
+        view.json({ 
+            commun: view.translation('common:common_message'),
+            message: view.translation('backend:general.welcome') 
+        })
+    })
+
+    // serve common locale files
+    const __dirname = path.dirname(fileURLToPath(import.meta.url))
+    app.use('/locales/common', express.static(path.join(__dirname, '../../common/locales/')))
 
     // configuration is defined in «.env» file
     const env = process.env

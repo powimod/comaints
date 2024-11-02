@@ -27,13 +27,16 @@ export default defineConfig({
         }
     ],
     server: {
-		host: "0.0.0.0",
-		port: 9000,
-		strictPort: true,
+        host: "0.0.0.0",
+        port: 9000,
+        strictPort: true,
         proxy: {
             '/api': {
                 target: 'http://localhost:9101', // backend address
+            },
+            '/locales/common': {
+                target: 'http://localhost:9101', // backend address
             }
         }
-	}
+    }
 })

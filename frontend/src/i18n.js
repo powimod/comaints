@@ -8,16 +8,22 @@ i18n
 .use(initReactI18next)
 .use(LanguageDetector)
 .init({
-    backend: {
-        loadPath: '/locales/{{lng}}.json'
+    ns: [ 'frontend', 'common'],
+    defaultNS: 'frontend',
+    fallbackLng: 'en',
+    detection: {
+        order: [ 'localStorage', 'cookie', 'navigator'],
+        caches: [ 'localStorage', 'cookie']
     },
-	fallbackLng: 'en',
-	detection: {
-		order: [ 'localStorage', 'cookie', 'navigator'],
-		caches: [ 'localStorage', 'cookie']
-	},
     interpolation: {
         escapeValue: false
+    },
+    backend: {
+        loadPath: (lng, ns) => {
+            if (ns[0] === 'common')
+                return '/locales/{{ns}}/{{lng}}.json'
+            return '/locales/{{lng}}.json'
+        }
     }
 })
 

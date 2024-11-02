@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from "react-router-dom"
 import createRouter from './router'
 import { Provider } from 'react-redux'
-import './i18n'
+import './i18n.js'
 
 import ComaintApiProvider, { initializeComaintApi } from './ComaintApi.jsx'
 import { initializeStore } from './store'
