@@ -9,7 +9,8 @@ header.root_header {
     display: grid;
     gap:var(--marge-size-medium);
     grid-template-areas:
-        "logo accessibility menu";
+        "logo accessibility menu"
+        "logo userid        userid";
     grid-template-columns: auto 1fr;
 
     background-color: var(--header-background-color);
@@ -49,6 +50,13 @@ header.root_header {
         border-radius: var(--marge-size-large);
     }
 
+    span.userid {
+        grid-area: userid;
+        color:var(--header-subtitle-color);
+        text-align: right;
+        margin-right: var(--marge-size-large);
+    }
+
     button.stock-button{
         grid-area: menu;
         color: var(--header-title-color);
@@ -61,8 +69,9 @@ header.root_header {
     @media (min-width: variables.$screen-size-small)  {
 
         grid-template-areas:
-            "logo title    accessibility menu"
-            "logo subtitle accessibility menu";
+            "logo title    accessibility menu  "
+            "logo subtitle accessibility menu  "
+            "logo userid   userid        userid";
         grid-template-columns: auto 1fr;
 
         h1 {

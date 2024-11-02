@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import i18n from "i18next"
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import i18n from "i18next"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWheelchair } from '@fortawesome/free-solid-svg-icons'
 
@@ -8,20 +8,40 @@ import Logo from './Logo'
 import StockButton from './StockButton'
 import PopupMenu from './PopupMenu'
 import AccessibilityDialog from './AccessibilityDialog'
+import { useComaintApi } from '../ComaintApi'
+import LoginDialog from './LoginDialog';
 
 import '../scss/header.scss'
 
 const Header = () => {
     const { t } = useTranslation()
+	const [connected, setConnected] = useState(false)
 	const [isAccountMenuVisible, setAccountMenuVisible] = useState(false)
+	const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 	const [isAccessibilityDialogOpen, setIsAccessibilityDialogOpen] = useState(false)
+    const { comaintContext } = useComaintApi()
+    const [ accountLabel, setAccountLabel ] = useState('')
+
+    useEffect( ()=> {
+	    setAccountLabel( comaintContext ? comaintContext.email : '')
+        setConnected( comaintContext ? comaintContext.connected : false)
+    }, [comaintContext])
+
 
     const onAccountButtonClick = () => {
-        setAccountMenuVisible(true)
+        if (connected)
+            setAccountMenuVisible(true)
+        else
+            setIsLoginDialogOpen(true)
     }
 
 	const onLogoutClick = () => {
 		setIsLogoutDialogOpen(true)
+    }
+
+
+    const onLoginDialogClose = () => {
+		setIsLoginDialogOpen(false)
     }
 
 	const onAccessibilityDialogClose = () => {
@@ -31,8 +51,6 @@ const Header = () => {
 	const onAccessibilityButtonClick = () => {
 		setIsAccessibilityDialogOpen(true)
 	}
-
-
 
     return (
         <>
@@ -47,6 +65,7 @@ const Header = () => {
                         inverse/>
                 </span>
                 <StockButton icon='user' onClick={onAccountButtonClick}/>
+			    <span className="userid">{accountLabel}</span>
 
             </header>
             <PopupMenu isVisible={isAccountMenuVisible} setVisible={setAccountMenuVisible}>
@@ -54,6 +73,7 @@ const Header = () => {
                 <div onClick={onLogoutClick}>{t('action.logout')}</div>
             </PopupMenu>
 		    <AccessibilityDialog isOpen={isAccessibilityDialogOpen} onClose={onAccessibilityDialogClose} /> 
+		    <LoginDialog isOpen={isLoginDialogOpen} onClose={onLoginDialogClose} /> 
         </>
     )
 }

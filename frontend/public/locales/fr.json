@@ -39,5 +39,14 @@
         "all_right_reserved": "© Tous droits réservés {{name}} - {{years}}", 
 	    "about_link": "À propos de",
         "product_conception": "Conçu par {{name}}"
-    }
+    },
+	"login-message": "Identifiez-vous",
+	"already-customer-question": "Déjà client ?",
+	"email-field": "EMail",
+	"password-field": "Mot de passe",
+	"forget-password-button" : "Mot de passe oublié",
+	"login-button": "Connexion",
+	"new-customer-question" : "Nouveau client",
+	"create-account-button" : "Créer un compte",
+	"close": "Fermer"
 }

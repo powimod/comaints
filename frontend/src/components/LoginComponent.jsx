@@ -22,7 +22,6 @@ const LoginComponent = () => {
 
     useEffect( ()=> {
         console.log("Login component context change", comaintContext)
-
     }, [comaintContext])
 
     return (

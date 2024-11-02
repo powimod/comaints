@@ -39,5 +39,17 @@
 	    "about_link": "About",
         "all_right_reserved": "© All right reserved {{name}} - {{years}}", 
         "product_conception": "{{name}} conception"
+    },
+	"login-message": "Identify",
+	"already-customer-question": "Already a customer",
+	"email-field": "EMail",
+	"password-field": "Password",
+	"forget-password-button" : "Forgotten password",
+	"login-button": "Login",
+	"new-customer-question" : "New customer",
+	"create-account-button" : "Create account",
+	"close": "Close",
+    "error": {
     }
+
 }

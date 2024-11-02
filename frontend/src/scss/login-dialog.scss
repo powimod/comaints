@@ -1,0 +1,17 @@
+.login-dialog {
+	& > div:first-child {
+		text-align: center;
+		font-weight: bolder;
+        font-size: var(--font-size-large);
+		font-variant-caps: all-small-caps;
+	}
+	& > section > div:first-child {
+        font-size: var(--font-size-bigger);
+		font-weight: bold;
+	}
+	& > section {
+		border: solid 1px var(--global-color-3);
+		padding: var(--marge-size-large);
+		margin: var(--marge-size-large);
+	}
+}

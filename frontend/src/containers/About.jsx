@@ -15,11 +15,11 @@ const About = (props) => {
     const [ backendVersion, setBackendVersion ] = useState('-')
 
     useEffect( () => {
-        if (api === null)
+        if (comaintApi === null)
             return
         const getApiVersion = async () => {
             try {
-                const result = await api.getBackendVersion()
+                const result = await comaintApi.getBackendVersion()
                 setBackendVersion(result)
             }
             catch (error) {
@@ -28,7 +28,7 @@ const About = (props) => {
             }
         }
         getApiVersion()
-    }, [api])
+    }, [comaintApi])
 
 	const sendMail = (ev) => {
 		ev.preventDefault()
