@@ -43,7 +43,7 @@ const AccessibilityDialog = ({isOpen, onClose}) => {
 
 	useEffect( () => {
 		localStorage.setItem('i18nextLng', lang)
-		activateLang()
+		i18n.changeLanguage(lang)
 	}, [ lang])
 
 	const activateTheme = () => {
@@ -60,10 +60,6 @@ const AccessibilityDialog = ({isOpen, onClose}) => {
 			document.body.classList.add('line-spacing-theme')
 	}
 	
-	const activateLang = () => {
-		i18n.changeLanguage(lang)
-	}
-
 	const onThemeChange = (ev) => {
 		setTheme(ev.target.value)
 	}
