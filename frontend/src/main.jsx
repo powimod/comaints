@@ -1,4 +1,4 @@
-import { StrictMode, useState } from 'react'
+import { StrictMode, useState, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from "react-router-dom"
 import createRouter from './router'
@@ -11,10 +11,14 @@ import DialogProvider from  './components/dialog/DialogContext.jsx'
 
 const Main = () => {
     const [ comaintContext, setComaintContext ] = useState(null)
-
     const comaintApi = initializeComaintApi(setComaintContext)
-
     const store = initializeStore(comaintApi, comaintContext)
+
+    /* TODO cleanup
+    useEffect( () => {
+        console.log("dOm modification contexte", comaintContext)
+    }, [comaintContext])
+    */
 
     return (
         <StrictMode>

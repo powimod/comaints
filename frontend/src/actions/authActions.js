@@ -13,8 +13,18 @@ const useAuthActions = () => {
         return dispatch(registerUser({email, password}))
     }
 
-    const login = (email, password) => {
-        return dispatch(loginUser({email, password}))
+    const login = async (email, password) => {
+        try {
+            const result = await dispatch(loginUser({email, password}))
+            if (loginUser.rejected.match(result)) {
+                const errorMessage = result.payload || 'Unknown error' // FIXME translation
+                throw new Error(errorMessage)
+            }
+        }
+        catch (error) {
+            console.error('Login failed: ', error.message)
+            throw error
+        }
     }
 
     const logout = () => {

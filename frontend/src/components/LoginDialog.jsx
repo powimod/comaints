@@ -2,13 +2,19 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 
-import authActions from '../actions/authActions.js'
+import useAuthActions from '../actions/authActions'
+import useContextActions from '../actions/contextActions'
 import CustomDialog from './dialog/CustomDialog'
+import { useSelector } from 'react-redux' // TODO remove this
 
 import '../scss/login-dialog.scss'
 
 const LoginDialog = ({isOpen, onClose, onCreateAccount}) => {
 	const { t } = useTranslation()
+    const { login } = useAuthActions()
+    //const { contextState } = useContextActions()
+    const isConnected = useSelector((state) => state.context.connected)
+    console.log("dOm isConnected", isConnected)
 
 	const [ error, setError ] = useState(null)
 	const [ email, setEmail] = useState('')
@@ -16,6 +22,7 @@ const LoginDialog = ({isOpen, onClose, onCreateAccount}) => {
 	const emailRef = useRef()
 	const passwordRef = useRef()
 	const navigate = useNavigate()
+
 
 	const EMAIL_STORAGE_KEY = 'login-email'
 
@@ -25,6 +32,19 @@ const LoginDialog = ({isOpen, onClose, onCreateAccount}) => {
 		if (email !== null)
 			setEmail(email)
 	}, [])
+   
+
+    /*
+	useEffect( () => {
+        console.log("dOm auth connected", connected)
+        //onClose() // close dialog
+	}, [contextState.connected])
+    */
+
+	useEffect( () => {
+        console.log("dOm auth isConnected", isConnected)
+        //onClose() // close dialog
+	}, [isConnected])
 
 	useEffect( () => {
 		if (email.length === 0)
@@ -44,6 +64,7 @@ const LoginDialog = ({isOpen, onClose, onCreateAccount}) => {
 	}, [isOpen])
 
 	const onLoginButtonClick = async () => {
+        setError(null)
         // TODO use global control functoins
 		if (email.length === 0) {
 			setError(t('invalid-email-error'))
@@ -54,15 +75,13 @@ const LoginDialog = ({isOpen, onClose, onCreateAccount}) => {
 			return
 		}
 		try {
-			const result = await authApi.login(email, password)
-			if (! result.ok) {
-				setError(result.error)
-				return
-			}
-			onClose() // close dialog
+            console.log("dOm login started")
+            await login(email, password)
+            console.log("dOm login terminated")
 		}
 		catch (error) {
-			setError(error)
+            console.log("dOm login error", error.message)
+			setError(error.message)
 		}
 	}
 
@@ -73,14 +92,17 @@ const LoginDialog = ({isOpen, onClose, onCreateAccount}) => {
 	}
 
 	const onEmailChanged = (ev) => {
+        setError(null)
 		setEmail(ev.target.value.trim())
 	}
 
 	const onPasswordChanged = (ev) => {
+        setError(null)
 		setPassword(ev.target.value.trim())
 	}
 
 	const onDialogClosed = () => {
+        setError(null)
 		onClose()
 	}
 

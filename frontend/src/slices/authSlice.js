@@ -30,12 +30,11 @@ export const validateAuthCode = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
     'auth/loginUser',
-    async ({ email, password }, { rejectWithValue, extra }) => {
+    async ({ email, password }, { rejectWithValue, getState, extra }) => {
         const { comaintApi } = extra
         try {
-            return await comaintApi.auth.login(email, password)
+            await comaintApi.auth.login(email, password)
         } catch (error) {
-            console.error('Login failed: ', error.message)
             return rejectWithValue(error.message || 'Login failed')
         }
     }
