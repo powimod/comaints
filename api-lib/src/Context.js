@@ -27,6 +27,9 @@ class Context{
         this.#loadAccount()
     }
 
+    setContextInfoCallback(contextInfoCallback) {
+        this.#contextInfoCallback = contextInfoCallback 
+    }
 
     async jsonFull(routeUrl, httpMethod, options={}, parameters=null) {
         if (routeUrl.startsWith('/'))

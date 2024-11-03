@@ -26,6 +26,12 @@ class ComaintBackendApi {
         this.#account = new AccountApi(this.#context)
     }
 
+    setContextInfoCallback(contextInfoCallback) {
+        if (contextInfoCallback !== null && typeof(contextInfoCallback ) !== 'function')
+            throw new Error('Parameter «contextInfoCallback » is not a function')
+        this.#context.setContextInfoCallback(contextInfoCallback)
+    }
+
     get auth() {
         return this.#auth
     }
