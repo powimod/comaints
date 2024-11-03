@@ -5,11 +5,11 @@ const ComaintContext = createContext(null)
 
 const ComaintContextProvider = ({ children }) => {
 
-    const [comaintContext, setComaintContext] = useState({ email: null, connected: false })
+    const [comaintContext, setComaintContext] = useState(null)
 
     useEffect(() => {
         const contextInfoCallback = (newContext) => {
-            setComaintContext((prevContext) => ({ ...prevContext, ...newContext }))
+            setComaintContext((prevContext) => ({...newContext}))
         }
         const comaintBackendApi = ComaintBackendApiSingleton.getInstance()
         comaintBackendApi.setContextInfoCallback(contextInfoCallback)
