@@ -1,38 +1,43 @@
-import { StrictMode, useState, useEffect } from 'react'
-import { createRoot } from 'react-dom/client'
-import { RouterProvider } from "react-router-dom"
-import createRouter from './router'
-import { Provider } from 'react-redux'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { StrictMode } from 'react'
+import { Provider as ReduxProvider } from 'react-redux'
 import './i18n.js'
 
-import ComaintApiProvider, { initializeComaintApi } from './ComaintApi.jsx'
-import { initializeStore } from './store'
+
 import DialogProvider from  './components/dialog/DialogContext.jsx'
+import ComaintProvider, { useComaintContext } from './ComaintContext.jsx'
 
-const Main = () => {
-    const [ comaintContext, setComaintContext ] = useState(null)
-    const comaintApi = initializeComaintApi(setComaintContext)
-    const store = initializeStore(comaintApi, comaintContext)
+import { RouterProvider } from 'react-router-dom'
+import initializeStore from './store.js'
+import createRouter from './router'
 
-    /* TODO cleanup
-    useEffect( () => {
-        console.log("dOm modification contexte", comaintContext)
-    }, [comaintContext])
-    */
+const InternalComponent = () => {
+    const { comaintApi, isApiReady } = useComaintContext(); // On récupère `comaintApi` depuis le contexte
+
+    if (! isApiReady)
+        return <div>Loading Comaint API</div> // FIXME translation
+
+    const store = initializeStore(comaintApi)
 
     return (
         <StrictMode>
-            <Provider store={store}>
-                <ComaintApiProvider comaintApi={comaintApi} comaintContext={comaintContext}>
-                    <DialogProvider>
-                        <RouterProvider router={createRouter()} />
-                    </DialogProvider>
-                </ComaintApiProvider>
-            </Provider>
+            <ReduxProvider store={store}>
+                <DialogProvider>
+                    <RouterProvider router={createRouter()} />
+                </DialogProvider>
+            </ReduxProvider>
         </StrictMode>
     )
 }
 
-createRoot(document.getElementById('root')).render(
-    <Main/>
-)
+const Main = () => {
+    return (
+        <ComaintProvider>
+            <InternalComponent/>
+        </ComaintProvider>
+    )
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Main/>)
+

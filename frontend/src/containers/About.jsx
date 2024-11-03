@@ -4,13 +4,13 @@ import { Link, useLoaderData } from 'react-router-dom'
 
 import Logo from '../components/Logo'
 import Config from '../Config'
-import { useComaintApi } from '../ComaintApi'
+import { useComaintContext } from '../ComaintContext'
 
 import '../scss/about.scss'
 
 const About = (props) => {
 	const { t } = useTranslation()
-    const { comaintApi } = useComaintApi()
+    const { comaintApi } = useComaintContext()
 
     const [ backendVersion, setBackendVersion ] = useState('-')
 

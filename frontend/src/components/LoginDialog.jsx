@@ -2,19 +2,17 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { useComaintContext } from '../ComaintContext';
+
 import useAuthActions from '../actions/authActions'
-import useContextActions from '../actions/contextActions'
 import CustomDialog from './dialog/CustomDialog'
-import { useSelector } from 'react-redux' // TODO remove this
 
 import '../scss/login-dialog.scss'
 
 const LoginDialog = ({isOpen, onClose, onCreateAccount}) => {
 	const { t } = useTranslation()
     const { login } = useAuthActions()
-    //const { contextState } = useContextActions()
-    const isConnected = useSelector((state) => state.context.connected)
-    console.log("dOm isConnected", isConnected)
+    const { comaintContext } = useComaintContext();
 
 	const [ error, setError ] = useState(null)
 	const [ email, setEmail] = useState('')
@@ -33,18 +31,12 @@ const LoginDialog = ({isOpen, onClose, onCreateAccount}) => {
 			setEmail(email)
 	}, [])
    
-
-    /*
 	useEffect( () => {
-        console.log("dOm auth connected", connected)
-        //onClose() // close dialog
-	}, [contextState.connected])
-    */
-
-	useEffect( () => {
-        console.log("dOm auth isConnected", isConnected)
-        //onClose() // close dialog
-	}, [isConnected])
+        if (comaintContext == null)
+            return
+        if (comaintContext.connected)
+            onClose()
+	}, [comaintContext])
 
 	useEffect( () => {
 		if (email.length === 0)

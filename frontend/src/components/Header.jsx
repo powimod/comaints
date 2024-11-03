@@ -8,7 +8,7 @@ import Logo from './Logo'
 import StockButton from './StockButton'
 import PopupMenu from './PopupMenu'
 import AccessibilityDialog from './AccessibilityDialog'
-import { useComaintApi } from '../ComaintApi'
+import { useComaintContext } from '../ComaintContext'
 import LoginDialog from './LoginDialog';
 
 import '../scss/header.scss'
@@ -19,7 +19,7 @@ const Header = () => {
 	const [isAccountMenuVisible, setAccountMenuVisible] = useState(false)
 	const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 	const [isAccessibilityDialogOpen, setIsAccessibilityDialogOpen] = useState(false)
-    const { comaintContext } = useComaintApi()
+    const { comaintContext } = useComaintContext()
     const [ accountLabel, setAccountLabel ] = useState('')
 
     useEffect( ()=> {

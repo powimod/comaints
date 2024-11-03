@@ -1,23 +1,23 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { ComaintBackendApi } from 'comaint-api-lib'
 
-import contextReducer from './slices/contextSlice'
 import authReducer from './slices/authSlice'
 
-const initializeStore = (comaintApi, comaintContext) => {
+const initializeStore = (comaintApi ) => {
+    if (! (comaintApi instanceof Object))
+        throw new Error('Invalid comaintApi argument')
     const store = configureStore({
         reducer: {
-            context: contextReducer,
             auth: authReducer
         },
         middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             thunk: {
-                extraArgument: { comaintApi, comaintContext }
+                extraArgument: { comaintApi }
             }
         }),
     })
     return store
 }
 
-export { initializeStore }
+export default initializeStore 
