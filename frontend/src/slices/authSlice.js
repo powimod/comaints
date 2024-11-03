@@ -1,10 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import STATUS from './status'
+import ComaintBackendApiSingleton from '../ComaintApi.js'
+
 
 export const registerUser = createAsyncThunk(
     'auth/registerUser',
-    async ({ email, password }, { rejectWithValue, extra }) => {
-        const { comaintApi } = extra
+    async ({ email, password }, { rejectWithValue }) => {
+        const comaintApi = ComaintBackendApiSingleton.getInstance()
         try {
             return await comaintApi.auth.register({email, password})
         } catch (error) {
@@ -16,8 +18,8 @@ export const registerUser = createAsyncThunk(
 
 export const validateAuthCode = createAsyncThunk(
     'auth/validateAuthCode',
-    async ({ code }, { rejectWithValue, extra }) => {
-        const { comaintApi } = extra
+    async ({ code }, { rejectWithValue }) => {
+        const comaintApi = ComaintBackendApiSingleton.getInstance()
         try {
             return await comaintApi.auth.validate({ code })
         } catch (error) {
@@ -30,8 +32,8 @@ export const validateAuthCode = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
     'auth/loginUser',
-    async ({ email, password }, { rejectWithValue, getState, extra }) => {
-        const { comaintApi } = extra
+    async ({ email, password }, { rejectWithValue, getState }) => {
+        const comaintApi = ComaintBackendApiSingleton.getInstance()
         try {
             await comaintApi.auth.login(email, password)
         } catch (error) {
@@ -42,8 +44,8 @@ export const loginUser = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk(
     'auth/logoutUser',
-    async (_, { rejectWithValue, extra }) => {
-        const { comaintApi } = extra
+    async (_, { rejectWithValue }) => {
+        const comaintApi = ComaintBackendApiSingleton.getInstance()
         try {
             await comaintApi.auth.logout()
         } catch (error) {

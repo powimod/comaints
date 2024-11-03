@@ -31,6 +31,10 @@ class Context{
         this.#contextInfoCallback = contextInfoCallback 
     }
 
+    setAccountSerializeCallback(accountSerializeCallback) {
+        this.#accountSerializeCallback = accountSerializeCallback 
+    }
+
     async jsonFull(routeUrl, httpMethod, options={}, parameters=null) {
         if (routeUrl.startsWith('/'))
             routeUrl = routeUrl.substr(1)

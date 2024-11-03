@@ -32,6 +32,13 @@ class ComaintBackendApi {
         this.#context.setContextInfoCallback(contextInfoCallback)
     }
 
+    setAccountSerializeCallback(accountSerializeCallback) {
+        if (accountSerializeCallback!== null && typeof(accountSerializeCallback) !== 'function')
+            throw new Error('Parameter «accountSerializeCallback» is not a function')
+        this.#context.setAccountSerializeCallback(accountSerializeCallback)
+    }
+
+
     get auth() {
         return this.#auth
     }

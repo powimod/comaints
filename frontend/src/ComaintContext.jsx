@@ -1,62 +1,32 @@
-import React, { createContext, useState, useEffect, useRef } from 'react';
-import { ComaintBackendApi } from 'comaint-api-lib';
+import React, { createContext, useState, useEffect, useRef } from 'react'
+import ComaintBackendApiSingleton from './ComaintApi.js'
 
-const ComaintContext = createContext(null);
+const ComaintContext = createContext(null)
 
-const ComaintProvider = ({ children }) => {
-    const comaintApiRef = useRef(null)
-    const [comaintContext, setComaintContext] = useState({ email: null, connected: false });
-    const [apiInitError, setApiInitError] = useState(false);
-    const [isApiReady, setIsApiReady] = useState(false)
+const ComaintContextProvider = ({ children }) => {
+
+    const [comaintContext, setComaintContext] = useState({ email: null, connected: false })
 
     useEffect(() => {
-        try {
-            const apiUrl = window.location.origin;
-
-            const contextInfoCallback = (newContext) => {
-                console.log("Context update", newContext);
-                setComaintContext((prevContext) => {
-                    const updatedContext = { ...prevContext, ...newContext }
-                    console.log("dOm update context state", updatedContext)
-                    return  updatedContext
-                });
-            };
-
-            const accountSerializeFunction = (data) => {
-                const accountStorageKey = 'account';
-                if (data === undefined) {
-                    const accountData = localStorage.getItem(accountStorageKey);
-                    data = JSON.parse(accountData);
-                } else {
-                    const accountData = JSON.stringify(data);
-                    localStorage.setItem(accountStorageKey, accountData);
-                }
-                return data;
-            };
-
-            comaintApiRef.current = new ComaintBackendApi(apiUrl, contextInfoCallback, accountSerializeFunction);
-            setIsApiReady(true);
-        } catch (error) {
-            console.error("Error during ComaintBackendApi initialization:", error.message);
-            setApiInitError(true);
+        const contextInfoCallback = (newContext) => {
+            setComaintContext((prevContext) => ({ ...prevContext, ...newContext }))
         }
+        const comaintBackendApi = ComaintBackendApiSingleton.getInstance()
+        comaintBackendApi.setContextInfoCallback(contextInfoCallback)
     }, [])
 
     return (
-        <ComaintContext.Provider value={{ isApiReady, comaintContext, comaintApi: comaintApiRef.current }}>
-            {apiInitError ? <div>Loading error</div> : children}
+        <ComaintContext.Provider value={{ comaintContext }}>
+            {children}
         </ComaintContext.Provider>
-    );
-};
+    )
+}
 
 const useComaintContext = () => {
-    const comaintContext = React.useContext(ComaintContext);
-    if (comaintContext === undefined) {
-        throw new Error('useComaintContext must be used within a ComaintProvider');
-    }
-    return comaintContext;
-};
+    const comaintContext = React.useContext(ComaintContext)
+    return comaintContext
+}
 
-export { ComaintContext , useComaintContext };
-export default ComaintProvider;
+export { ComaintContext , useComaintContext }
+export default ComaintContextProvider
 
