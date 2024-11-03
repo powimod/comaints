@@ -9,7 +9,7 @@ import './i18n.js'
 import DialogProvider from  './components/dialog/DialogContext.jsx'
 import ComaintContextProvider from './ComaintContext.jsx'
 
-import initializeStore from './store.js'
+import initializeStore from './slices/store.js'
 import createRouter from './router'
 
 const Main = () => {
