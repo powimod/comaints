@@ -27,8 +27,20 @@ const useAuthActions = () => {
         }
     }
 
-    const logout = () => {
-        dispatch(logoutUser())
+    const logout = async () => {
+        try {
+            console.log("dOm avant logout")
+            const result = await dispatch(logoutUser())
+            console.log("dOm après logout")
+            if (logoutUser.rejected.match(result)) {
+                const errorMessage = result.payload || 'Unknown error' // FIXME translation
+                throw new Error(errorMessage)
+            }
+        }
+        catch (error) {
+            console.error('Login failed: ', error.message)
+            throw error
+        }
     }
 
     const validateCode = (code) => {

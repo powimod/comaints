@@ -56,9 +56,9 @@ class Context{
 
         if (sendToken) {
             if (this.#accessToken === null)
-                throw new Error('Access token not found')
+                throw new Error('Access token not found') // FIXME translation
             if (this.#refreshToken === null)
-                throw new Error('Refresh token not found')
+                throw new Error('Refresh token not found') // FIXME translation
         }
 
         if (parameters !== null) {

@@ -1,4 +1,3 @@
-//import LoginComponent from '../components/LoginComponent'
 //import RegisterComponent from '../components/RegisterComponent'
 import { useTranslation } from 'react-i18next'
 

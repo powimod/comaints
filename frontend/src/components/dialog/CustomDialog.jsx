@@ -46,7 +46,6 @@ import '../../scss/custom-dialog.scss'
 
 const CustomDialog = ({isOpen, onClose, className = '',  children}) => {
 
-
 	const [ dialogId, setDialogId ] = useState(parseInt(Math.random() * 1000))
 	const [ isDialogOpen, setDialogOpen ] = useState(false)
 	const dialogRef = useRef(null)
@@ -85,11 +84,13 @@ const CustomDialog = ({isOpen, onClose, className = '',  children}) => {
 		onClose()
 	}
 
-	return (
-		<dialog ref={dialogRef} className={className}>
-			{children}
-		</dialog>
-		)
+	return (<>
+        { isOpen &&
+            <dialog ref={dialogRef} className={className}>
+                {children}
+            </dialog>
+        }
+		</>)
 }
 
 CustomDialog.propTypes = {

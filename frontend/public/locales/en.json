@@ -32,6 +32,7 @@
         "website": "Website",
         "contact": "Contact"
     },
+    "logout-question": "Do you want to disconnect ?",
     "footer": {
         "contact_us": "Contact us",
         "privacy_policy": "Privacy policy",

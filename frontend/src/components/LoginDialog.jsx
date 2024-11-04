@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { useComaintContext } from '../ComaintContext';
-
+import { useComaintContext } from '../ComaintContext'
 import useAuthActions from '../actions/authActions'
 import CustomDialog from './dialog/CustomDialog'
 

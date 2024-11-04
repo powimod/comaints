@@ -9,7 +9,8 @@ import StockButton from './StockButton'
 import PopupMenu from './PopupMenu'
 import AccessibilityDialog from './AccessibilityDialog'
 import { useComaintContext } from '../ComaintContext'
-import LoginDialog from './LoginDialog';
+import LoginDialog from './LoginDialog'
+import LogoutDialog from './LogoutDialog'
 
 import '../scss/header.scss'
 
@@ -17,7 +18,8 @@ const Header = () => {
     const { t } = useTranslation()
 	const [connected, setConnected] = useState(false)
 	const [isAccountMenuVisible, setAccountMenuVisible] = useState(false)
-	const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+	const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
+	const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
 	const [isAccessibilityDialogOpen, setIsAccessibilityDialogOpen] = useState(false)
     const { comaintContext } = useComaintContext()
     const [ accountLabel, setAccountLabel ] = useState('')
@@ -35,7 +37,7 @@ const Header = () => {
             setIsLoginDialogOpen(true)
     }
 
-	const onLogoutClick = () => {
+	const onLogoutMenuClick = () => {
 		setIsLogoutDialogOpen(true)
     }
 
@@ -43,6 +45,10 @@ const Header = () => {
     const onLoginDialogClose = () => {
 		setIsLoginDialogOpen(false)
     }
+
+	const onLogoutDialogResponse = (confirmation) => {
+		setIsLogoutDialogOpen(false)
+	}
 
 	const onAccessibilityDialogClose = () => {
 		setIsAccessibilityDialogOpen(false)
@@ -69,11 +75,11 @@ const Header = () => {
 
             </header>
             <PopupMenu isVisible={isAccountMenuVisible} setVisible={setAccountMenuVisible}>
-                <div onClick={onLogoutClick}>{t('action.logout')}</div>
-                <div onClick={onLogoutClick}>{t('action.logout')}</div>
+                <div onClick={onLogoutMenuClick}>{t('action.logout')}</div>
             </PopupMenu>
 		    <AccessibilityDialog isOpen={isAccessibilityDialogOpen} onClose={onAccessibilityDialogClose} /> 
 		    <LoginDialog isOpen={isLoginDialogOpen} onClose={onLoginDialogClose} /> 
+		    <LogoutDialog isOpen={isLogoutDialogOpen} onResponse={onLogoutDialogResponse}/>
         </>
     )
 }

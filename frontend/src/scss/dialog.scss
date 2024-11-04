@@ -74,6 +74,7 @@ dialog.standard-dialog {
         display: flex;
         justify-content: center;
         gap: 2rem;
+        padding: 1rem;
         & > button {
             min-width: 6rem; /* TODO hard coded min button size */
             min-height: 4rem; /* TODO hard coded min button size */
