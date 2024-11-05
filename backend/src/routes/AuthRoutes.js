@@ -241,7 +241,6 @@ class AuthRoutes {
 
                 const isAuthCodeValid = await authModel.checkAuthCode(userId, code)
 
-                let context = null
                 if (isAuthCodeValid) {
                     const user = await authModel.processAuthOperation(userId)
                     if (user === null) {

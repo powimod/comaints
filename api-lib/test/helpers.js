@@ -4,10 +4,6 @@ import { expect } from 'chai'
 
 import { api, requestDb } from './util.js'
 
-const ROUTE_REGISTER = 'api/v1/auth/register'
-const ROUTE_LOGOUT = 'api/v1/auth/logout'
-const ROUTE_VALIDATE = 'api/v1/auth/validate'
-
 const DEFAULT_PASSWORD = 'abC.dEf.GH1.lMn!'
 
 const createUserAccount = async (options = {}) => {

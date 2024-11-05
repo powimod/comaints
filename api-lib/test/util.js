@@ -21,11 +21,21 @@ const contextInfoCallback = (updatedContext) => {
     context = {... updatedContext}
 }
 
+const accountSerializeCallback = (data) => {
+    if (data === undefined)
+        data = JSON.parse(accountData)
+    else
+        accountData = JSON.stringify(data)
+    return data
+}
+
 const initializeApi = () => {
     const backendUrl = process.env.BACKEND_URL
     if (! backendUrl)
         throw new Error('Env variable «BACKEND_URL» is not defined')
-    api = new ComaintBackendApi(backendUrl, contextInfoCallback )
+
+
+    api = new ComaintBackendApi(backendUrl, accountSerializeCallback, contextInfoCallback)
     context = null
 }
 

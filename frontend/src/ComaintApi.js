@@ -10,7 +10,9 @@ class ComaintBackendApiSingleton {
             if (data === undefined) {
                 const accountData = localStorage.getItem(accountStorageKey)
                 data = JSON.parse(accountData)
+                console.log("Serialize function - load account", data)
             } else {
+                console.log("Serialize function - save account", data)
                 const accountData = JSON.stringify(data)
                 localStorage.setItem(accountStorageKey, accountData)
             }
@@ -19,8 +21,7 @@ class ComaintBackendApiSingleton {
 
         if (ComaintBackendApiSingleton.#instance === null) {
             const apiUrl = window.location.origin
-            ComaintBackendApiSingleton.#instance = new ComaintBackendApi(apiUrl)
-            ComaintBackendApiSingleton.#instance.setAccountSerializeCallback(accountSerializeCallback)
+            ComaintBackendApiSingleton.#instance = new ComaintBackendApi(apiUrl, accountSerializeCallback)
         }
 
         return ComaintBackendApiSingleton.#instance

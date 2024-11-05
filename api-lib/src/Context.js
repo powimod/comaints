@@ -9,18 +9,9 @@ class Context{
     #refreshToken = null
     #accessToken = null
 
-    constructor(backendUrl, contextInfoCallback, accountSerializeCallback) {
-        if (accountSerializeCallback === null) {
-            let accountData = null
-            // default serialize function with in memory storage
-            accountSerializeCallback = (data) => {
-                if (data === undefined)
-                    data = JSON.parse(accountData)
-                else
-                    accountData = JSON.stringify(data)
-                return data
-            }
-        }
+    constructor(backendUrl, accountSerializeCallback, contextInfoCallback = null) {
+        if (typeof(accountSerializeCallback) !== 'function') 
+            throw new Error('Invalid «accountSerializeCallback» argument')
         this.#backendUrl = backendUrl
         this.#contextInfoCallback = contextInfoCallback 
         this.#accountSerializeCallback = accountSerializeCallback
@@ -29,10 +20,6 @@ class Context{
 
     setContextInfoCallback(contextInfoCallback) {
         this.#contextInfoCallback = contextInfoCallback 
-    }
-
-    setAccountSerializeCallback(accountSerializeCallback) {
-        this.#accountSerializeCallback = accountSerializeCallback 
     }
 
     async jsonFull(routeUrl, httpMethod, options={}, parameters=null) {

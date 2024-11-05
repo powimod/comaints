@@ -5,12 +5,19 @@ dotenv.config()
 import { ComaintBackendApi } from 'comaint-api-lib'
 
 let accountData = null
+const accountSerializeCallback = (data) => {
+    if (data === undefined)
+        data = JSON.parse(accountData)
+    else
+        accountData = JSON.stringify(data)
+    return data
+}
 
 const main = async () => {
     const backendUrl = process.env.BACKEND_URL
     if (! backendUrl)
         throw new Error('backendUrl not defined')
-    const api = new ComaintBackendApi(backendUrl)
+    const api = new ComaintBackendApi(backendUrl, accountSerializeCallback)
 
     console.log("Checking API library...")
     let ret = api.checkApiLib()
