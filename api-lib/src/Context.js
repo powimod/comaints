@@ -8,6 +8,7 @@ class Context{
     #contextInfoCallback = null
     #refreshToken = null
     #accessToken = null
+    #contextData = null
 
     constructor(backendUrl, accountSerializeCallback, contextInfoCallback = null) {
         if (typeof(accountSerializeCallback) !== 'function') 
@@ -16,10 +17,14 @@ class Context{
         this.#contextInfoCallback = contextInfoCallback 
         this.#accountSerializeCallback = accountSerializeCallback
         this.#loadAccount()
+        this.#transmitContext()
     }
 
     setContextInfoCallback(contextInfoCallback) {
+        if (typeof(contextInfoCallback) !== 'function')
+            throw new Error('Invalid callback function')
         this.#contextInfoCallback = contextInfoCallback 
+        this.#transmitContext()
     }
 
     async jsonFull(routeUrl, httpMethod, options={}, parameters=null) {
@@ -178,10 +183,11 @@ class Context{
         }
 
         // intercept context information
-        const context = globalResult.context
-        if (context !== undefined && this.#contextInfoCallback !== null) {
-            this.#contextInfoCallback(context)
-            // do not transmit context to API client
+        const contextData = globalResult.context
+        if (contextData !== undefined ) {
+            this.#contextData = contextData
+            this.#transmitContext()
+            this.#saveAccount() // context is saved in account data
             delete globalResult.context
         }
 
@@ -212,22 +218,33 @@ class Context{
     #loadAccount() {
         let result = this.#accountSerializeCallback()
         if (result === null)
-            result = {refreshToken:null, accessToken: null}
+            result = {refreshToken:null, accessToken: null, contextData: null}
         if (! (result instanceof Object))
             throw new Error('Serialize function does not return an object')
-        const {refreshToken, accessToken} = result
+        const {refreshToken, accessToken, contextData} = result
         if (refreshToken !== null && typeof(refreshToken) !== 'string')
             throw new Error('Invalid refresh token')
         if (accessToken !== null && typeof(accessToken) !== 'string')
             throw new Error('Invalid access token')
+        if (contextData !== null && typeof(contextData) !== 'object')
+            throw new Error('Invalid context')
         this.#refreshToken = refreshToken
         this.#accessToken = accessToken
+        this.#contextData = contextData
     }
 
     #saveAccount() {
         const accessToken = this.#accessToken
         const refreshToken = this.#refreshToken
-        this.#accountSerializeCallback({ accessToken, refreshToken})
+        const contextData = this.#contextData
+        this.#accountSerializeCallback({ accessToken, refreshToken, contextData})
+    }
+
+    #transmitContext() {
+        if (this.#contextInfoCallback !== null) {
+            console.log("dOm api-lib transmit context", this.#contextData)
+            this.#contextInfoCallback(this.#contextData)
+        }
     }
 }
 

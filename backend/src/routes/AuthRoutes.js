@@ -27,6 +27,7 @@ class AuthRoutes {
             if (! tokenFoundInDatabase) {
                 // if a token is not found in database, it should be an attempt to usurp token :
                 // since a refresh token is deleted when used, it will not be found with a second attempt to use it.
+                console.log(`Token ${tokenId} not found in database`)
                 console.log(`Token renew - detection of an attempt to reuse a refresh token : lock account userId = ${userId}`)
                 await authModel.lockAccount(userId)
                 // TODO send an email
@@ -35,6 +36,7 @@ class AuthRoutes {
             }
 
             // remove refresh token from database
+            console.log(`Delete token ${tokenId} in database`)
             await authModel.deleteRefreshToken(tokenId)
 
             const isLocked = await authModel.isAccountLocked(userId)
