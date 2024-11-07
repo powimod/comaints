@@ -8,7 +8,7 @@ import CustomDialog from './dialog/CustomDialog'
 
 import '../scss/login-dialog.scss'
 
-const LoginDialog = ({isOpen, onClose, onCreateAccount}) => {
+const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
 	const { t } = useTranslation()
     const { login } = useAuthActions()
     const { comaintContext } = useComaintContext();
@@ -122,10 +122,10 @@ const LoginDialog = ({isOpen, onClose, onCreateAccount}) => {
 			<section>
 				<div>{t('new-customer-question')}</div>
 				<div className='button-bar-right'>
-					<button onClick={onCreateAccount}>{t('create-account-button')}</button>
+					<button onClick={onRegisterAccount}>{t('create-account-button')}</button>
 				</div>
 			</section>
-			<div className='button-bar'>
+			<div className='button-bar-right'>
 				<button onClick={onClose}>{t('close')}</button>
 			</div>
 

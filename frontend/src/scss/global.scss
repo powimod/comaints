@@ -31,6 +31,7 @@
     --global-color-3: #000000; /* black */
     --global-color-4: #323232; /* dark gray*/
     --global-color-5: #de1c5b; /* red */
+    --global-color-6: #102a4c; /* very dark blue*/
 }
 
 html {  
@@ -40,6 +41,26 @@ html {
 
 body {
     font-family: 'Roboto', sans-serif;
+    --banner-title-color: var(--global-color-0); /* white */
+    --banner-subtitle-color: var(--global-color-2); /* light blue */
+    --banner-text-color: var(--global-color-2); /* light-blue*/
+    --banner-background-color: var(--global-color-1); /* dark blue */
+    --banner-link-color: var(--global-color-2); /* light blue */
+    --banner-link-hover-color: var(--global-color-2); /* light blue */
+    --content-background-color: var(--global-color-0); /* white */
+}
+body.dark-theme {
+    --banner-title-color: var(--global-color-0); /* white */
+    --banner-subtitle-color: var(--global-color-2); /* light blue */
+    --banner-text-color: var(--global-color-2); /* light-blue*/
+    --banner-background-color: var(--global-color-6); /* dark blue -> very dark blue */
+    --banner-link-color: var(--global-color-2); /* light blue */
+    --banner-link-hover-color: var(--global-color-2); /* light blue */
+
+    --content-background-color: yellow;
+}
+body.line-spacing-theme {
+    line-height: 2;
 }
 
 *{
@@ -47,6 +68,10 @@ body {
     margin: 0;
     padding: 0;
     font-size: var(--font-size-medium);
+}
+
+main {
+    background-color:var(--content-background-color);
 }
 
 .orbitron-900 {

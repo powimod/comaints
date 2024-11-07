@@ -80,9 +80,10 @@ class View {
             jsonBody['refresh-token'] = null
         }
         else {
-            if (this.#renewedAccessToken !== null)
+            // add tokens if they were renewed or set to null
+            if (this.#renewedAccessToken !== undefined)
                 jsonBody['access-token'] = this.#renewedAccessToken
-            if (this.#renewedRefreshToken !== null)
+            if (this.#renewedRefreshToken !== undefined)
                 jsonBody['refresh-token'] = this.#renewedRefreshToken
         }
 

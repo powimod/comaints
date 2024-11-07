@@ -120,6 +120,24 @@ class Context{
                 }
             }
 
+            // si la réponse contient des jetons, les récupérer
+            let tokenFound = false
+            const accessToken = jsonResponse['access-token']
+            if (accessToken !== undefined) {
+                this.#accessToken = accessToken
+                tokenFound = true
+            }
+            const refreshToken = jsonResponse['refresh-token']
+            if (refreshToken !== undefined) {
+                this.#refreshToken = refreshToken
+                tokenFound = true
+            }
+
+            // demander au client de sauver les jetons
+            if (tokenFound)
+                this.#saveAccount()
+
+
             // Cas où la requête HTTP a échoué
             if (! response.ok) {
 
@@ -156,23 +174,6 @@ class Context{
                 // dans ce cas, il faut boucler sur une seconde tentative qui enverra le jeton de rafraîchissement
                 continue
             }
-
-            // si la réponse contient des jetons, les récupérer
-            let tokenFound = false
-            const accessToken = jsonResponse['access-token']
-            if (accessToken !== undefined) {
-                this.#accessToken = accessToken
-                tokenFound = true
-            }
-            const refreshToken = jsonResponse['refresh-token']
-            if (refreshToken !== undefined) {
-                this.#refreshToken = refreshToken
-                tokenFound = true
-            }
-
-            // demander au client de sauver les jetons
-            if (tokenFound)
-                this.#saveAccount()
 
             // la requête HTTP a réussi : sortir
             globalResult = jsonResponse

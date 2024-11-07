@@ -88,7 +88,7 @@ class AuthRoutes {
                     view.storeRenewedTokens(newAccessToken, newRefreshToken)
                 }
                 catch (error) {
-                    view.error(error) // FIXME send a ComaintError
+                    view.error( new ComaintApiErrorInvalidToken(), { resetTokens: true })
                     return
                 }
             }
@@ -108,11 +108,7 @@ class AuthRoutes {
                         // TODO add selftest to check invalid token
                         const errorMessage = error.message ? error.message : error
                         console.log(`Token middleware -> error : ${errorMessage}`)
-                        // FIXME how to reset access and refresh tokens
-                        view.error(
-                            new ComaintApiErrorInvalidToken(view.translation('error.access_token_error', {error: errorMessage})),
-                            { resetTokens: true }
-                        )
+                        view.error( new ComaintApiErrorInvalidToken(), { resetTokens: true })
                         return
                     }
                 }

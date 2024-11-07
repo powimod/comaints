@@ -50,7 +50,26 @@
 	"new-customer-question" : "New customer",
 	"create-account-button" : "Create account",
 	"close": "Close",
+
+	"create-account-message" : "Create an account",
+	"create-account-instruction": "Please provide a valid email address and a password in order to create an account",
+	"password-rules": "Minimum 8 characters with at least one uppercase, one lowercase, one number, and one special character",
+	"firstname-field": "Firstname",
+	"lastname-field": "Lastname",
+
+	"ask-code-message": "Please enter the confirmation code that was sent to you by email",
+	"resend-validation-code": "Resend validation code",
+	"validation-code": "Validation code",
+	"invalid-validation-code-error": "Validation code must be a six digits number",
+
     "error": {
+        "invalid-email": "Invalid Email",
+        "invalid-password": "Invalid Password",
+        "different-password": "Passwords does not match",
+        "invalid-code": "Invalid code",
+	    "invalid-validation-code": "Le code de validation doit être un nombre à six chiffres",
+        "empty-firstname": "Firstname can not be empty",
+        "empty-lastname": "Lastname can not be empty"
     }
 
 }

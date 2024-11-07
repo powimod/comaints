@@ -2,11 +2,8 @@
 
 footer.root_footer{
 
-    --footer-background-color: var(--global-color-1); /* dark blue */
-    --footer-text-color: var(--global-color-2); /* white */
-
-    background-color: var(--footer-background-color);
-    color: var(--footer-text-color);
+    background-color: var(--banner-background-color);
+    color: var(--banner-text-color);
     padding: var(--marge-size-tiny);
 
 	display: grid;

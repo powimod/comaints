@@ -2,10 +2,6 @@
 
 header.root_header {
 
-    --header-background-color: var(--global-color-1); /* dark blue */
-    --header-title-color: var(--global-color-0); /* white */
-    --header-subtitle-color: var(--global-color-2); /* blue */
-
     display: grid;
     gap:var(--marge-size-medium);
     grid-template-areas:
@@ -13,7 +9,7 @@ header.root_header {
         "logo userid        userid";
     grid-template-columns: auto 1fr;
 
-    background-color: var(--header-background-color);
+    background-color: var(--banner-background-color);
     padding: var(--marge-size-medium);
 
     /* size of logo and buttons */
@@ -31,7 +27,7 @@ header.root_header {
 
     h1 {
         display: none;
-        color: var(--header-title-color);
+        color: var(--banner-title-color);
         font-family: "Orbitron", sans-serif;
         font-optical-sizing: auto;
         font-weight: 900;
@@ -40,28 +36,28 @@ header.root_header {
     }
     h2 {
         display: none;
-        color: var(--header-subtitle-color);
+        color: var(--banner-subtitle-color);
     }
 
     span.stock-button {
         grid-area: accessibility;
-        border: solid 1px var(--header-title-color);
+        border: solid 1px var(--banner-title-color);
         padding: var(--marge-size-large);
         border-radius: var(--marge-size-large);
     }
 
     span.userid {
         grid-area: userid;
-        color:var(--header-subtitle-color);
+        color:var(--banner-subtitle-color);
         text-align: right;
         margin-right: var(--marge-size-large);
     }
 
     button.stock-button{
         grid-area: menu;
-        color: var(--header-title-color);
+        color: var(--banner-title-color);
         &:hover {
-            border-color: var(--header-subtitle-color);
+            border-color: var(--banner-subtitle-color);
         }
     }
 

@@ -10,7 +10,18 @@ const useAuthActions = () => {
     }
 
     const register = (email, password) => {
-        return dispatch(registerUser({email, password}))
+        try {
+            const result = dispatch(registerUser({email, password}))
+            if (registerUser.rejected.match(result)) {
+                const errorMessage = result.payload || 'Unknown error' // FIXME translation
+                throw new Error(errorMessage)
+            }
+        }
+        catch (error) {
+            console.error('Login failed: ', error.message)
+            throw error
+        }
+
     }
 
     const login = async (email, password) => {
@@ -29,9 +40,7 @@ const useAuthActions = () => {
 
     const logout = async () => {
         try {
-            console.log("dOm avant logout")
             const result = await dispatch(logoutUser())
-            console.log("dOm après logout")
             if (logoutUser.rejected.match(result)) {
                 const errorMessage = result.payload || 'Unknown error' // FIXME translation
                 throw new Error(errorMessage)
@@ -44,8 +53,19 @@ const useAuthActions = () => {
     }
 
     const validateCode = (code) => {
-        dispatch(validateAuthCode({code}))
+        try {
+            const result = dispatch(validateAuthCode({code}))
+            if (validateAuthCode.rejected.match(result)) {
+                const errorMessage = result.payload || 'Unknown error' // FIXME translation
+                throw new Error(errorMessage)
+            }
+        }
+        catch (error) {
+            console.error('Login failed: ', error.message)
+            throw error
+        }
     }
+
 
     return {
         getAuth,

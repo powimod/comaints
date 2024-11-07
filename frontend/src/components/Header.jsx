@@ -11,6 +11,7 @@ import AccessibilityDialog from './AccessibilityDialog'
 import { useComaintContext } from '../ComaintContext'
 import LoginDialog from './LoginDialog'
 import LogoutDialog from './LogoutDialog'
+import RegisterAccountDialog from './RegisterAccountDialog'
 
 import '../scss/header.scss'
 
@@ -21,6 +22,7 @@ const Header = () => {
 	const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
 	const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
 	const [isAccessibilityDialogOpen, setIsAccessibilityDialogOpen] = useState(false)
+	const [isRegisterAccountDialogOpen, setIsRegisterAccountDialogOpen] = useState(false);
     const { comaintContext } = useComaintContext()
     const [ accountLabel, setAccountLabel ] = useState('')
 
@@ -58,6 +60,15 @@ const Header = () => {
 		setIsAccessibilityDialogOpen(true)
 	}
 
+	const onRegisterAccount = () => {
+		setIsLoginDialogOpen(false)
+		setIsRegisterAccountDialogOpen(true);
+	}
+
+	const onRegisterAccountDialogClose = () => {
+		setIsRegisterAccountDialogOpen(false);
+	}
+
     return (
         <>
             <header className="root_header">
@@ -78,8 +89,9 @@ const Header = () => {
                 <div onClick={onLogoutMenuClick}>{t('action.logout')}</div>
             </PopupMenu>
 		    <AccessibilityDialog isOpen={isAccessibilityDialogOpen} onClose={onAccessibilityDialogClose} /> 
-		    <LoginDialog isOpen={isLoginDialogOpen} onClose={onLoginDialogClose} /> 
+		    <LoginDialog isOpen={isLoginDialogOpen} onClose={onLoginDialogClose} onRegisterAccount={onRegisterAccount} /> 
 		    <LogoutDialog isOpen={isLogoutDialogOpen} onResponse={onLogoutDialogResponse}/>
+		    <RegisterAccountDialog isOpen={isRegisterAccountDialogOpen} onClose={onRegisterAccountDialogClose} /> 
         </>
     )
 }

@@ -49,5 +49,26 @@
 	"login-button": "Connexion",
 	"new-customer-question" : "Nouveau client",
 	"create-account-button" : "Créer un compte",
-	"close": "Fermer"
+	"close": "Fermer",
+
+	"create-account-message" : "Créez un compte",
+	"create-account-instruction": "Veuillez fournir une adresse mail valide et un mot de passe pour pouvoir vous créer un compte",
+	"password-rules": "(8 caractères minimum avec au moins une majuscule, une minuscule, un chiffre et un caractère spécial)",
+	"firstname-field": "Prénom",
+	"lastname-field": "Nom",
+
+	"ask-code-message": "Veuillez entrer le code de confirmation qui vous a été envoyé par mail",
+	"resend-validation-code": "Renvoyer le code de validation",
+	"validation-code": "Code de validation",
+	"invalid-validation-code-error": "Le code de validation doit être un nombre de six chiffres",
+
+    "error": {
+        "invalid-email": "Adresse mail invalide",
+        "invalid-password": "Mot de passe invalide",
+        "different-password": "Les mots de passe ne correpondent pas",
+        "invalid-code": "Code invalide",
+	    "invalid-validation-code-error": "Validation code must be a six digits number",
+        "empty-firstname": "Le prénom ne peut pas être vide",
+        "empty-lastname": "Le nom ne peut pas être vide"
+    }
 }

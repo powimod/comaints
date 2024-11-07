@@ -11,13 +11,17 @@ const LogoutDialog = ({isOpen, onResponse}) => {
 
 	const [ error, setError ] = useState(null)
 
+    useEffect( () => {
+        setError(null)
+    }, [isOpen])
+
 	const onDialogResponse = async (confirmation) => {
 		if (confirmation)  {
 			try {
+                setError(null)
                 await logout()
 			}
 			catch (error) {
-                console.log("dOm ================ error")
 				console.error(error)
 				setError(error.message !== undefined ? error.message : error)
 				return

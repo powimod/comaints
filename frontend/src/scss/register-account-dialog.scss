@@ -1,0 +1,18 @@
+.register-account-dialog {
+	max-width: 40rem;
+	& > div:first-child {
+		text-align: center;
+		font-weight: bolder;
+		font-size: 1.8rem;
+		font-variant-caps: all-small-caps;
+	}
+	& > section > div:first-child {
+		font-size: 1.6rem;
+		font-weight: bold;
+	}
+	& > section {
+		border: solid black 1px;
+		padding: 0.8rem;
+		margin: 0.8rem;
+	}
+}
