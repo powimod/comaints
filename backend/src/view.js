@@ -46,7 +46,7 @@ class View {
     }
 
     error(error, options = {}) {
-        const resetTokens = options.resetTokens || false
+        const resetAccount = options.resetAccount || false
         if (error === undefined)
             throw new Error('Error parameter is not defined')
         if (error === null)
@@ -75,7 +75,7 @@ class View {
         if (this.#renewedContext !== null)
             jsonBody.context = this.#renewedContext
 
-        if (resetTokens) {
+        if (resetAccount) {
             jsonBody['access-token'] = null
             jsonBody['refresh-token'] = null
         }

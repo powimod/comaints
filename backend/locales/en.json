@@ -21,6 +21,7 @@
         "user_not_logged_in": "User is not logged in",
         "unauthorized_error": "Unauthorized error",
         "invalid_token": "Invalid token",
+        "attempt_to_reuse_token": "Attempt to reuse a refresh token",
         "invalid_response": "Invalid response",
         "invalid_email_or_password": "Invalid EMail or password",
         "invalid_password": "Invalid password",

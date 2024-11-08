@@ -31,8 +31,7 @@ class AuthRoutes {
                 console.log(`Token renew - detection of an attempt to reuse a refresh token : lock account userId = ${userId}`)
                 await authModel.lockAccount(userId)
                 // TODO send an email
-                // TODO renvoyer un context avec {email:null, connected:false}
-                throw new Error('Attempt to reuse a refresh token') // TODO send a ComaintError
+                throw new ComaintApiErrorUnauthorized(view.translation('error.attempt_to_reuse_token'))
             }
 
             // remove refresh token from database
@@ -42,8 +41,7 @@ class AuthRoutes {
             const isLocked = await authModel.isAccountLocked(userId)
             if (await authModel.isAccountLocked(userId)) {
                 console.log(`Token renew - account locked userId = ${userId}`)
-                // TODO renvoyer un context avec {email:null, connected:false}
-                throw new Error('Account locked') // TODO send a ComaintError
+                throw new ComaintApiErrorUnauthorized(view.translation('error.account_locked'))
             }
 
             const user = await authModel.getUserProfile(userId)
@@ -88,7 +86,7 @@ class AuthRoutes {
                     view.storeRenewedTokens(newAccessToken, newRefreshToken)
                 }
                 catch (error) {
-                    view.error( new ComaintApiErrorInvalidToken(), { resetTokens: true })
+                    view.error( new ComaintApiErrorInvalidToken(), { resetAccount: true })
                     return
                 }
             }
@@ -108,7 +106,7 @@ class AuthRoutes {
                         // TODO add selftest to check invalid token
                         const errorMessage = error.message ? error.message : error
                         console.log(`Token middleware -> error : ${errorMessage}`)
-                        view.error( new ComaintApiErrorInvalidToken(), { resetTokens: true })
+                        view.error( new ComaintApiErrorInvalidToken(), { resetAccount: true })
                         return
                     }
                 }
@@ -354,11 +352,11 @@ class AuthRoutes {
                 const refreshTokenId = request.refreshTokenId // HTTP token header
                 assert(refreshTokenId !== null)
                 await authModel.logout(userId, refreshTokenId)
-                view.storeRenewedContext({
-                   email: null,
-                   connected: false
-                })
                 view.storeRenewedTokens(null, null)
+                view.storeRenewedContext({
+                    email: null,
+                    connected: false
+                })
                 view.json({ message: 'logout success'})
             }
             catch(error) {
