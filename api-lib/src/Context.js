@@ -85,6 +85,9 @@ class Context{
                 else {
                     // deuxième tentative : envoyer le jeton de renouvellement 
                     // (le jeton d'accès avait été détecté comme périmé à la première tentative)
+                    if (this.#refreshToken === null)
+                        throw new Error("No refresh token to provide")
+
                     fetchParam.headers['x-refresh-token'] = this.#refreshToken
                 }
             }
@@ -243,7 +246,6 @@ class Context{
 
     #transmitContext() {
         if (this.#contextInfoCallback !== null) {
-            console.log("dOm api-lib transmit context", this.#contextData)
             this.#contextInfoCallback(this.#contextData)
         }
     }

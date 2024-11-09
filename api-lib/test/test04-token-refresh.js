@@ -1,7 +1,7 @@
 'use strict'
 import { expect } from 'chai'
 
-import { api, initializeApi, terminateApi, connectDb, disconnectDb } from './util.js'
+import { api, initializeApi, terminateApi, connectDb, disconnectDb, accessToken, refreshToken } from './util.js'
 import { createUserAccount, deleteUserAccountById, getDatabaseUserById } from './helpers.js'
 
 describe('Check token refresh', () => {
@@ -9,6 +9,8 @@ describe('Check token refresh', () => {
     const PASSWORD = '4BC+d3f-6H1.lMn!'
     let userId = null
     let userEmail = null
+    let accessTokenMemo = null
+    let refreshTokenMemo = null
 
 	before( async () =>  {
         await connectDb()
@@ -24,6 +26,11 @@ describe('Check token refresh', () => {
         await terminateApi()
     })
 
+    it ('Check tokens', async () => {
+        expect(accessToken).not.to.equal(null)
+        expect(refreshToken).not.to.equal(null)
+    })
+
     it ('Get profile with valid access token', async () => {
         const result = await api.account.getProfile()
         expect(result).to.be.instanceOf(Object)
@@ -34,7 +41,17 @@ describe('Check token refresh', () => {
         expect(result.state).to.be.a('number').and.to.equal(1) // ACTIVE
     })
 
+    it ('Check tokens', async () => {
+        expect(accessToken).not.to.equal(null)
+        expect(refreshToken).not.to.equal(null)
+        accessTokenMemo = accessToken
+        refreshTokenMemo = refreshToken
+    })
+
     it ('Get profile with expired access token', async () => {
+        // access with expired token will not generate an error because
+        // refresh token will be used to renew access token
+        // and API request will be successfull
         const result = await api.account.getProfile({expiredAccessTokenEmulation:true})
         expect(result).to.be.instanceOf(Object)
         expect(result).to.have.keys('id', 'email', 'firstname', 'lastname', 'state', 'lastUse', 'administrator', 'companyId')
@@ -46,6 +63,14 @@ describe('Check token refresh', () => {
         expect(result.lastUse).to.equal(null)
         expect(result.administrator).to.be.a('boolean').and.to.equal(false)
         expect(result.companyId).to.equal(null)
+    })
+
+    it ('Check token changes', async () => {
+        expect(accessToken).not.to.equal(null) 
+        expect(refreshToken).not.to.equal(null) 
+        // check access token and refresh tokens where renewed
+        expect(accessToken).not.to.equal(accessTokenMemo)
+        expect(refreshToken).not.to.equal(refreshTokenMemo)
     })
 
 })

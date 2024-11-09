@@ -8,6 +8,8 @@ dotenv.config({ path: './test/.env' })
 
 let api = null
 let accountData = null
+let accessToken = null
+let refreshToken = null
 
 let db = null
 let dbHost
@@ -21,20 +23,22 @@ const contextInfoCallback = (updatedContext) => {
     context = {... updatedContext}
 }
 
-const accountSerializeCallback = (data) => {
-    if (data === undefined)
-        data = JSON.parse(accountData)
-    else
-        accountData = JSON.stringify(data)
-    return data
+const accountSerializeCallback = (jsonData) => {
+    if (jsonData === undefined) {
+        jsonData = JSON.parse(accountData)
+    }
+    else {
+        accountData = JSON.stringify(jsonData)
+        accessToken = jsonData.accessToken
+        refreshToken = jsonData.refreshToken
+    }
+    return jsonData
 }
 
 const initializeApi = () => {
     const backendUrl = process.env.BACKEND_URL
     if (! backendUrl)
         throw new Error('Env variable «BACKEND_URL» is not defined')
-
-
     api = new ComaintBackendApi(backendUrl, accountSerializeCallback, contextInfoCallback)
     context = null
 }
@@ -89,5 +93,7 @@ export {
     connectDb,
     disconnectDb,
     requestDb,
-    context
+    context,
+    accessToken,
+    refreshToken
 }

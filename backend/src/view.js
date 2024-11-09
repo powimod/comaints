@@ -101,6 +101,14 @@ class View {
         this.#renewedAccessToken = accessToken
         this.#renewedRefreshToken = refreshToken
     }
+
+    storeRenewedAccessToken(accessToken) {
+        this.#renewedAccessToken = accessToken
+    }
+
+    storeRenewedRefreshToken(refreshToken) {
+        this.#renewedRefreshToken = refreshToken
+    }
 }
 
 export default View

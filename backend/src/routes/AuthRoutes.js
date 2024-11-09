@@ -71,9 +71,9 @@ class AuthRoutes {
 
             // parameter «expiredToken» to emulate expired access Token (in GET or POST request)
             let expiredAccessTokenEmulation = false
-            if (request.query.expiredAccessTokenEmulation  === 'true') // value is a string not a boolean
+            if (request.query.expiredAccessTokenEmulation  === 'true') // GET : value is a string not a boolean
                 expiredAccessTokenEmulation = true
-            if (request.body.expiredAccessTokenEmulation === true)
+            if (request.body.expiredAccessTokenEmulation === true) // POST
                 expiredAccessTokenEmulation = true
 
             const refreshToken = request.headers['x-refresh-token']
@@ -92,7 +92,7 @@ class AuthRoutes {
             }
             else {
                 if (accessToken === undefined) {
-                    console.log(`Token middleware -> access token absent (anonymous request)`)
+                    console.log(`Token middleware -> access token not provided (anonymous request)`)
                 }
                 else {
                     try {
@@ -106,7 +106,9 @@ class AuthRoutes {
                         // TODO add selftest to check invalid token
                         const errorMessage = error.message ? error.message : error
                         console.log(`Token middleware -> error : ${errorMessage}`)
-                        view.error( new ComaintApiErrorInvalidToken(), { resetAccount: true })
+                        // reset only access token (refresh token is still valid)
+                        view.storeRenewedAccessToken(null)
+                        view.error(new ComaintApiErrorInvalidToken())
                         return
                     }
                 }
