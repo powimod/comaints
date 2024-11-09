@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import i18n from "i18next"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -72,7 +73,9 @@ const Header = () => {
     return (
         <>
             <header className="root_header">
-                <Logo/>
+                <Link to='/' className='logo'>
+                    <Logo/>
+                </Link>
                 <h1>{t('header_title')}</h1>
                 <h2>{t('header_subtitle')}</h2>
                 <span className='stock-button'>
