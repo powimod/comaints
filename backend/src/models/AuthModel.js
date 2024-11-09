@@ -9,6 +9,12 @@ import { ComaintApiError, ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthor
 import { AccountState } from '../../../common/src/global.mjs'
 import MailManagerSingleton from '../MailManager.js'
 
+const AUTH_OPERATION_REGISTER = 'register'
+const AUTH_OPERATION_UNLOCK = 'unlock'
+const AUTH_OPERATION_CHANGE_EMAIL = 'change-email'
+const AUTH_OPERATION_ACCOUNT_DELETION = 'account-deletion'
+const AUTH_OPERATION_RESET_PASSWORD = 'reset-password'
+
 class AuthModel {
     #db = null
     #userModel = null
@@ -54,7 +60,7 @@ class AuthModel {
 
 
     async register(email, password, authCode, invalidateCodeImmediately) {
-        const authAction = 'register'
+        const authAction = AUTH_OPERATION_REGISTER
         const authAttempts = 0
         const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
         const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
@@ -128,23 +134,27 @@ class AuthModel {
             throw new Error('User not found')
         const action = user.authAction
         switch (action) {
-            case 'register' :
+            case AUTH_OPERATION_REGISTER :
                 if (user.state !== AccountState.PENDING)
                     throw new ComaintApiError('error.account_already_registered')
                 user.state = AccountState.ACTIVE
                 break
-            case 'unlock' :
+            case AUTH_OPERATION_UNLOCK :
                 if (user.state !== AccountState.LOCKED)
                     throw new ComaintApiError('error.account_not_locked')
                 user.state = AccountState.ACTIVE
                 break
-            case 'change-email' :
+            case AUTH_OPERATION_CHANGE_EMAIL :
                 user.email = user.authData
                 break
-            case 'account-deletion' :
+            case AUTH_OPERATION_ACCOUNT_DELETION :
                 await this.#userModel.deleteUserById(user.id)
                 user = null
                 break
+            case AUTH_OPERATION_RESET_PASSWORD:
+                const data = JSON.parse(user.authData)
+                await this.#userModel.changePasswordHash(data.email, data.passwordHash)
+                break;
             default:
                 throw new Error(`Invalid action «${action}»`)
         }
@@ -213,6 +223,17 @@ class AuthModel {
         const subject  = i18n_t('unlock_account_email.mail_title')
         const textBody = i18n_t('unlock_account_email.mail_body', { 'code' : code })
         const htmlBody = i18n_t('unlock_account_email.mail_body', { 'code' : `<b>${code}</b>code` })
+        const mailManager = MailManagerSingleton.getInstance()
+        return await mailManager.sendMail(email, subject, textBody, htmlBody)
+    }
+
+    async sendResetPasswordAuthCode(code, email, i18n_t) {
+        assert(code   !== undefined && typeof(code)   === 'number')
+        assert(email  !== undefined && typeof(email)  === 'string')
+        assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
+        const subject  = i18n_t('reset_password.mail_title')
+        const textBody = i18n_t('reset_password.mail_body', { 'code' : code })
+        const htmlBody = i18n_t('reset_password.mail_body', { 'code' : `<b>${code}</b>code` })
         const mailManager = MailManagerSingleton.getInstance()
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
@@ -385,8 +406,12 @@ class AuthModel {
 	}
 
 
-    async getUserProfile(userId) {
+    async getUserProfileById(userId) {
         return await this.#userModel.getUserById(userId)
+    }
+
+    async getUserProfileByEmail(email) {
+        return await this.#userModel.getUserByEmail(email)
     }
 
     async getUserProfileByEmail(email) {
@@ -461,7 +486,7 @@ class AuthModel {
         const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
         const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
 
-        user.authAction = 'change-email'
+        user.authAction = AUTH_OPERATION_CHANGE_EMAIL
         user.authExpiration = authExpiration
         user.authCode = authCode
         user.authData = newEmail
@@ -471,6 +496,27 @@ class AuthModel {
         return user
     }
 
+    async preparePasswordReset(email, newPassword, authCode, invalidateCodeImmediately) {
+        let user = await this.#userModel.getUserByEmail(email)
+        if (user === null)
+            throw new Error('User not found') // FIXME should silently ignore
+
+        const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
+        const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
+
+        const passwordHash = await this.#userModel.encryptPassword(newPassword)
+
+        user.authAction = AUTH_OPERATION_RESET_PASSWORD
+        user.authExpiration = authExpiration
+        user.authCode = authCode
+        user.authData = JSON.stringify({ email, passwordHash: passwordHash})
+        user.authAttempts = 0
+
+        user = await this.#userModel.editUser(user)
+        return user
+    }
+
+
     async prepareAccountDeletion(userId, authCode, invalidateCodeImmediately) {
         let user = await this.#userModel.getUserById(userId)
         if (user === null)
@@ -479,7 +525,7 @@ class AuthModel {
         const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
         const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
 
-        user.authAction = 'account-deletion'
+        user.authAction = AUTH_OPERATION_ACCOUNT_DELETION
         user.authExpiration = authExpiration
         user.authCode = authCode
         user.authData = null

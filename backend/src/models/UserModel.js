@@ -105,14 +105,26 @@ class UserModel {
         return user
     }
 
+    async changePasswordHash(email, encryptedPassword) {
+        const sqlRequest = `UPDATE users SET password = ? WHERE email = ?`
+        await this.#db.query(sqlRequest, [ encryptedPassword, email])
+    }
+
+
+    async encryptPassword(password) {
+        assert (password !== undefined)
+        if (password === undefined)
+            return
+        return await bcrypt.hash(password, this.#hashSalt)
+    }
+
 
     async encryptPasswordIfPresent(user) {
         assert (user !== undefined)
         if (user.password === undefined)
             return
-        user.password = await bcrypt.hash(user.password, this.#hashSalt)
+        user.password = await this.encryptPassword(user.password) 
     }
-
 
 
     async checkPassword(userId, password) {
@@ -131,8 +143,8 @@ class UserModel {
         const hashedPassword = result[0].password
         const isValid = await bcrypt.compare(password, hashedPassword)
         return isValid
-
     }
+
 
     async checkAuthCode(userId, authCode) {
         if (userId === undefined)

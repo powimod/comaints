@@ -75,5 +75,10 @@
     "register_attempt_with_used_email": {
 		"mail_body": "Bonjour,\n.Une tentative a été faite pour créer un compte avec cette adresse e-mail.\nSi vous êtes à l'origine de cette demande, veuillez vous connecter avec vos identifiants ou réinitialiser votre mot de passe. Sinon, vous pouvez ignorer simplement ce message.\n",
 		"mail_title": "[Comaint] Tentative d'enregistrement avec une adresse e-mail déjà utilisée"
+    },
+    "reset_password": {
+		"mail_body": "Bonjour,\nLe code de validation pour la réinitialisation de votre mot de passe est {{code}}\n.Si vous êtes à l'origine de cette demande, vous pouvez simplement ignorer ce message.\n",
+		"mail_title": "[Comaint] reset password validation"
     }
+
 }

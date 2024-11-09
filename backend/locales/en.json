@@ -75,5 +75,9 @@
     "register_attempt_with_used_email": {
 		"mail_body": "Hello,\nAn attempt was done to create an account with this e-mail address\nIf your are the initiator of this request, please connect with your credentials or reinitialize your password. Otherwise, simply ignore this message.",
 		"mail_title": "[Comaint] registration attempt with an already used e-mail"
+    },
+    "reset_password": {
+		"mail_body": "Hello,\nValidation code to reset your password is {{code}}\nIf your are the initiator of this request, simply ignore this message.",
+		"mail_title": "[Comaint] reset password validation"
     }
 }

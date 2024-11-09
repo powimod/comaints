@@ -44,7 +44,7 @@ class AuthRoutes {
                 throw new ComaintApiErrorUnauthorized(view.translation('error.account_locked'))
             }
 
-            const user = await authModel.getUserProfile(userId)
+            const user = await authModel.getUserProfileById(userId)
             if (user === null)
                 throw new Error('User account does not exist')
             if (companyId !== user.companyId)
@@ -218,13 +218,28 @@ class AuthRoutes {
         expressApp.post('/api/v1/auth/validate', async (request, response) => {
             const view = request.view
             try {
-                // get IDs from access token
-                let userId = request.userId
-                if (userId === null)
-                    throw new Error('Access token not found in HTTP header')
-                const companyId = request.companyId // can be null with newly registered user
-                const refreshTokenId = request.refreshTokenId
-                assert (refreshTokenId !== null)
+                let user = null
+
+                // try to get IDs from access token
+                const userId = request.userId
+                if (userId !== null) {
+                    user = await authModel.getUserProfileById(userId)
+                }
+                else {
+                    // if access token was not found try to use an email in request body (used to reset password)
+                    const email = request.body.email
+                    if (email === undefined)
+                        throw new Error("Can't identify user by access-token or email") // TODO use ComaintApiError
+                    if (typeof(email) !== 'string')
+                        throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'})
+                    const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email)
+                    if (errorMsg1)
+                        throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1)
+                    user = await authModel.getUserProfileByEmail(email)
+                }
+
+                if (user === null)
+                    throw new Error('User not found') // FIXME silently ignore error ?
 
                 let code = request.body.code
                 if (code === undefined)
@@ -235,13 +250,12 @@ class AuthRoutes {
                 if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
 
-                const isAuthCodeValid = await authModel.checkAuthCode(userId, code)
+                const isAuthCodeValid = await authModel.checkAuthCode(user.id, code)
 
                 if (isAuthCodeValid) {
-                    const user = await authModel.processAuthOperation(userId)
+                    user = await authModel.processAuthOperation(user.id)
                     if (user === null) {
                         // with delete account route, user is set to null
-                        userId = null
                         view.storeRenewedTokens(null, null)
                         view.storeRenewedContext({
                             email: null,
@@ -249,10 +263,10 @@ class AuthRoutes {
                         })
                     }
                     else {
+                        // TODO delete previous refresh token stored in request.refreshTokenId ?
                         // generate a new access token with userConnected = true
-                        userId = user.id
-                        const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, true)
-                        const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId, true)
+                        const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(user.id, user.companyId, true)
+                        const newAccessToken  = await authModel.generateAccessToken(user.id, user.companyId, newRefreshTokenId, true)
                         view.storeRenewedTokens(newAccessToken, newRefreshToken)
                         view.storeRenewedContext({
                             email: user.email,
@@ -269,16 +283,17 @@ class AuthRoutes {
 
         // public auth
         expressApp.post('/api/v1/auth/resendCode', requireUserAuth, async (request, response) => {
+            const view = request.view
             const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
                 request.body.sendCodeByEmail : true
-            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null) // due to requireUserAuth
                 // self-test does not send validation code by email
 
-                const profile = await authModel.getUserProfile(userId)
+                const profile = await authModel.getUserProfileById(userId)
                 const authCode = authModel.generateRandomAuthCode()
+                // FIXME send mail before or after changing it in AuthModel ?
                 if (sendCodeByEmail)
                     await authModel.sendRegisterAuthCode(authCode, profile.email, view.translation)
                 await authModel.changeAuthCode(userId, authCode)
@@ -389,6 +404,41 @@ class AuthRoutes {
             }
         })
 
+        expressApp.post('/api/v1/auth/reset-password', async (request, response) => {
+            const view = request.view
+            const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?  request.body.sendCodeByEmail : true
+            try {
+                let email = request.body.email
+                if (email === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'email'})
+                if (typeof(email) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'})
+                const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email)
+                if (errorMsg1)
+                    throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1)
+
+                let newPassword = request.body.password
+                if (newPassword === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'password'})
+                if (typeof(newPassword) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'password'})
+                const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', newPassword)
+                if (errorMsg2)
+                    throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2)
+
+                const authCode = authModel.generateRandomAuthCode()
+                if (sendCodeByEmail)
+                    await authModel.sendResetPasswordAuthCode(authCode, email, view.translation)
+                await authModel.preparePasswordReset(email, newPassword, authCode, false)
+
+                view.json({ message: 'Password changed, waiting for validation code' })
+            }
+            catch (error) {
+                console.error("Reset password error:", (error.message) ? error.message : error)
+                view.error(error)
+            }
+        })
+ 
     }
 }
 
