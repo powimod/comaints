@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useComaintContext } from '../ComaintContext'
 import useAuthActions from '../actions/authActions'
 import CustomDialog from './dialog/CustomDialog'
+import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
+import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 
 import '../scss/login-dialog.scss'
 
@@ -33,12 +35,14 @@ const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
         setPassword('')
 	}, [isOpen])
    
+
 	useEffect( () => {
         if (comaintContext == null)
             return
         if (comaintContext.connected)
             onClose()
 	}, [comaintContext])
+
 
 	useEffect( () => {
 		if (email.length === 0)
@@ -47,25 +51,35 @@ const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
 			localStorage.setItem(EMAIL_STORAGE_KEY, email)
 	}, [email])
 
+
 	useEffect( () => {
 		setError(null)
 		if (! isOpen)
 			return
-		let focusedField = (emailRef.current.value.length > 0) ?  passwordRef : emailRef
-		setTimeout( () => {
-			focusedField.current.focus()
-		}, 100) // FIXME why does not work with zero ?
+		setFocus( (emailRef.current.value.length > 0) ?  passwordRef : emailRef )
 	}, [isOpen])
+
+
+    const setFocus = (fieldRef) => {
+		setTimeout( () => {
+			fieldRef.current.focus()
+		}, 100) // FIXME why does not work with zero ?
+    }
 
 	const onLoginButtonClick = async () => {
         setError(null)
-        // TODO use global control functoins
-		if (email.length === 0) {
-			setError(t('invalid-email-error'))
+        let errorMsg, errorParams
+
+        [ errorMsg, errorParams ] = controlObjectProperty(userObjectDef, 'email', email)
+        if (errorMsg) {
+			setError(t(errorMsg, errorParams))
+            setFocus(emailRef)
 			return
 		}
+        [ errorMsg, errorParams ] = controlObjectProperty(userObjectDef, 'password', password)
 		if (password.length === 0) {
 			setError(t('invalid-password-error'))
+            setFocus(passwordRef)
 			return
 		}
 		try {
@@ -73,6 +87,7 @@ const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
 		}
 		catch (error) {
 			setError(error.message)
+            setFocus(passwordRef)
 		}
 	}
 
