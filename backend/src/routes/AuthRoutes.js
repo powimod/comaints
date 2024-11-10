@@ -54,7 +54,7 @@ class AuthRoutes {
             const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, connected)
             const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
 
-            return [ userId, companyId, newAccessToken, newRefreshToken, connected ]
+            return [ userId, companyId, connected, newRefreshTokenId, newAccessToken, newRefreshToken ]
         }
 
 
@@ -80,40 +80,38 @@ class AuthRoutes {
             const accessToken  = request.headers['x-access-token']
 
             if (refreshToken !== undefined) {
+                console.log(`Token middleware - refresh token found -> renew tokens`)
                 try {
                     let newAccessToken, newRefreshToken
-                    [ userId, companyId, newAccessToken, newRefreshToken, connected ] = await _renewTokens(refreshToken)
+                    [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken ] = await _renewTokens(refreshToken)
                     view.storeRenewedTokens(newAccessToken, newRefreshToken)
                 }
                 catch (error) {
+                    const errorMessage = error.message ? error.message : error
+                    console.log(`Token middleware - error : `, errorMessage)
                     view.error( new ComaintApiErrorInvalidToken(), { resetAccount: true })
                     return
                 }
             }
-            else {
-                if (accessToken === undefined) {
-                    console.log(`Token middleware -> access token not provided (anonymous request)`)
+            else if (accessToken !== undefined) {
+                console.log(`Token middleware - access token found`)
+                try {
+                    [userId, companyId, refreshTokenId, connected] = await authModel.checkAccessToken(accessToken, expiredAccessTokenEmulation)
                 }
-                else {
-                    try {
-                        [userId, companyId, refreshTokenId, connected] = await authModel.checkAccessToken(accessToken, expiredAccessTokenEmulation)
-                        console.log(`Token middleware -> userId = ${userId}`)
-                        console.log(`Token middleware -> companyId = ${companyId}`)
-                        console.log(`Token middleware -> refreshTokenId = ${refreshTokenId}`)
-                        console.log(`Token middleware -> connected = ${connected}`)
-                    }
-                    catch (error) {
-                        // TODO add selftest to check invalid token
-                        const errorMessage = error.message ? error.message : error
-                        console.log(`Token middleware -> error : ${errorMessage}`)
-                        // reset only access token (refresh token is still valid)
-                        view.storeRenewedAccessToken(null)
-                        view.error(new ComaintApiErrorInvalidToken())
-                        return
-                    }
+                catch (error) {
+                    // TODO add selftest to check invalid token
+                    const errorMessage = error.message ? error.message : error
+                    console.log(`Token middleware - error : ${errorMessage}`)
+                    // reset only access token (refresh token is still valid)
+                    view.storeRenewedAccessToken(null)
+                    view.error(new ComaintApiErrorInvalidToken())
+                    return
                 }
             }
-            console.log(`Token middleware : userId=${userId}, companyId=${companyId}, connected=${connected}`)
+            else {
+                console.log(`Token middleware - token not found (anonymous request)`)
+            }
+            console.log(`Token middleware : userId=${userId}, companyId=${companyId}, connected=${connected}, refreshTokenId = ${refreshTokenId}`)
             request.userId = userId
             request.companyId = companyId
             request.refreshTokenId = refreshTokenId
@@ -394,7 +392,7 @@ class AuthRoutes {
                 if (typeof(refreshToken) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'token'})
 
-                const [ userId, companyId, newAccessToken, newRefreshToken, connected ] = await _renewTokens(refreshToken)
+                const [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken ] = await _renewTokens(refreshToken)
 
                 console.log(`auth/refresh - send new tokens userId ${userId}`)
                 view.storeRenewedTokens(newAccessToken, newRefreshToken)
