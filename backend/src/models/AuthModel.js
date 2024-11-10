@@ -4,8 +4,9 @@ import assert from 'assert'
 import jwt from 'jsonwebtoken'
 
 import ModelSingleton from '../model.js'
-import { ComaintApiError, ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken }
-    from '../../../common/src/error.mjs'
+
+import { ComaintApiError, ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized,
+    ComaintApiErrorInvalidToken, ComaintApiErrorExpiredToken  } from '../../../common/src/error.mjs'
 import { AccountState } from '../../../common/src/global.mjs'
 import MailManagerSingleton from '../MailManager.js'
 
@@ -68,7 +69,7 @@ class AuthModel {
         let user = await this.#userModel.getUserByEmail(email)
         if (user !== null) {
             // case where user already exists
-            assert(user.state === AccountState.PENDING) // already checked in authRoute 
+            assert(user.state === AccountState.PENDING) // already checked in authRoute
             // update user registration
             user = await this.#userModel.editUser({
                 id: user.id,
@@ -267,21 +268,23 @@ class AuthModel {
         })
     }
 
-    checkAccessToken(token, expiredAccessTokenEmulation = false) {
-        const expiredTokenErrorMessage = "Expired access token"
+
+    async checkAccessToken(token, expiredAccessTokenEmulation = false) {
+
         const decodeAccessTokenPromise = new Promise( (resolve, reject) => {
-            if (expiredAccessTokenEmulation){
-                reject(expiredTokenErrorMessage)
-                return
-            }
-            jwt.verify(token, this.#tokenSecret, (err, payload) => {
+
+            // ignore expiration
+            jwt.verify(token, this.#tokenSecret, { ignoreExpiration: true }, (err, payload) => {
                 if (err !== null)  {
-                    if (err.constructor.name === 'TokenExpiredError')
-                        reject(expiredTokenErrorMessage)
-                    else
-                        reject('Invalid token')
+                    reject('Invalid token')
                     return
                 }
+
+                // do not generate an error if token is expired
+                let expired = payload.exp * 1000 < Date.now()
+                if (expiredAccessTokenEmulation)
+                    expired = true
+
                 if (payload.type !== 'access') {
                     reject('Not an access token')
                     return
@@ -306,17 +309,29 @@ class AuthModel {
                     reject(`Invalid token content`)
                     return
                 }
-                resolve([userId, companyId, refreshTokenId, connected ])
+                resolve([expired, userId, companyId, refreshTokenId, connected ])
             })
         })
-        return decodeAccessTokenPromise
+
+        let expired, userId, companyId, refreshTokenId, connected
+        try {
+            [ expired, userId, companyId, refreshTokenId, connected ] = await decodeAccessTokenPromise
+        }
+        catch (error) {
+            console.log("Access token error", error.message)
+            throw new ComaintApiErrorInvalidToken()
+        }
+
+        if (expired)
+            throw new ComaintApiErrorExpiredToken()
+        return [ userId, companyId, refreshTokenId, connected ]
     }
 
 
     async generateRefreshToken(userId, companyId, connected) {
         assert(companyId !== undefined)
         assert(connected !== undefined)
-        assert(typeof(connected) === 'boolean') 
+        assert(typeof(connected) === 'boolean')
         assert(this.#tokenSecret !== undefined)
         assert(this.#refreshTokenLifespan !== undefined)
 
@@ -426,7 +441,7 @@ class AuthModel {
         if (! isPasswordValid) {
             user.authAction = 'login'
             user.authExpiration = null
-            user.authCode = null 
+            user.authCode = null
             user.authData = null
             if (user.authAttempts === null)
                 user.authAttempts = 0
@@ -440,7 +455,7 @@ class AuthModel {
             await this.#userModel.editUser(user)
             throw new ComaintApiErrorUnauthorized('error.invalid_email_or_password')
         }
-        
+
         if (user.authAttempts >= this.#maxAuthAttempts)
             throw new ComaintApiErrorUnauthorized('error.too_many_attempts')
 

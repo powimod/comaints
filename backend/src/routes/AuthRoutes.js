@@ -102,9 +102,8 @@ class AuthRoutes {
                     // TODO add selftest to check invalid token
                     const errorMessage = error.message ? error.message : error
                     console.log(`Token middleware - error : ${errorMessage}`)
-                    // reset only access token (refresh token is still valid)
-                    view.storeRenewedAccessToken(null)
-                    view.error(new ComaintApiErrorInvalidToken())
+                    view.storeRenewedAccessToken(null) // reset only access token (refresh token is still valid)
+                    view.error(error)
                     return
                 }
             }

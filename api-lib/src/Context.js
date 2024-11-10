@@ -168,7 +168,7 @@ class Context{
                 }
 
                 // Sortir en erreur si l'erreur ne vient pas d'un jeton d'accès périmé
-                if (jsonResponse.error !== comaintErrors.INVALID_TOKEN) {
+                if (jsonResponse.error !== comaintErrors.EXPIRED_TOKEN) {
                     globalError = error
                     break
                 }

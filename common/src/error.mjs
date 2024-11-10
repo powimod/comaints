@@ -8,6 +8,7 @@ const comaintErrors = {
     CONFLICT_ERROR: 'ConflictError',
     INTERNAL_ERROR: 'InternalError',
     INVALID_TOKEN: 'InvalidToken',
+    EXPIRED_TOKEN: 'ExpiredToken',
     INVALID_RESPONSE: 'InvalidResponse'
 }
 
@@ -71,6 +72,12 @@ class ComaintApiErrorInvalidToken extends ComaintApiError {
     }
 }
 
+class ComaintApiErrorExpiredToken extends ComaintApiError {
+    constructor() {
+        super('error.expired_token', {}, comaintErrors.EXPIRED_TOKEN, 401)
+    }
+}
+
 class ComaintApiErrorInvalidResponse extends ComaintApiError {
     constructor() {
         super('error.invalid_response', {}, comaintErrors.INVALID_RESPONSE, 500)
@@ -94,6 +101,8 @@ const buildComaintError = (comaintErrorCode, params = {}) => {
             return new ComaintApiErrorInternalError('error.internal_error', params)
         case comaintErrors.INVALID_TOKEN:
             return new ComaintApiErrorInvalidToken()
+        case comaintErrors.EXPIRED_TOKEN:
+            return new ComaintApiErrorExpiredToken()
         case comaintErrors.INVALID_RESPONSE:
             return new ComaintApiErrorInvalidResponse()
         default:
@@ -111,6 +120,7 @@ export {
     ComaintApiErrorConflict,
     ComaintApiErrorInternalError,
     ComaintApiErrorInvalidToken,
+    ComaintApiErrorExpiredToken,
     ComaintApiErrorInvalidResponse,
     buildComaintError
 }
