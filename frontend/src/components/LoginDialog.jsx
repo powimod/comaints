@@ -24,11 +24,14 @@ const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
 	const EMAIL_STORAGE_KEY = 'login-email'
 
 	useEffect( () => {
+        if (! isOpen)
+            return
 		setError(null)
 		const email = localStorage.getItem(EMAIL_STORAGE_KEY)
 		if (email !== null)
 			setEmail(email)
-	}, [])
+        setPassword('')
+	}, [isOpen])
    
 	useEffect( () => {
         if (comaintContext == null)
