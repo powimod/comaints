@@ -70,6 +70,18 @@
 	    "invalid-validation-code": "Le code de validation doit être un nombre à six chiffres",
         "empty-firstname": "Firstname can not be empty",
         "empty-lastname": "Lastname can not be empty"
-    }
+    },
 
+	"forgotten_password" : {
+		"title": "Forgotten password",
+        "step_1": "First step",
+        "step_2": "Step two",
+		"email_field": "Email address",
+		"send_code_button": "Send code",
+		"code": "code",
+		"new_password_field": "New password",
+		"confirm_password_field": "Confirm password",
+		"send_code_message": "Please enter the validation code that was sent to your email address",
+		"password_changed_message": "Your password has been changed"
+	}
 }

@@ -66,12 +66,9 @@ const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
 			return
 		}
 		try {
-            console.log("dOm login started")
             await login(email, password)
-            console.log("dOm login terminated")
 		}
 		catch (error) {
-            console.log("dOm login error", error.message)
 			setError(error.message)
 		}
 	}

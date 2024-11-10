@@ -18,18 +18,30 @@ export const registerUser = createAsyncThunk(
 
 export const validateAuthCode = createAsyncThunk(
     'auth/validateAuthCode',
-    async ({ code }, { rejectWithValue }) => {
+    async ({ email, code }, { rejectWithValue }) => {
         const comaintApi = ComaintBackendApiSingleton.getInstance()
         try {
-            return await comaintApi.auth.validate({ code })
+            return await comaintApi.auth.validate({ email, code })
         } catch (error) {
             console.error('Auth code validation failed: ', error.message)
             return rejectWithValue(error.message || 'Auth code validation')
         }
     }
-
 )
 
+export const authResetPassword = createAsyncThunk(
+    'auth/authResetPassword',
+    async ({ email, password }, { rejectWithValue }) => {
+        const comaintApi = ComaintBackendApiSingleton.getInstance()
+        try {
+            return await comaintApi.auth.resetPassword(email, password)
+        } catch (error) {
+            console.log("dOm Ac error", error)
+            return rejectWithValue(error.message || 'Send password reset code error')
+        }
+    }
+
+)
 export const loginUser = createAsyncThunk(
     'auth/loginUser',
     async ({ email, password }, { rejectWithValue, getState }) => {
@@ -74,6 +86,11 @@ const authSlice = createSlice({
             .addCase(validateAuthCode.pending,   (state) => { state.authStatus = STATUS.LOADING; state.authError = null })
             .addCase(validateAuthCode.fulfilled, (state) => { state.authStatus = STATUS.SUCCEEDED; state.isAuthenticated = true })
             .addCase(validateAuthCode.rejected,  (state, action) => { state.authStatus = STATUS.FAILED; state.authError = action.payload })
+
+            // send reset password validation code
+            .addCase(authResetPassword.pending,   (state) => { state.authStatus = STATUS.LOADING; state.authError = null })
+            .addCase(authResetPassword.fulfilled, (state) => { state.authStatus = STATUS.SUCCEEDED; state.isAuthenticated = true })
+            .addCase(authResetPassword.rejected,  (state, action) => { state.authStatus = STATUS.FAILED; state.authError = action.payload })
 
             // login
             .addCase(loginUser.pending,   (state) => { state.authStatus = STATUS.LOADING; state.authError = null })

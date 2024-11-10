@@ -40,15 +40,26 @@ class AuthApi {
         return response
     }
 
-    async validate({code}) {
+    async validate({email, code}) {
         if (code === undefined)
             throw new Error('Argument «code» not defined')
         const VALIDATE_ROUTE = 'api/v1/auth/validate'
-        // access token must be send because it contains user ID
-        const response = await this.#context.jsonPost(VALIDATE_ROUTE, {code}, {token:true})
+        let response
+        if (email !== undefined)
+            response= await this.#context.jsonPost(VALIDATE_ROUTE, {email, code}, {token:false})
+        else
+            response= await this.#context.jsonPost(VALIDATE_ROUTE, {code}, {token:true})
+        if (response.validated === undefined)
+            throw new Error('Invalid backend response')
+        const result = response.validated
         return response
     }
 
+    async resetPassword(email, password) {
+        const ROUTE = 'api/v1/auth/reset-password'
+        const response = await this.#context.jsonPost(ROUTE, {email, password}, {token:false})
+        return response
+    }
 
 }
 export default AuthApi

@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { registerUser, loginUser, logoutUser, validateAuthCode } from '../slices/authSlice'
+import { registerUser, loginUser, logoutUser, validateAuthCode, authResetPassword} from '../slices/authSlice'
 
 const useAuthActions = () => {
     const dispatch = useDispatch()
@@ -9,9 +9,9 @@ const useAuthActions = () => {
         return authState
     }
 
-    const register = (email, password) => {
+    const register = async (email, password) => {
         try {
-            const result = dispatch(registerUser({email, password}))
+            const result = await dispatch(registerUser({email, password}))
             if (registerUser.rejected.match(result)) {
                 const errorMessage = result.payload || 'Unknown error' // FIXME translation
                 throw new Error(errorMessage)
@@ -52,16 +52,45 @@ const useAuthActions = () => {
         }
     }
 
-    const validateCode = (code) => {
+    const validateCode = async (code) => {
         try {
-            const result = dispatch(validateAuthCode({code}))
+            const result = await dispatch(validateAuthCode({code}))
             if (validateAuthCode.rejected.match(result)) {
                 const errorMessage = result.payload || 'Unknown error' // FIXME translation
                 throw new Error(errorMessage)
             }
         }
         catch (error) {
-            console.error('Login failed: ', error.message)
+            console.error('Code validation failed: ', error.message)
+            throw error
+        }
+    }
+
+    const validateCodeWithEmail = async (email, code) => {
+        try {
+            const result = await dispatch(validateAuthCode({email, code}))
+            if (validateAuthCode.rejected.match(result)) {
+                const errorMessage = result.payload || 'Unknown error' // FIXME translation
+                throw new Error(errorMessage)
+            }
+        }
+        catch (error) {
+            console.error('Code validation failed: ', error.message)
+            throw error
+        }
+    }
+
+ 
+    const resetPassword = async (email, password) => {
+        try {
+            const result = await dispatch(authResetPassword({email, password}))
+            if (authResetPassword.rejected.match(result)) {
+                const errorMessage = result.payload || 'Unknown error' // FIXME translation
+                throw new Error(errorMessage)
+            }
+        }
+        catch (error) {
+            console.error('Reset password failed: ', error.message)
             throw error
         }
     }
@@ -72,7 +101,9 @@ const useAuthActions = () => {
         register,
         login,
         logout,
-        validateCode
+        validateCode,
+        validateCodeWithEmail,
+        resetPassword
     }
 }
 
