@@ -56,7 +56,7 @@ const controlObject = (objDef, object, options) => {
 		const propValue = object[propName]
 		if (propValue === undefined || propValue === null) {
 			if (fullCheck && propDef.mandatory)
-                return [ 'error.prop.is_not_defined', { property: propName } ]
+                return [ 'common:error.prop.is_not_defined', { property: propName } ]
 		}
 		else {
 			return controlObjectProperty (objDef, propName, object[propName])
@@ -69,7 +69,7 @@ const controlObject = (objDef, object, options) => {
  * Contrôle une propriété d'un objet dont le nom est passé en deuxième argument et dont la valeur est passée
  * en troisième argument avec la définition d'objet passée en premier argument.
  * Renvoie un tableau de deux éléments.
- * Le premier élément est soit un booléen contenant la valeur «false» la propriété contrôlée est valide
+ * Le premier élément est soit un booléen contenant la valeur «false» si la propriété contrôlée est valide
  * soit un identifiant de message d'erreur indiquant le problème rencontré.
  * Le deuxième élément du tableau est un objet contenant les clés/valeurs des différents paramètres du
  * message d'erreur.
@@ -102,11 +102,11 @@ const controlObjectProperty = (objDef, propName, propValue) => {
 		throw new Error(`Invalid property name [${propName}]`)
 
 	if (propValue === undefined)
-		return ['error.prop.has_no_value', {property: propName}]
+		return ['common:error.prop.has_no_value', {property: propName}]
 
 	if (propValue === null) {
 		if (propDef.mandatory)
-			return ['error.prop.is_null', {property: propName}]
+			return ['common:error.prop.is_null', {property: propName}]
 		else
 			return null // FIXME 
 	}
@@ -114,7 +114,7 @@ const controlObjectProperty = (objDef, propName, propValue) => {
 
 	if (propName === 'password')  {
         if (propDef.minimum && propValue.length < propDef.minimum )
-            return ['error.prop.password_to_small', {property: propName, size: propDef.minimum}]
+            return ['common:error.prop.password_to_small', {property: propName, size: propDef.minimum}]
         let nLower = 0
         let nUpper = 0
         let nDigit = 0
@@ -126,13 +126,13 @@ const controlObjectProperty = (objDef, propName, propValue) => {
             else nSpec++
         }
         if (nLower == 0)
-            return ['error.prop.password_no_lowercase_letter', {property: propName}]
+            return ['common:error.prop.password_no_lowercase_letter', {property: propName}]
         if (nUpper == 0)
-            return ['error.prop.password_no_uppercase_letter', {property: propName}]
+            return ['common:error.prop.password_no_uppercase_letter', {property: propName}]
         if (nDigit == 0)
-            return ['error.prop.password_no_digit_character', {property: propName}]
+            return ['common:error.prop.password_no_digit_character', {property: propName}]
         if (nSpec == 0)
-            return ['error.prop.password_no_special_character', {property: propName}]
+            return ['common:error.prop.password_no_special_character', {property: propName}]
         return [ false ] // no error
     }
 
@@ -141,53 +141,52 @@ const controlObjectProperty = (objDef, propName, propValue) => {
 		case 'id':
 		case 'link':
 			if (typeof(propValue) !== 'number' )
-				return ['error.prop.is_not_an_integer', {property: propName}]
+				return ['common:error.prop.is_not_an_integer', {property: propName}]
             return [ false ] // no error
 
 		case 'integer':
 			if (typeof(propValue) !== 'number' )
-				return ['error.prop.is_not_an_integer', {property: propName}]
+				return ['common:error.prop.is_not_an_integer', {property: propName}]
 			if (propDef.minimum && propValue < propDef.minimum )
-				return ['error.prop.is_too_small', {property: propName, size: propDef.minimum}]
+				return ['common:error.prop.is_too_small', {property: propName, size: propDef.minimum}]
 			if (propDef.maximum && propValue > propDef.maximum )
-				return ['error.prop.is_too_large', {property: propName, size: propDef.maximum}]
+				return ['common:error.prop.is_too_large', {property: propName, size: propDef.maximum}]
             return [ false ] // no error
 
 		case 'string':
 		case 'text':
 		case 'image':
 			if (typeof(propValue) !== 'string' )
-				return ['error.prop.is_not_a_string', {property: propName}]
+				return ['common:error.prop.is_not_a_string', {property: propName}]
 			if (propDef.minimum && propValue.length < propDef.minimum )
-				return ['error.prop.is_too_short', {property: propName, size: propDef.minimum}]
+				return ['common:error.prop.is_too_short', {property: propName, size: propDef.minimum}]
 			if (propDef.maximum && propValue.length > propDef.maximum )
-				return ['error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
+				return ['common:error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
 			if (propDef.type !== 'text' && propValue.includes('\n'))
-				return ['error.prop.contains_line_feeds',  {property: propName, size: propDef.maximum}]
+				return ['common:error.prop.contains_line_feeds',  {property: propName, size: propDef.maximum}]
             return [ false ] // no error
 
 		case 'email':
 			if (typeof(propValue) !== 'string' )
-				return ['error.prop.is_not_a_string', {property: propName}]
+				return ['common:error.prop.is_not_a_string', {property: propName}]
 			if (propDef.minimum && propValue.length < propDef.minimum )
-				return ['error.prop.is_too_short', {property: propName, size: propDef.minimum}]
+				return ['common:error.prop.is_too_short', {property: propName, size: propDef.minimum}]
 			if (propDef.maximum && propValue.length > propDef.maximum )
-				return ['error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
+				return ['common:error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
 			if (propValue.match(/\S+@\S+\.\S+/) === null)
-				return ['error.prop.is_malformed_email', {property: 'email'}]
+				return ['common:error.prop.is_malformed_email', {property: 'email'}]
             return [ false ] // no error
 
 		case 'date':
 		case 'datetime':
 			if (typeof(propValue) !== 'object' || propValue.constructor.name !== 'date')
-				return ['error.prop.is_not_a_date', {property: propName}]
+				return ['common:error.prop.is_not_a_date', {property: propName}]
             return [ false ] // no error
 
 		case 'boolean':
 			if (typeof(propValue) !== 'boolean')
-				return ['error.prop.is_not_a_boolean', {property: propName}]
+				return ['common:error.prop.is_not_a_boolean', {property: propName}]
             return [ false ] // no error
-
 
 		default:
 			throw new Error(`Property type [${propDef.type}] not supported`)
