@@ -41,6 +41,7 @@ CREATE TABLE users(
 	state INTEGER NOT NULL DEFAULT '0',
 	last_use DATETIME,
 	administrator BOOLEAN NOT NULL DEFAULT false,
+	manager BOOLEAN NOT NULL DEFAULT false,
 	auth_action VARCHAR(16),
 	auth_data VARCHAR(255),
 	auth_code INTEGER DEFAULT '0',

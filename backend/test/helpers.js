@@ -82,7 +82,7 @@ const connectWithAdminAccount = async () => {
 }
 
 const userPublicProperties = [
-    'id', 'email', 'firstname', 'lastname', 'state', 'lastUse', 'administrator', 'companyId'
+    'id', 'email', 'firstname', 'lastname', 'state', 'lastUse', 'administrator', 'manager', 'companyId'
 ]
 
 export {

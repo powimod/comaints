@@ -52,6 +52,12 @@ const userObjectDef = {
         "mandatory": "true",
         "scope": "public"
     },
+    "manager" : {
+        "type": "boolean",
+        "default": "false",
+        "mandatory": "true",
+        "scope": "public"
+    },
     "authAction" : {
         "type": "string",
         "field": "auth_action",

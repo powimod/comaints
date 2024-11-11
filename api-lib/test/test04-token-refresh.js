@@ -54,7 +54,7 @@ describe('Check token refresh', () => {
         // and API request will be successfull
         const result = await api.account.getProfile({expiredAccessTokenEmulation:true})
         expect(result).to.be.instanceOf(Object)
-        expect(result).to.have.keys('id', 'email', 'firstname', 'lastname', 'state', 'lastUse', 'administrator', 'companyId')
+        expect(result).to.have.keys('id', 'email', 'firstname', 'lastname', 'state', 'lastUse', 'administrator', 'manager', 'companyId')
         expect(result.id).to.be.a('number')
         expect(result.email).to.be.a('string').and.to.equal(userEmail)
         expect(result.firstname).to.equal(null)

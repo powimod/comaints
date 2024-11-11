@@ -95,6 +95,9 @@ objects:
       - name: "administrator"
         type: "boolean"
         default: false
+      - name: "manager"
+        type: "boolean"
+        default: false
 
       - name : "authAction"
         scope: "protected"
