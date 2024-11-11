@@ -8,12 +8,14 @@ import UserModelSingleton     from './models/UserModel.js'
 import AccountModelSingleton  from './models/AccountModel.js'
 import TokenModelSingleton    from './models/TokenModel.js'
 import AuthModelSingleton     from './models/AuthModel.js'
+import AdminModelSingleton    from './models/AdminModel.js'
 
 class Model {
     #config = null
     #dbPool = null
     #authModel = null
     #accountModel = null
+    #adminModel = null
     #companyModel = null
     #userModel = null
     #tokenModel = null
@@ -111,6 +113,9 @@ class Model {
         this.#accountModel = AccountModelSingleton.getInstance()
         this.#accountModel.initialize(dbPool)
 
+        this.#adminModel = AccountModelSingleton.getInstance()
+        this.#adminModel.initialize(dbPool)
+
         this.#companyModel = CompanyModelSingleton.getInstance()
         this.#companyModel.initialize(dbPool)
     }
@@ -140,6 +145,10 @@ class Model {
 
     getUserModel() {
         return this.#userModel
+    }
+
+    getAdminModel() {
+        return this.#adminModel
     }
 
     getAccountModel() {

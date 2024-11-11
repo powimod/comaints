@@ -7,6 +7,7 @@ import { ComaintApiErrorInvalidRequest } from '../../common/src/error.mjs'
 import AuthRoutesSingleton    from './routes/AuthRoutes.js'
 import AccountRoutesSingleton from './routes/AccountRoutes.js'
 import CompanyRoutesSingleton from './routes/CompanyRoutes.js'
+import AdminRoutesSingleton   from './routes/AdminRoutes.js'
 import UserRoutesSingleton    from './routes/UserRoutes.js'
 import TokenRoutesSingleton   from './routes/TokenRoutes.js'
 
@@ -16,6 +17,7 @@ class Controller {
 
 	#authRoutes = null;
 	#accountRoutes = null;
+	#adminRoutes = null;
 	#companyRoutes = null;
 	#userRoutes = null;
 	#tokenRoutes = null;
@@ -40,6 +42,9 @@ class Controller {
 
         this.#companyRoutes = CompanyRoutesSingleton.getInstance()
         this.#companyRoutes.initialize(expressApp)
+
+        this.#adminRoutes = AdminRoutesSingleton.getInstance()
+        this.#adminRoutes.initialize(expressApp)
 
         this.#userRoutes = UserRoutesSingleton.getInstance()
         this.#userRoutes.initialize(expressApp)
