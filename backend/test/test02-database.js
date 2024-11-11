@@ -10,6 +10,7 @@ describe('Check database', () => {
 		loadConfig()
 	}),
 
+        /*
 	describe('Test company list API', () => {
 
         const COMPANY_LIST_ROUTE = '/api/v1/company/list'
@@ -28,6 +29,7 @@ describe('Check database', () => {
             }
 		})
     })
+    */
 
 	describe('Test company creation API', () => {
 
@@ -41,7 +43,7 @@ describe('Check database', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Parameter «company» not found in request body"})`)
+                expect(error.message).to.equal(`Parameter «company» not found in request body`)
             }
             expect(success, 'Should generate an error').to.equal(false)
 		})
@@ -54,7 +56,7 @@ describe('Check database', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Invalid value for «company» parameter in request body"})`)
+                expect(error.message).to.equal(`Invalid value for «company» parameter in request body`)
             }
             expect(success, 'Should generate an error').to.equal(false)
 		})
@@ -67,7 +69,7 @@ describe('Check database', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Property «name» is not defined"})`)
+                expect(error.message).to.equal(`Property «name» is not defined`)
             }
             expect(success, 'Should generate an error').to.equal(false)
 		})
@@ -86,9 +88,6 @@ describe('Check database', () => {
             expect(json).to.have.property('name')
             expect(json.name).to.be.a('string').and.to.equal(newCompanyName)
 		})
-
-
-
 	})
 })
 

@@ -1,0 +1,25 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # return a 404 error for Markdown request if file does not exist
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule \.md$ - [R=404,L]
+
+  # proxy to serve locales/common from backend
+  RewriteCond %{REQUEST_URI} ^/locales/common [NC]
+  RewriteRule ^(.*)$ http://localhost:9101/$1 [P,L]
+
+  # proxy to serve API from backend
+  RewriteCond %{REQUEST_URI} ^/api [NC]
+  RewriteRule ^(.*)$ http://localhost:9101/$1 [P,L]
+
+  # Serve immediately if file exists
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Redirect all other requests to React index page
+  RewriteRule ^ index.html [L]
+</IfModule>
+

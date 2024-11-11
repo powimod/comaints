@@ -6,10 +6,13 @@ import i18next from 'i18next'
 import Backend from 'i18next-fs-backend'
 import middleware from 'i18next-http-middleware'
 import dotenv from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url';
 
 import MailManagerModel from './MailManager.js'
 import ModelSingleton from './model.js'
 import ControllerSingleton from './controller.js'
+import View from './view.js'
 
 dotenv.config()
 
@@ -23,11 +26,30 @@ const main = async () => {
     i18next.use(Backend).use(middleware.LanguageDetector).init({
         fallbackLng: 'en',
         preload: ['en', 'fr'],
+        ns: [ 'backend', 'common'],
+        defaultNS: 'backend',
         backend: {
-            loadPath: './locales/{{lng}}/translation.json'
+            loadPath: (lng, ns) => {
+                if (ns === 'common')
+                    return `../${ns}/locales/${lng}.json`
+                return `./locales/${lng}.json`
+            }
         }
     })
     app.use(middleware.handle(i18next))
+
+    // TODO remove this route
+    app.get(`/api/translation`, (request, response) => {
+        const view = new View(request, response)
+        view.json({ 
+            commun: view.translation('common:common_message'),
+            message: view.translation('backend:general.welcome') 
+        })
+    })
+
+    // serve common locale files
+    const __dirname = path.dirname(fileURLToPath(import.meta.url))
+    app.use('/locales/common', express.static(path.join(__dirname, '../../common/locales/')))
 
     // configuration is defined in «.env» file
     const env = process.env
@@ -58,6 +80,8 @@ const main = async () => {
             user: env.DB_USER || 'admin',
             retry_interval: env.DB_RETRY_INTERVAL || 10, // seconds
             max_retries: env.DB_MAX_RETRIES || -1, // -1:infinity
+            ping_interval: env.DB_PING_INTERVAL || 600, // 10 minutes 
+            connection_limit: env.DB_CONNECTION_LIMIT || 10, // max number of connexion in pool
             password: dbPassword
         },
         security: {
@@ -87,12 +111,15 @@ const main = async () => {
 	await controller.initialize(config, app)
 
 
-    // catch CTRL+C interuption
-    process.on('SIGINT', async () => {
+    // catch signals to stop daemon
+    const stopService = async () => {
         console.log('Stopping Comaint backend...')
 	    await model.terminate()
         process.exit(0)
-    })
+    }
+    process.on('SIGINT' , stopService) // catch CTRL+C signal 
+    process.on('SIGTERM', stopService) // catch CTRL+D signal (sent by SystemD)
+
 
     const port = config.server.port
     
@@ -114,10 +141,8 @@ const main = async () => {
 
 
 main()
-/* TODO reactivate this
 . catch (error => {
 	const message = error.message ? error.message : error
     console.error(`ERROR : Can not start Comaint backend : ${message}`)
 	process.exit(1)
 })
-*/

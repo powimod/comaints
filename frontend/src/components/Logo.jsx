@@ -1,6 +1,4 @@
-
 import logoSvg from '../assets/logo.svg'
-
 import '../scss/logo.scss'
 
 const Logo = (props) => {

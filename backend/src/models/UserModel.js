@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt'
 import { buildFieldArrays, controlObject, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs'
+import { AccountState } from '../../../common/src/global.mjs'
 
 class UserModel {
     #db = null
@@ -105,14 +106,27 @@ class UserModel {
         return user
     }
 
+    async changePasswordHash(email, encryptedPassword) {
+        // remet le compte à l'état actif (state=1) au cas où il ait été verrouillé
+        const sqlRequest = `UPDATE users SET password = ?, state = ? WHERE email = ?`
+        await this.#db.query(sqlRequest, [ encryptedPassword, AccountState.ACTIVE, email])
+    }
+
+
+    async encryptPassword(password) {
+        assert (password !== undefined)
+        if (password === undefined)
+            return
+        return await bcrypt.hash(password, this.#hashSalt)
+    }
+
 
     async encryptPasswordIfPresent(user) {
         assert (user !== undefined)
         if (user.password === undefined)
             return
-        user.password = await bcrypt.hash(user.password, this.#hashSalt)
+        user.password = await this.encryptPassword(user.password) 
     }
-
 
 
     async checkPassword(userId, password) {
@@ -131,8 +145,8 @@ class UserModel {
         const hashedPassword = result[0].password
         const isValid = await bcrypt.compare(password, hashedPassword)
         return isValid
-
     }
+
 
     async checkAuthCode(userId, authCode) {
         if (userId === undefined)

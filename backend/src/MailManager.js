@@ -36,7 +36,6 @@ class MailManager {
                     pass: this.#password
                 },
                 tls: {
-                    // TODO remove this
                     rejectUnauthorized: false
                 }
             })
@@ -48,11 +47,10 @@ class MailManager {
                 html: htmlBody
             }
             transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    reject(error)
-                    return
-                }
-                resolve(`Message ${info.messageId} sent: ${info.response}`)
+                if (error) 
+                    resolve(`Mail not sent: ${error}`) // do not reject if an error occures
+                else
+                    resolve(`Message ${info.messageId} sent: ${info.response}`)
             })
         })
     }

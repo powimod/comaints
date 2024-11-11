@@ -5,7 +5,6 @@ import assert from 'assert'
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
 import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserByEmail } from './helpers.js'
 
-
 const ROUTE_LOGIN = 'api/v1/auth/login'
 const ROUTE_LOGOUT = 'api/v1/auth/logout'
 const ROUTE_PROFILE = 'api/v1/account/profile'
@@ -38,7 +37,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Parameter «email» not found in request body"})`)
+                expect(error.message).to.equal(`Parameter «email» not found in request body`)
             }
         })
 
@@ -52,7 +51,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Property «email» is too short"})`)
+                expect(error.message).to.equal(`Property «email» is too short`)
             }
         })
 
@@ -66,7 +65,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Property «email» is not a valid email"})`)
+                expect(error.message).to.equal(`Property «email» is not a valid email`)
             }
         })
 
@@ -81,7 +80,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «password» not found in request body"})')
+                expect(error.message).to.equal('Parameter «password» not found in request body')
             }
         })
 
@@ -97,7 +96,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password is too small"})')
+                expect(error.message).to.equal('Password is too small')
             }
         })
 
@@ -112,7 +111,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain uppercase letter"})')
+                expect(error.message).to.equal('Password does not contain uppercase letter')
             }
         })
 
@@ -127,7 +126,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain digit character"})')
+                expect(error.message).to.equal('Password does not contain digit character')
             }
         })
 
@@ -142,7 +141,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain special character"})')
+                expect(error.message).to.equal('Password does not contain special character')
             }
         })
 
@@ -157,7 +156,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+                expect(error.message).to.equal('Unauthorized access')
             }
         })
 
@@ -172,7 +171,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+                expect(error.message).to.equal('Invalid EMail or password')
             }
         })
 
@@ -181,28 +180,30 @@ describe('Test user login', () => {
                     email:user.email,
                     password: PASSWORD
                 })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('access-token')
-            expect(json['access-token']).to.be.a('string')
-            expect(json).to.have.property('refresh-token')
-            expect(json['refresh-token']).to.be.a('string')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'message', 'access-token', 'refresh-token')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.be.a('string').and.to.equal(user.email)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+            expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
+            expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
             // check token in util.js
             expect(accessToken).not.to.equal(null)
             expect(refreshToken).not.to.equal(null)
         })
+
         it('Get user profile', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.property('id')
-            expect(user.id).to.equal(user.id)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
-            expect(user.state).to.be.a('number').and.to.equal(1) // active
-            expect(user.administrator).to.be.a('boolean').and.to.equal(false)
-            expect(user.companyId).to.equal(null)
+            expect(json).to.have.property('profile')
+            const profile = json.profile
+            expect(profile).to.have.keys(userPublicProperties)
+            expect(profile).to.be.instanceOf(Object)
+            expect(profile).to.have.property('id')
+            expect(profile.id).to.equal(user.id)
+            expect(profile.email).to.be.a('string').and.to.equal(user.email)
+            expect(profile.state).to.be.a('number').and.to.equal(1) // active
+            expect(profile.administrator).to.be.a('boolean').and.to.equal(false)
+            expect(profile.companyId).to.equal(null)
         })
 
         it('Try to login when already logged', async () => {
@@ -215,18 +216,18 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"User already connected"})')
+                expect(error.message).to.equal('User already connected')
             }
         })
 
         it('Call logout route being connected', async () => {
             const json = await jsonPost(ROUTE_LOGOUT, {})
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.equal(null)
-            expect(json).to.have.property('access-token')
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.equal(null)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(false)
+            expect(json.message).to.be.a('string').and.to.equal('logout success')
             expect(json['access-token']).to.equal(null)
-            expect(json).to.have.property('refresh-token')
             expect(json['refresh-token']).to.equal(null)
             // check token in util.js
             expect(accessToken).to.equal(null)
@@ -240,7 +241,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+                expect(error.message).to.equal('Unauthorized access')
             }
         })
 
@@ -249,11 +250,13 @@ describe('Test user login', () => {
                     email:user.email,
                     password: PASSWORD
                 })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('access-token')
-            expect(json['access-token']).to.be.a('string')
-            expect(json).to.have.property('refresh-token')
-            expect(json['refresh-token']).to.be.a('string')
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.be.a('string').and.to.equal(user.email)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+            expect(json.message).to.be.a('string').and.to.equal('login success')
+            expect(json['access-token']).not.to.equal(null)
+            expect(json['refresh-token']).not.to.equal(null)
             // check token in util.js
             expect(accessToken).not.to.equal(null)
             expect(refreshToken).not.to.equal(null)
@@ -262,25 +265,25 @@ describe('Test user login', () => {
         it('Get user profile', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.id).to.equal(user.id)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
-            expect(user.state).to.be.a('number').and.to.equal(1) // active
-            expect(user.administrator).to.be.a('boolean').and.to.equal(false)
-            expect(user.companyId).to.equal(null)
+            expect(json).to.have.property('profile')
+            const profile = json.profile
+            expect(profile).to.be.instanceOf(Object)
+            expect(profile).to.have.keys(userPublicProperties)
+            expect(profile.id).to.equal(user.id)
+            expect(profile.email).to.be.a('string').and.to.equal(user.email)
+            expect(profile.state).to.be.a('number').and.to.equal(1) // active
+            expect(profile.administrator).to.be.a('boolean').and.to.equal(false)
+            expect(profile.companyId).to.equal(null)
         })
 
         it('Call logout route', async () => {
             const json = await jsonPost(ROUTE_LOGOUT, {})
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.equal(null)
-            expect(json).to.have.property('access-token')
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.equal(null)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(false)
+            expect(json.message).to.be.a('string').and.to.equal('logout success')
             expect(json['access-token']).to.equal(null)
-            expect(json).to.have.property('refresh-token')
             expect(json['refresh-token']).to.equal(null)
             // check token in util.js
             expect(accessToken).to.equal(null)
@@ -302,7 +305,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+                expect(error.message).to.equal('Invalid EMail or password')
             }
         })
         it('Check user in database after first login attempt', async () => {
@@ -325,7 +328,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+                expect(error.message).to.equal('Invalid EMail or password')
             }
         })
         it('Check user in database after second login attempt', async () => {
@@ -348,7 +351,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid EMail or password"})')
+                expect(error.message).to.equal('Invalid EMail or password')
             }
         })
 

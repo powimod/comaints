@@ -74,6 +74,7 @@ dialog.standard-dialog {
         display: flex;
         justify-content: center;
         gap: 2rem;
+        padding: 1rem;
         & > button {
             min-width: 6rem; /* TODO hard coded min button size */
             min-height: 4rem; /* TODO hard coded min button size */
@@ -83,4 +84,28 @@ dialog.standard-dialog {
     }
 
 }
+
+.input-container {
+	display: flex;
+	flex-direction: column;
+	margin-top:0.4rem;
+	margin-top:0.2rem;
+
+}
+
+.button-bar {
+	display: flex;
+    gap:1rem;
+	justify-content: center;
+	margin: 1rem 0.3rem;
+}
+
+.button-bar-right {
+	display: flex;
+    gap:1rem;
+	justify-content: end;
+	margin: 1rem 0.3rem;
+}
+
+
 

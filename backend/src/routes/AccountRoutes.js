@@ -4,7 +4,6 @@ import assert from 'assert'
 
 import View from '../view.js'
 import ModelSingleton from '../model.js'
-import ControllerSingleton from '../controller.js'
 import { requireUserAuth } from './AuthRoutes.js'
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs'
 import { controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs'
@@ -13,19 +12,18 @@ import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 class AccountRoutes {
 
     initialize(expressApp) {
-        const controller = ControllerSingleton.getInstance()
         const model  = ModelSingleton.getInstance()
 
         const accountModel = model.getAccountModel()
 
         expressApp.get('/api/v1/account/profile', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null)
                 let user = await accountModel.getUserProfile(userId)
                 user = buildPublicObjectVersion(userObjectDef, user)
-                view.json({ user })
+                view.json({ profile:user })
             }
             catch(error) {
                 view.error(error)
@@ -33,7 +31,7 @@ class AccountRoutes {
         })
 
         expressApp.post('/api/v1/account/change-password', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null)
@@ -77,7 +75,7 @@ class AccountRoutes {
 
 
         expressApp.post('/api/v1/account/change-email', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null)
@@ -131,7 +129,7 @@ class AccountRoutes {
         })
 
         expressApp.post('/api/v1/account/delete', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null)
@@ -165,7 +163,7 @@ class AccountRoutes {
                 if (sendCodeByEmail)
                     await accountModel.sendAccountDeletionAuthCode(authCode, user.email, view.translation)
 
-                view.json({message: 'Done, waiting for validation code'})
+                view.json({ message: 'Done, waiting for validation code' })
             }
             catch(error) {
                 view.error(error)
@@ -173,7 +171,7 @@ class AccountRoutes {
         })
 
         expressApp.post('/api/v1/account/unlock', requireUserAuth, async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 const userId = request.userId
                 assert(userId !== null)

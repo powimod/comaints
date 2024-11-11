@@ -2,7 +2,6 @@
 
 import View from '../view.js'
 import ModelSingleton from '../model.js'
-import ControllerSingleton from '../controller.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
 
 import { controlObject } from '../../../common/src/objects/object-util.mjs'
@@ -11,21 +10,20 @@ import companyObjectDef from '../../../common/src/objects/company-object-def.mjs
 class CompanyRoutes {
 
     initialize(expressApp) {
-        const controller = ControllerSingleton.getInstance()
 	    const model  = ModelSingleton.getInstance()
         
         const companyModel = model.getCompanyModel()
 
         // TODO ajouter withAuth
 	    expressApp.get('/api/v1/company/list', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
 			const companyList = await companyModel.findCompanyList()
             view.json({ companyList })
         })
 
         // TODO ajouter withAuth
         expressApp.post('/api/v1/company', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 let company = request.body.company
                 if (company === undefined)

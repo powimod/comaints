@@ -33,11 +33,11 @@ describe('Test change password route', () => {
     it('Check profile access', async () => {
         const json = await jsonGet(ROUTE_PROFILE)
         expect(json).to.be.instanceOf(Object)
-        expect(json).to.have.property('user')
-        const user = json.user
-        expect(user).to.be.instanceOf(Object)
-        expect(user).to.have.keys(userPublicProperties)
-        expect(user.email).to.be.a('string').and.to.equal(user.email)
+        expect(json).to.have.property('profile')
+        const profile= json.profile
+        expect(profile).to.be.instanceOf(Object)
+        expect(profile).to.have.keys(userPublicProperties)
+        expect(profile.email).to.be.a('string').and.to.equal(user.email)
     })
 
 
@@ -49,7 +49,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «currentPassword» not found in request body"})')
+                expect(error.message).to.equal('Parameter «currentPassword» not found in request body')
             }
         })
 
@@ -60,7 +60,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Invalid value for «currentPassword» parameter in request body"})')
+                expect(error.message).to.equal('Invalid value for «currentPassword» parameter in request body')
             }
         })
 
@@ -71,7 +71,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password is too small"})')
+                expect(error.message).to.equal('Password is too small')
             }
         })
 
@@ -82,7 +82,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Invalid value for «newPassword» parameter in request body"})')
+                expect(error.message).to.equal('Invalid value for «newPassword» parameter in request body')
             }
         })
 
@@ -93,7 +93,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password is too small"})')
+                expect(error.message).to.equal('Password is too small')
             }
         })
 
@@ -106,7 +106,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid password"})')
+                expect(error.message).to.equal('Invalid password')
             }
         })
     })
@@ -122,12 +122,12 @@ describe('Test change password route', () => {
 
         it('Call logout route', async () => {
             const json = await jsonPost(ROUTE_LOGOUT, {})
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.equal(null)
-            expect(json).to.have.property('access-token')
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.equal(null)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(false)
+            expect(json.message).to.be.a('string').and.to.equal('logout success')
             expect(json['access-token']).to.equal(null)
-            expect(json).to.have.property('refresh-token')
             expect(json['refresh-token']).to.equal(null)
             // check token in util.js
             expect(accessToken).to.equal(null)
@@ -141,7 +141,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+                expect(error.message).to.equal('Unauthorized access')
             }
         })
 
@@ -152,7 +152,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+                expect(error.message).to.equal('Unauthorized access')
             }
         })
 
@@ -162,11 +162,13 @@ describe('Test change password route', () => {
                     email:user.email,
                     password: NEW_PASSWORD
                 })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('access-token')
-            expect(json['access-token']).to.be.a('string')
-            expect(json).to.have.property('refresh-token')
-            expect(json['refresh-token']).to.be.a('string')
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.be.a('string').and.to.equal(user.email)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+            expect(json.message).to.be.a('string').and.to.equal('login success')
+            expect(json['access-token']).not.to.equal(null)
+            expect(json['refresh-token']).not.to.equal(null)
             // check token in util.js
             expect(accessToken).not.to.equal(null)
             expect(refreshToken).not.to.equal(null)
@@ -175,11 +177,11 @@ describe('Test change password route', () => {
         it('Get profile', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            expect(json).to.have.property('profile')
+            const profile = json.profile
+            expect(profile).to.be.instanceOf(Object)
+            expect(profile).to.have.keys(userPublicProperties)
+            expect(profile.email).to.be.a('string').and.to.equal(user.email)
         })
 
     })

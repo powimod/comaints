@@ -11,7 +11,7 @@ import AuthModelSingleton     from './models/AuthModel.js'
 
 class Model {
     #config = null
-    #dbConnection = null
+    #dbPool = null
     #authModel = null
     #accountModel = null
     #companyModel = null
@@ -19,6 +19,7 @@ class Model {
     #tokenModel = null
 
     async initialize(config) {
+        this.#config = config
 
         // check «database» configuration section 
         const dbConfig = config.database
@@ -26,7 +27,7 @@ class Model {
             throw new Error(`Config «database» section not defined`)
         const dbParameterNames = [ 
             'name', 'host', 'port', 'user', 'password', 
-            'retry_interval', 'max_retries'
+            'retry_interval', 'max_retries', 'ping_interval'
         ]
         for (const parameterName of dbParameterNames ) {
             if (dbConfig[parameterName] === undefined)
@@ -42,63 +43,87 @@ class Model {
 		let maxRetries = dbConfig.max_retries
         if (maxRetries < 0)
             maxRetries = Infinity
-		this.#dbConnection = null
-		let dbConnection = null
+
+        // L'initialisation du pool ne tente pas directement une connexion à la base
+        // les connexions réelles à la base se font lors des requêtes
+		let dbPool =  await mysql.createPool({
+            host: dbConfig.host,
+            database: dbConfig.name,
+            user: dbConfig.user,
+            password: dbConfig.password,
+            connectionLimit: dbConfig.connection_limit,
+            reconnect: true // activated by default
+        })
+
+        let connection = false
 		for (let retry = 0; retry < maxRetries ; retry++){
 			console.log(`Connecting database ...`)
 			try {
-                dbConnection = await mysql.createConnection({
-                    host: dbConfig.host,
-                    database: dbConfig.name,
-                    user: dbConfig.user,
-                    password: dbConfig.password,
-                })
-				if (dbConnection.code === undefined)
-					break
-				console.error(`Can not open database : ${db.code}`)
-				dbConnection = null
+                // execute a fake query to initialize database connection
+                await dbPool.query('SELECT 1')
+                connection = true
+                break
 			}
 			catch (error) {
 				console.log(`Database connection error : ${error.message}`)
 			}
-		    dbConnection = null
 			console.log(`Connection retry n°${retry+1}/${maxRetries} : waiting ${retryInterval}s...`)
 			await sleep(retryInterval * 1000)
 		}
-        if (dbConnection === null)
+        if (connection === false)
             throw new Error(`Can not connect database`)
+
+        this.#dbPool = dbPool
+
+		// setting regular database ping to keep connection alive
+		const pingInterval = dbConfig.ping_interval
+		console.log(`Database ping interval : ${pingInterval}s`)
+        let interrupt = false
+		setInterval( async () => {
+			try {
+				await dbPool.query('SELECT 1')
+                if (interrupt) {
+				    console.log('Database connection resumed') 
+                    interrupt = false
+                }
+			} catch(error) {
+                if (! interrupt) {
+				    console.log('Database connection lost') 
+                }
+				console.log(`Database ping error : ${error.message}`)
+                interrupt = true
+			}
+		}, pingInterval * 1000)
+
 
         // IMPORTANT : do not change modele declaration order because of module dependencies
         this.#userModel = UserModelSingleton.getInstance()
-        this.#userModel.initialize(dbConnection, config.security.hashSalt)
+        this.#userModel.initialize(dbPool, config.security.hashSalt)
 
         this.#tokenModel = TokenModelSingleton.getInstance()
-        this.#tokenModel.initialize(dbConnection)
+        this.#tokenModel.initialize(dbPool)
 
         // authModel depends on userModel and tokenModel
         this.#authModel = AuthModelSingleton.getInstance()
-        this.#authModel.initialize(dbConnection, config.security)
+        this.#authModel.initialize(dbPool, config.security)
 
         // authModel depends on authModel
         this.#accountModel = AccountModelSingleton.getInstance()
-        this.#accountModel.initialize(dbConnection)
+        this.#accountModel.initialize(dbPool)
 
         this.#companyModel = CompanyModelSingleton.getInstance()
-        this.#companyModel.initialize(dbConnection)
-
-        this.#dbConnection = dbConnection
-        this.#config = config
+        this.#companyModel.initialize(dbPool)
     }
 
     async terminate() {
-        if (! this.#dbConnection)
+        if (this.#dbPool !== null)
             return
-        await this.#dbConnection.end()
-        this.#dbConnection = null
+        await this.#dbPool.end()
+        this.#dbPool = null
     }
 
     async checkAccess() {
-        const rows = await this.#dbConnection.query('SELECT 1');
+        const rows = await this.#dbPool.query('SELECT 1');
         // [ RowDataPacket { '1': 1 } ]
         if (! (rows instanceof Array))
             throw new Error('Invalid result')

@@ -13,36 +13,58 @@ const ROUTE_PROFILE  = 'api/v1/account/profile'
 
 describe('Test user login', () => {
 
+    const dte = new Date()
+    const userEmail1 = `u${dte.getTime()}-a@x.y`
+    const userEmail2 = `u${dte.getTime()}-b@x.y`
+
     const PASSWORD = '4BC+d3f-6H1.lMn!'
-    let user = null
+    let user1 = null
+    let user2 = null
     let cpyAccessToken
     let cpyRefreshToken
 
     before( async () =>  {
         loadConfig()
         await connectDb()
-        user = await createUserAccount({password: PASSWORD})
+        user1 = await createUserAccount({email:userEmail1, password: PASSWORD, logout:true})
+        user2 = await createUserAccount({email:userEmail2, password: PASSWORD, logout:true})
     }),
 
     after( async () =>  {
-        await deleteUserAccount(user)
+        await deleteUserAccount(user1)
+        await deleteUserAccount(user2)
         await disconnectDb()
     }),
 
-    describe(`Call route /${ROUTE_LOGIN} with valid data`, () => {
+    describe(`Call route /${ROUTE_LOGIN}`, () => {
+
+        it('Call login route', async () => {
+            let json = await jsonPost(ROUTE_LOGIN, {
+                    email:userEmail1,
+                    password: PASSWORD
+                })
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'message', 'access-token', 'refresh-token')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.be.a('string').and.to.equal(userEmail1)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+            expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
+            expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
+            // check token in util.js
+            expect(accessToken).not.to.equal(null)
+            expect(refreshToken).not.to.equal(null)
+        })
 
         it('Check profile access', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            expect(json).to.have.property('profile')
+            const user1 = json.profile
+            expect(user1).to.be.instanceOf(Object)
+            expect(user1).to.have.keys(userPublicProperties)
+            expect(user1.email).to.be.a('string').and.to.equal(userEmail1)
             cpyAccessToken = accessToken
             cpyRefreshToken = refreshToken
         })
-
 
         it('Try to access with emulation of an expired token', async () => {
             try {
@@ -51,9 +73,9 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Expired access token","refresh-token":null,"access-token":null})')
-                expect(accessToken).to.equal(null)
-                expect(refreshToken).to.equal(null)
+                expect(error.message).to.equal('Expired token')
+                expect(accessToken).to.equal(null) // access token reset
+                expect(refreshToken).not.to.equal(null) // refresh token still present
             }
         })
 
@@ -65,7 +87,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «token» not found in request body"})')
+                expect(error.message).to.equal('Parameter «token» not found in request body')
             }
         })
 
@@ -76,7 +98,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Invalid value for «token» parameter in request body"})')
+                expect(error.message).to.equal('Invalid value for «token» parameter in request body')
             }
         })
 
@@ -88,24 +110,24 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Invalid token"})')
+                expect(error.message).to.equal('Invalid token')
             }
         })
-
 
 
         it('Refresh access token', async () => {
             const json = await jsonPost(ROUTE_REFRESH, {token: cpyRefreshToken})
             expect(json).to.be.instanceOf(Object)
 
-            expect(json).to.have.property('access-token')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
+            expect(json.message).to.be.a('string').and.to.equal('token refresh done')
+
             const newAccessToken = json['access-token']
-            expect(newAccessToken).to.be.a('string')
+            expect(newAccessToken).to.be.a('string').and.to.have.length.above(0)
             expect(newAccessToken !== cpyAccessToken)
 
-            expect(json).to.have.property('refresh-token')
             const newRefreshToken = json['refresh-token']
-            expect(newRefreshToken).to.be.a('string')
+            expect(newRefreshToken).to.be.a('string').and.to.have.length.above(0)
             expect(newRefreshToken !== cpyRefreshToken)
 
             // check HTTP header tokens
@@ -117,11 +139,11 @@ describe('Test user login', () => {
         it('Check profile access', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            expect(json).to.have.property('profile')
+            const user1 = json.profile
+            expect(user1).to.be.instanceOf(Object)
+            expect(user1).to.have.keys(userPublicProperties)
+            expect(user1.email).to.be.a('string').and.to.equal(userEmail1)
             cpyAccessToken = accessToken
             cpyRefreshToken = refreshToken
         })
@@ -129,14 +151,74 @@ describe('Test user login', () => {
         it('Check profile access with new token', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.email).to.be.a('string').and.to.equal(user.email)
+            expect(json).to.have.keys('profile')
+            const user1 = json.profile
+            expect(user1).to.be.instanceOf(Object)
+            expect(user1).to.have.keys(userPublicProperties)
+            expect(user1.email).to.be.a('string').and.to.equal(user1.email)
+        })
+    })
+
+    describe(`Call route /${ROUTE_LOGIN}`, () => {
+
+        it('Call logout route being connected', async () => {
+            let json = await jsonPost(ROUTE_LOGOUT)
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.equal(null)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(false)
+            expect(json.message).to.be.a('string').and.to.equal('logout success')
+            expect(json['access-token']).to.equal(null)
+            expect(json['refresh-token']).to.equal(null)
+            // check token in util.js
+            expect(accessToken).to.equal(null)
+            expect(refreshToken).to.equal(null)
         })
 
+        it('Call logout route not being connected', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGOUT)
+                expect.fail('Being already disconnected not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('User is not logged in')
+                expect(accessToken).to.equal(null)
+                expect(refreshToken).to.equal(null)
+            }
+        })
 
+        it('Call login route with first account and a bad password', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, {
+                    email:userEmail1,
+                    password: PASSWORD + 'Z'
+                })
+                expect.fail('Bad password not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Invalid EMail or password')
+                expect(accessToken).to.equal(null)
+                expect(refreshToken).to.equal(null)
+            }
+        })
+
+        it('Call login route with second account and a bad password', async () => {
+            try {
+                let json = await jsonPost(ROUTE_LOGIN, {
+                    email:userEmail2,
+                    password: PASSWORD + 'Z'
+                })
+                expect.fail('Bad password not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Invalid EMail or password')
+                expect(accessToken).to.equal(null)
+                expect(refreshToken).to.equal(null)
+            }
+        })
     })
 
 })

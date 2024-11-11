@@ -2,7 +2,6 @@
 
 import View from '../view.js'
 import ModelSingleton from '../model.js'
-import ControllerSingleton from '../controller.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
 
 import { controlObject } from '../../../common/src/objects/object-util.mjs'
@@ -11,21 +10,20 @@ import tokenObjectDef from '../../../common/src/objects/token-object-def.mjs'
 class TokenRoutes {
 
     initialize(expressApp) {
-        const controller = ControllerSingleton.getInstance()
 	    const model  = ModelSingleton.getInstance()
         
         const tokenModel = model.getTokenModel()
 
         // TODO ajouter withAuth
 	    expressApp.get('/api/v1/token/list', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
 			const tokenList = await tokenModel.findTokenList()
             view.json({ tokenList })
         })
 
         // TODO ajouter withAuth
         expressApp.post('/api/v1/token', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 let token = request.body.token
                 if (token === undefined)

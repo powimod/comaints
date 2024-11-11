@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import assert from 'assert'
 
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
-import { userPublicProperties } from './helpers.js'
+import { userPublicProperties, getDatabaseUserByEmail } from './helpers.js'
 
 const ROUTE_REGISTER = 'api/v1/auth/register'
 const ROUTE_VALIDATE = 'api/v1/auth/validate'
@@ -16,11 +16,13 @@ describe('Test user registration', () => {
     const dte = new Date()
 
     const userEmail = `u${dte.getTime()}@x.y`
-    let userId = null
     const userEmail2 = `u${dte.getTime()}2@x.y`
-    let userId2 = null
     const userEmail3 = `u${dte.getTime()}3@x.y`
+    const userEmail4 = `u${dte.getTime()}3@x.y`
+    let userId = null
+    let userId2 = null
     let userId3 = null
+    let userId4 = null
 
     before( async () =>  {
         loadConfig()
@@ -28,11 +30,10 @@ describe('Test user registration', () => {
     }),
 
     after( async () =>  {
-        /* TODO reactivate this
         await requestDb('DELETE FROM users WHERE email=?', userEmail)
         await requestDb('DELETE FROM users WHERE email=?', userEmail2)
         await requestDb('DELETE FROM users WHERE email=?', userEmail3)
-        */
+        await requestDb('DELETE FROM users WHERE email=?', userEmail4)
         await disconnectDb()
     }),
 
@@ -49,7 +50,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Parameter «email» not found in request body"})`)
+                expect(error.message).to.equal(`Parameter «email» not found in request body`)
             }
         })
 
@@ -65,7 +66,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Property «email» is too short"})`)
+                expect(error.message).to.equal(`Property «email» is too short`)
             }
         })
 
@@ -80,7 +81,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Property «email» is not a valid email"})`)
+                expect(error.message).to.equal(`Property «email» is not a valid email`)
             }
         })
 
@@ -96,7 +97,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Parameter «password» not found in request body"})')
+                expect(error.message).to.equal('Parameter «password» not found in request body')
             }
         })
 
@@ -111,7 +112,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password is too small"})')
+                expect(error.message).to.equal('Password is too small')
             }
         })
 
@@ -126,7 +127,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain uppercase letter"})')
+                expect(error.message).to.equal('Password does not contain uppercase letter')
             }
         })
 
@@ -141,7 +142,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain digit character"})')
+                expect(error.message).to.equal('Password does not contain digit character')
             }
         })
 
@@ -156,7 +157,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 400 ({"error":"Password does not contain special character"})')
+                expect(error.message).to.equal('Password does not contain special character')
             }
         })
     })
@@ -170,24 +171,24 @@ describe('Test user registration', () => {
                 password:'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             })
-            expect(json).to.have.keys('access-token', 'refresh-token')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
             expect(json['access-token']).to.be.a('string')
             expect(json['refresh-token']).to.be.a('string')
+            expect(json['message']).to.be.a('string').and.to.equal('User registration done, waiting for validation code')
         })
 
         it('Check registration attempt with an existing email', async () => {
-            try {
-                const json = await jsonPost(ROUTE_REGISTER, {
-                        email:userEmail,
-                        password:'aBcdef+ghijkl9',
-                        sendCodeByEmail: false
-                    })
-                expect.fail('Invalid «password» parameter not detected')
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 409 ({"error":"Duplicated «email» field for object «user»"})')
-            }
+            const json = await jsonPost(ROUTE_REGISTER, {
+                    email:userEmail,
+                    password:'aBcdef+ghijkl9',
+                    sendCodeByEmail: false
+                })
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
+            expect(json['access-token']).to.be.a('string')
+            expect(json['refresh-token']).to.be.a('string')
+            // On n'a pas reçu l'information que le compte existe afin de ne pas faciliter
+            // les tentatives de piratage de compte par force brute.
+            expect(json['message']).to.be.a('string').and.to.equal('User registration done, waiting for validation code')
         })
 
         it('Check newly created user in database', async () => {
@@ -225,7 +226,7 @@ describe('Test user registration', () => {
             expect(user).to.have.property('auth_expiration')
             expect(user.auth_expiration).not.to.be.equal(null)
             expect(user.auth_expiration).to.be.a('Date')
- 
+
             const expirationDate = user.auth_expiration
             expect(expirationDate).not.to.be.equal(null)
             expect(expirationDate).to.be.a('Date')
@@ -241,7 +242,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Server status 401 ({"error":"Unauthorized"})')
+                expect(error.message).to.equal('Unauthorized access')
             }
         })
 
@@ -252,7 +253,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Parameter «code» not found in request body"})`)
+                expect(error.message).to.equal(`Parameter «code» not found in request body`)
             }
         })
 
@@ -263,7 +264,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Invalid value for «code» parameter in request body"})`)
+                expect(error.message).to.equal(`Invalid value for «code» parameter in request body`)
             }
         })
 
@@ -274,7 +275,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 400 ({"error":"Property «authCode» is too large"})`)
+                expect(error.message).to.equal(`Property «authCode» is too large`)
             }
         })
 
@@ -282,20 +283,19 @@ describe('Test user registration', () => {
         it('Send incorrect validation code', async () => {
             const incorrectCode = authCode + 1
             const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(false)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.be.a('number').and.to.equal(userId)
         })
 
         it('Send validation code', async () => {
             const json = await jsonPost(ROUTE_VALIDATE, { code: authCode})
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'validated', 'access-token', 'refresh-token')
             expect(json.validated).to.be.a('boolean').and.to.equal(true)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.be.a('number').and.to.equal(userId)
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.be.a('string').and.to.equal(userEmail)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+            expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
+            expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
         })
 
         it('Check newly registered user in database', async () => {
@@ -335,13 +335,13 @@ describe('Test user registration', () => {
         it('Check profile access when connected', async () => {
             const json = await jsonGet(ROUTE_PROFILE)
             expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('user')
-            const user = json.user
-            expect(user).to.be.instanceOf(Object)
-            expect(user).to.have.keys(userPublicProperties)
-            expect(user.id).to.be.a('number')
-            expect(user.email).to.be.a('string').and.to.equal(userEmail)
-            expect(user.state).to.be.a('number').and.to.equal(1) // active
+            expect(json).to.have.property('profile')
+            const profile = json.profile
+            expect(profile).to.be.instanceOf(Object)
+            expect(profile).to.have.keys(userPublicProperties)
+            expect(profile.id).to.be.a('number')
+            expect(profile.email).to.be.a('string').and.to.equal(userEmail)
+            expect(profile.state).to.be.a('number').and.to.equal(1) // active
         })
 
     })
@@ -350,12 +350,12 @@ describe('Test user registration', () => {
 
         it('Call logout route being connected', async () => {
             const json = await jsonPost(ROUTE_LOGOUT, {})
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.equal(null)
-            expect(json).to.have.property('access-token')
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.equal(null)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(false)
+            expect(json.message).to.be.a('string').and.to.equal('logout success')
             expect(json['access-token']).to.equal(null)
-            expect(json).to.have.property('refresh-token')
             expect(json['refresh-token']).to.equal(null)
             // check token in util.js
             expect(accessToken).to.equal(null)
@@ -383,7 +383,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 401 ({"error":"User is not logged in"})`)
+                expect(error.message).to.equal('User is not logged in')
             }
         })
     })
@@ -397,9 +397,10 @@ describe('Test user registration', () => {
                 password:'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             })
-            expect(json).to.have.keys('access-token', 'refresh-token')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
             expect(json['access-token']).to.be.a('string')
             expect(json['refresh-token']).to.be.a('string')
+            expect(json['message']).to.be.a('string').and.to.equal('User registration done, waiting for validation code')
         })
 
         it('Check newly created user in database', async () => {
@@ -429,16 +430,13 @@ describe('Test user registration', () => {
             expect(user.auth_data).to.be.equal(null)
         })
 
- 
+
         //───────────── First attempt
         it('First attempt to confirm registration with an invalid code', async () => {
             const incorrectCode = authCode + 1
             const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(false)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.be.a('number').and.to.equal(userId2)
         })
 
         it('Check user in database after first attempt', async () => {
@@ -472,11 +470,8 @@ describe('Test user registration', () => {
         it('Second attempt to confirm registration with an invalid code', async () => {
             const incorrectCode = authCode + 1
             const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(false)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.be.a('number').and.to.equal(userId2)
         })
 
         it('Check user in database after second attempt', async () => {
@@ -498,11 +493,8 @@ describe('Test user registration', () => {
         it('Third attempt to confirm registration with an invalid code', async () => {
             const incorrectCode = authCode + 1
             const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode })
-            expect(json).to.be.instanceOf(Object)
-            expect(json).to.have.property('validated')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('validated')
             expect(json.validated).to.be.a('boolean').and.to.equal(false)
-            expect(json).to.have.property('userId')
-            expect(json.userId).to.be.a('number').and.to.equal(userId2)
         })
 
         it('Check user in database after third attempt', async () => {
@@ -541,9 +533,10 @@ describe('Test user registration', () => {
                 sendCodeByEmail: false,
                 invalidateCodeImmediately: true // set code validity to zero
             })
-            expect(json).to.have.keys('access-token', 'refresh-token')
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
             expect(json['access-token']).to.be.a('string')
             expect(json['refresh-token']).to.be.a('string')
+            expect(json['message']).to.be.a('string').and.to.equal('User registration done, waiting for validation code')
         })
 
         it('Check newly created user in database', async () => {
@@ -585,9 +578,100 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Server status 401 ({"error":"Expired code"})`)
+                expect(error.message).to.equal(`Expired code`)
             }
         })
     })
-        
+
+    describe(`Check registration with existing account`, () => {
+
+        it('First user regisration', async () => {
+            const json = await jsonPost(ROUTE_REGISTER, {
+                email:userEmail4,
+                password:'aBcdef+ghijkl9',
+                sendCodeByEmail: false
+            })
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
+            expect(json['access-token']).to.be.a('string')
+            expect(json['refresh-token']).to.be.a('string')
+            expect(json['message']).to.be.a('string').and.to.equal('User registration done, waiting for validation code')
+        })
+
+        it('Get validation code in database', async () => {
+            const user = await getDatabaseUserByEmail(userEmail4)
+            expect(user.state).to.equal(0) // PENDING
+            authCode = user.auth_code
+            expect(authCode).to.be.a('number').and.to.be.above(0)
+        })
+
+        //  on tente une seconde fois de s'enregistrer sans avoir envoyé le code de validation
+        //  ça ne doit pas générer d'erreur et générer un nouveau code
+        it('Second user regisration', async () => {
+            const json = await jsonPost(ROUTE_REGISTER, {
+                email:userEmail4,
+                password:'aBcdef+ghijkl9',
+                sendCodeByEmail: false
+            })
+            expect(json).to.have.keys('access-token', 'refresh-token', 'message')
+            expect(json['access-token']).to.be.a('string')
+            expect(json['refresh-token']).to.be.a('string')
+            expect(json['message']).to.be.a('string').and.to.equal('User registration done, waiting for validation code')
+        })
+
+        it('Check validation code change in database', async () => {
+            const user = await getDatabaseUserByEmail(userEmail4)
+            expect(user.state).to.equal(0) // PENDING
+            expect(user.auth_code).to.be.a('number').and.to.be.above(0)
+            // check auth code has changed with second attempt to register
+            expect(user.auth_code).not.to.equal(authCode)
+            authCode = user.auth_code
+        })
+
+        it('Send validation code', async () => {
+            const json = await jsonPost(ROUTE_VALIDATE, { code: authCode})
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'validated', 'access-token', 'refresh-token')
+            expect(json.validated).to.be.a('boolean').and.to.equal(true)
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.be.a('string').and.to.equal(userEmail4)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+            expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
+            expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
+        })
+
+       it('Check user registration in database', async () => {
+            const user = await getDatabaseUserByEmail(userEmail4)
+            expect(user.state).to.equal(1) // ACTIVE
+            expect(user.auth_code).to.equal(null)
+        })
+
+        it('Call logout route', async () => {
+            const json = await jsonPost(ROUTE_LOGOUT, {})
+            expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context.email).to.equal(null)
+            expect(json.context.connected).to.be.a('boolean').and.to.equal(false)
+            expect(json.message).to.be.a('string').and.to.equal('logout success')
+            expect(json['access-token']).to.equal(null)
+            expect(json['refresh-token']).to.equal(null)
+            // check token in util.js
+            expect(accessToken).to.equal(null)
+            expect(refreshToken).to.equal(null)
+        })
+
+        it('Attempt to register an already registered email', async () => {
+            const json = await jsonPost(ROUTE_REGISTER, {
+                email:userEmail4,
+                password:'aBcdef+ghijkl9',
+                sendCodeByEmail: false
+            })
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('access-token', 'refresh-token', 'message')
+            expect(json['access-token']).to.be.a('string')
+            expect(json['refresh-token']).to.be.a('string')
+            // On n'a pas reçu l'information que le compte existe afin de ne pas faciliter
+            // les tentatives de piratage de compte par force brute.
+            expect(json['message']).to.be.a('string').and.to.equal('User registration done, waiting for validation code')
+        })
+
+    })
+
 })

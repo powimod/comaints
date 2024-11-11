@@ -1,26 +1,34 @@
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLoaderData } from 'react-router-dom'
 
 import Logo from '../components/Logo'
 import Config from '../Config'
+import { useComaintContext } from '../ComaintContext'
 
 import '../scss/about.scss'
-import api from '../api.js'
-
-const loader = async () => {
-	try {
-        const result = await api.getBackendVersion()
-		return {backendVersion: result.version}
-	}
-	catch (error) {
-		console.error(error)
-		return {backendVersion: '?'}
-	}
-}
 
 const About = (props) => {
 	const { t } = useTranslation()
-	const { backendVersion } = useLoaderData()
+    const { comaintApi } = useComaintContext()
+
+    const [ backendVersion, setBackendVersion ] = useState('-')
+
+    useEffect( () => {
+        if (comaintApi === null)
+            return
+        const getApiVersion = async () => {
+            try {
+                const result = await comaintApi.getBackendVersion()
+                setBackendVersion(result)
+            }
+            catch (error) {
+                console.error(error)
+                setBackendVersion('?')
+            }
+        }
+        getApiVersion()
+    }, [comaintApi])
 
 	const sendMail = (ev) => {
 		ev.preventDefault()
@@ -50,4 +58,3 @@ const About = (props) => {
 }
 
 export default About
-export { loader }

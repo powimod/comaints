@@ -1,0 +1,61 @@
+{
+    "general": {
+        "welcome": "Bienvenue",
+        "hello": "Bonjour {{firstname}} {{lastname}}"
+    },
+    "error": {
+        "unauthorized_access": "Accès non autorisé",
+        "access_token_error": "Jeton d'accès invalide({{error}})",
+        "request_param_not_found": "Paramètre «{{parameter}}» non trouvé dans le corps de la requête",
+        "request_param_invalid": "Paramètre «{{parameter}}» invalide dans le corps de la requête", 
+        "not_found_error": "TODO change message",
+        "invalid_request_error": "TODO change message",
+        "internal_error": "TODO change message",
+        "confict_error" : "Doublon sur le champ «{{field}»} pour l'ojet «{{object}}»",
+        "account_locked": "Ce compte est verrouillé",
+        "account_not_locked": "Ce compte n'est pas verrouillé",
+        "account_disabled": "Ce compte est désactivé",
+        "account_already_registered": "Ce compte est déjà enregistré",
+        "account_not_registered": "Ce compte n'est pas encore enregistré",
+        "account_not_found": "Ce compte n'existe pas",
+        "user_not_logged_in": "L'utilisateur n'est pas connecté",
+        "unauthorized_error": "Accès non autorisé",
+        "invalid_token": "Jeton invalide",
+        "expired_token": "Jeton expiré",
+        "attempt_to_reuse_token": "Tenttive de réutilisation d'un jeton",
+        "invalid_response": "Réponse invalide",
+        "invalid_email_or_password": "Adresse EMail ou mot de passe invalide",
+        "invalid_password": "Mot de passe invalide",
+        "already_logged_in": "Utilisateur déjà connecté",
+        "too_many_attempts": "Nombre de tentatives dépassé",
+        "expired_code": "Code expiré",
+        "same_email": "L'adresse mail est identique",
+        "already_used_email": "L'adresse mail est déjà utilisée",
+        "no_auth_in_progress": "Pas d'opératon d'authentification en cours"
+    },
+    "register": {
+        "mail_body": "Bonjour,\nVotre code pour la création d'un compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",
+        "mail_title": "[Comaint] Enregistrement d'un nouveau compte"
+    },
+    "account_deletion": {
+        "mail_body": "Bonjour,\nVotre code pour la suppression définitive de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",
+        "mail_title": "[Comaint] Suppression de votre compte"
+    },
+    "change_email": {
+        "mail_body": "Bonjour,\nVotre code pour le changement de l'adresse e-mail de votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",
+        "mail_title": "[Comaint] Changement d'adresse e-mail"
+    },
+    "unlock_account_email": {
+		"mail_body": "Bonjour,\nLe code pour débloquer votre compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",
+		"mail_title": "[Comaint] Déblocage de compte"
+    },
+    "register_attempt_with_used_email": {
+		"mail_body": "Bonjour,\n.Une tentative a été faite pour créer un compte avec cette adresse e-mail.\nSi vous n'êtes pas à l'origine de cette demande, veuillez vous connecter avec vos identifiants ou réinitialiser votre mot de passe. Sinon, vous pouvez ignorer simplement ce message.\n",
+		"mail_title": "[Comaint] Tentative d'enregistrement avec une adresse e-mail déjà utilisée"
+    },
+    "reset_password": {
+		"mail_body": "Bonjour,\nLe code de validation pour la réinitialisation de votre mot de passe est {{code}}\n.Si vous n'êtes pas à l'origine de cette demande, vous pouvez simplement ignorer ce message.\n",
+		"mail_title": "[Comaint] reset password validation"
+    }
+
+}

@@ -1,0 +1,9 @@
+echo "───────────────────── Runing backend self-tests..."
+cd ./backend || exit 1
+npm run test || exit 1
+cd ..
+echo "───────────────────── Runing api-lib self-tests..."
+cd "./api-lib" || exit 1
+npm run test || exit 1
+cd ..
+exit 0

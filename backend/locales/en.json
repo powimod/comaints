@@ -1,0 +1,60 @@
+{
+    "general": {
+        "welcome": "Welcome",
+        "hello": "Hello {{firstname}} {{lastname}}"
+    },
+    "error": {
+        "unauthorized_access": "Unauthorized access",
+        "access_token_error": "Invalid access token ({{error}})",
+        "request_param_not_found": "Parameter «{{parameter}}» not found in request body",
+        "request_param_invalid": "Invalid value for «{{parameter}}» parameter in request body",
+        "not_found_error": "TODO change message",
+        "invalid_request_error": "TODO change message",
+        "internal_error": "TODO change message",
+        "confict_error" : "Duplicated «{{field}}» field for object «{{object}}»",
+        "account_locked": "This account is locked",
+        "account_not_locked": "This account is not locked",
+        "account_disabled": "This account is disabled",
+        "account_already_registered": "This account is already registered",
+        "account_not_registered": "This account is not yet registered",
+        "account_not_found": "This account does not exist",
+        "user_not_logged_in": "User is not logged in",
+        "unauthorized_error": "Unauthorized error",
+        "invalid_token": "Invalid token",
+        "expired_token": "Expired token",
+        "attempt_to_reuse_token": "Attempt to reuse a refresh token",
+        "invalid_response": "Invalid response",
+        "invalid_email_or_password": "Invalid EMail or password",
+        "invalid_password": "Invalid password",
+        "already_logged_in": "User already connected",
+        "too_many_attempts": "Number of attempts exceeded",
+        "expired_code": "Expired code",
+        "same_email": "New email address is the same",
+        "already_used_email": "Email address is already used",
+        "no_auth_in_progress": "No authentification operation in progress"
+    },
+    "register": {
+        "mail_body": "Hello,\nYour validation code for the creation of an account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message.",
+        "mail_title": "[Comaint] - New account registration"
+    },
+    "account_deletion": {
+        "mail_body": "Hello,\nYour validation code for the definitive deletion of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message.",
+        "mail_title": "[Comaint] Deletion of your account"
+    },
+    "change_email": {
+        "mail_body": "Hello,\nYour validation code to change the email address of your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message.",
+        "mail_title": "[Comaint] email address change"
+    },
+    "unlock_account_email": {
+		"mail_body": "Hello,\nValidation code to unlock your account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message.",
+		"mail_title": "[Comaint] account unlock"
+    },
+    "register_attempt_with_used_email": {
+		"mail_body": "Hello,\nAn attempt was done to create an account with this e-mail address\nIf your are the initiator of this request, please connect with your credentials or reinitialize your password. Otherwise, simply ignore this message.",
+		"mail_title": "[Comaint] registration attempt with an already used e-mail"
+    },
+    "reset_password": {
+		"mail_body": "Hello,\nValidation code to reset your password is {{code}}\nIf your are the initiator of this request, simply ignore this message.",
+		"mail_title": "[Comaint] reset password validation"
+    }
+}

@@ -4,10 +4,17 @@ import assert from 'assert'
 import jwt from 'jsonwebtoken'
 
 import ModelSingleton from '../model.js'
-import { ComaintApiError, ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken }
-    from '../../../common/src/error.mjs'
+
+import { ComaintApiError, ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized,
+    ComaintApiErrorInvalidToken, ComaintApiErrorExpiredToken  } from '../../../common/src/error.mjs'
 import { AccountState } from '../../../common/src/global.mjs'
 import MailManagerSingleton from '../MailManager.js'
+
+const AUTH_OPERATION_REGISTER = 'register'
+const AUTH_OPERATION_UNLOCK = 'unlock'
+const AUTH_OPERATION_CHANGE_EMAIL = 'change-email'
+const AUTH_OPERATION_ACCOUNT_DELETION = 'account-deletion'
+const AUTH_OPERATION_RESET_PASSWORD = 'reset-password'
 
 class AuthModel {
     #db = null
@@ -54,19 +61,38 @@ class AuthModel {
 
 
     async register(email, password, authCode, invalidateCodeImmediately) {
-        const authAction = 'register'
+        const authAction = AUTH_OPERATION_REGISTER
         const authAttempts = 0
         const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
         const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
-        const user = await this.#userModel.createUser({
-            email,
-            password,
-            state: AccountState.PENDING,
-            authCode,
-            authAction,
-            authExpiration,
-            authAttempts
-        })
+
+        let user = await this.#userModel.getUserByEmail(email)
+        if (user !== null) {
+            // case where user already exists
+            assert(user.state === AccountState.PENDING) // already checked in authRoute
+            // update user registration
+            user = await this.#userModel.editUser({
+                id: user.id,
+                password,
+                state: AccountState.PENDING,
+                authCode,
+                authAction,
+                authExpiration,
+                authAttempts
+            })
+        }
+        else {
+            // case where user does not exist
+            user = await this.#userModel.createUser({
+                email,
+                password,
+                state: AccountState.PENDING,
+                authCode,
+                authAction,
+                authExpiration,
+                authAttempts
+            })
+        }
         return { user }
     }
 
@@ -109,23 +135,27 @@ class AuthModel {
             throw new Error('User not found')
         const action = user.authAction
         switch (action) {
-            case 'register' :
+            case AUTH_OPERATION_REGISTER :
                 if (user.state !== AccountState.PENDING)
                     throw new ComaintApiError('error.account_already_registered')
                 user.state = AccountState.ACTIVE
                 break
-            case 'unlock' :
+            case AUTH_OPERATION_UNLOCK :
                 if (user.state !== AccountState.LOCKED)
                     throw new ComaintApiError('error.account_not_locked')
                 user.state = AccountState.ACTIVE
                 break
-            case 'change-email' :
+            case AUTH_OPERATION_CHANGE_EMAIL :
                 user.email = user.authData
                 break
-            case 'account-deletion' :
+            case AUTH_OPERATION_ACCOUNT_DELETION :
                 await this.#userModel.deleteUserById(user.id)
                 user = null
                 break
+            case AUTH_OPERATION_RESET_PASSWORD:
+                const data = JSON.parse(user.authData)
+                await this.#userModel.changePasswordHash(data.email, data.passwordHash)
+                break;
             default:
                 throw new Error(`Invalid action «${action}»`)
         }
@@ -198,6 +228,27 @@ class AuthModel {
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
 
+    async sendResetPasswordAuthCode(code, email, i18n_t) {
+        assert(code   !== undefined && typeof(code)   === 'number')
+        assert(email  !== undefined && typeof(email)  === 'string')
+        assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
+        const subject  = i18n_t('reset_password.mail_title')
+        const textBody = i18n_t('reset_password.mail_body', { 'code' : code })
+        const htmlBody = i18n_t('reset_password.mail_body', { 'code' : `<b>${code}</b>code` })
+        const mailManager = MailManagerSingleton.getInstance()
+        return await mailManager.sendMail(email, subject, textBody, htmlBody)
+    }
+
+    async sendExistingEmailAlertMessage(email, i18n_t) {
+        assert(email  !== undefined && typeof(email)  === 'string')
+        assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
+        const subject  = i18n_t('register_attempt_with_used_email.mail_title')
+        const textBody = i18n_t('register_attempt_with_used_email.mail_body')
+        const htmlBody = i18n_t('register_attempt_with_used_email.mail_body')
+        const mailManager = MailManagerSingleton.getInstance()
+        return await mailManager.sendMail(email, subject, textBody, htmlBody)
+    }
+
     generateAccessToken(userId, companyId, refreshTokenId, connected) {
         assert(userId !== undefined)
         assert(companyId !== undefined)
@@ -217,21 +268,23 @@ class AuthModel {
         })
     }
 
-    checkAccessToken(token, expiredAccessTokenEmulation = false) {
-        const expiredTokenErrorMessage = "Expired access token"
+
+    async checkAccessToken(token, expiredAccessTokenEmulation = false) {
+
         const decodeAccessTokenPromise = new Promise( (resolve, reject) => {
-            if (expiredAccessTokenEmulation){
-                reject(expiredTokenErrorMessage)
-                return
-            }
-            jwt.verify(token, this.#tokenSecret, (err, payload) => {
+
+            // ignore expiration
+            jwt.verify(token, this.#tokenSecret, { ignoreExpiration: true }, (err, payload) => {
                 if (err !== null)  {
-                    if (err.constructor.name === 'TokenExpiredError')
-                        reject(expiredTokenErrorMessage)
-                    else
-                        reject('Invalid token')
+                    reject('Invalid token')
                     return
                 }
+
+                // do not generate an error if token is expired
+                let expired = payload.exp * 1000 < Date.now()
+                if (expiredAccessTokenEmulation)
+                    expired = true
+
                 if (payload.type !== 'access') {
                     reject('Not an access token')
                     return
@@ -256,15 +309,29 @@ class AuthModel {
                     reject(`Invalid token content`)
                     return
                 }
-                resolve([userId, companyId, refreshTokenId, connected ])
+                resolve([expired, userId, companyId, refreshTokenId, connected ])
             })
         })
-        return decodeAccessTokenPromise
+
+        let expired, userId, companyId, refreshTokenId, connected
+        try {
+            [ expired, userId, companyId, refreshTokenId, connected ] = await decodeAccessTokenPromise
+        }
+        catch (error) {
+            console.log("Access token error", error.message)
+            throw new ComaintApiErrorInvalidToken()
+        }
+
+        if (expired)
+            throw new ComaintApiErrorExpiredToken()
+        return [ userId, companyId, refreshTokenId, connected ]
     }
 
 
-    async generateRefreshToken(userId, companyId) {
+    async generateRefreshToken(userId, companyId, connected) {
         assert(companyId !== undefined)
+        assert(connected !== undefined)
+        assert(typeof(connected) === 'boolean')
         assert(this.#tokenSecret !== undefined)
         assert(this.#refreshTokenLifespan !== undefined)
 
@@ -277,7 +344,8 @@ class AuthModel {
             type: 'refresh',
             token_id: tokenId,
             user_id: userId,
-            company_id: companyId
+            company_id: companyId,
+            connected: connected
         }
         const jwtToken = jwt.sign(payload, this.#tokenSecret, { expiresIn: `${refreshTokenLifespan}days` })
         return [ jwtToken, tokenId ]
@@ -295,7 +363,7 @@ class AuthModel {
                     if (err.constructor.name === 'TokenExpiredError')
                         reject(expiredTokenErrorMessage)
                     else
-                        reject('Invalid tOken')
+                        reject('Invalid token')
                     return
                 }
                 if (payload.type !== 'refresh') {
@@ -306,13 +374,13 @@ class AuthModel {
                     reject(`Invalid token content`)
                     return
                 }
-                resolve([payload.token_id, payload.user_id, payload.company_id])
+                resolve([payload.token_id, payload.user_id, payload.connected, payload.company_id])
             })
         })
 
-        let tokenId, userId, companyId
+        let tokenId, userId, companyId, connected
         try {
-            [tokenId, userId, companyId] = await decodeRefreshTokenPromise
+            [tokenId, userId, connected, companyId] = await decodeRefreshTokenPromise
         }
         catch(error) {
             throw new ComaintApiErrorInvalidToken()
@@ -321,12 +389,14 @@ class AuthModel {
         assert(tokenId !== undefined)
         assert(userId !== undefined)
         assert(companyId !== undefined)
+        assert(connected !== undefined)
+        assert(typeof(connected) === 'boolean')
 
         // token must be present in database to be valid (detect token usurpation)
         token = await this.#tokenModel.getTokenById(tokenId)
         const tokenFound = (token !== null)
 
-        return [tokenFound, tokenId, userId, companyId]
+        return [tokenFound, tokenId, userId, connected, companyId]
     }
 
 
@@ -351,8 +421,16 @@ class AuthModel {
 	}
 
 
-    async getUserProfile(userId) {
+    async getUserProfileById(userId) {
         return await this.#userModel.getUserById(userId)
+    }
+
+    async getUserProfileByEmail(email) {
+        return await this.#userModel.getUserByEmail(email)
+    }
+
+    async getUserProfileByEmail(email) {
+        return await this.#userModel.getUserByEmail(email)
     }
 
     async login(email, password) {
@@ -363,7 +441,7 @@ class AuthModel {
         if (! isPasswordValid) {
             user.authAction = 'login'
             user.authExpiration = null
-            user.authCode = null 
+            user.authCode = null
             user.authData = null
             if (user.authAttempts === null)
                 user.authAttempts = 0
@@ -377,7 +455,7 @@ class AuthModel {
             await this.#userModel.editUser(user)
             throw new ComaintApiErrorUnauthorized('error.invalid_email_or_password')
         }
-        
+
         if (user.authAttempts >= this.#maxAuthAttempts)
             throw new ComaintApiErrorUnauthorized('error.too_many_attempts')
 
@@ -423,7 +501,7 @@ class AuthModel {
         const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
         const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
 
-        user.authAction = 'change-email'
+        user.authAction = AUTH_OPERATION_CHANGE_EMAIL
         user.authExpiration = authExpiration
         user.authCode = authCode
         user.authData = newEmail
@@ -433,6 +511,27 @@ class AuthModel {
         return user
     }
 
+    async preparePasswordReset(email, newPassword, authCode, invalidateCodeImmediately) {
+        let user = await this.#userModel.getUserByEmail(email)
+        if (user === null)
+            throw new Error('User not found') // FIXME should silently ignore
+
+        const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
+        const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
+
+        const passwordHash = await this.#userModel.encryptPassword(newPassword)
+
+        user.authAction = AUTH_OPERATION_RESET_PASSWORD
+        user.authExpiration = authExpiration
+        user.authCode = authCode
+        user.authData = JSON.stringify({ email, passwordHash: passwordHash})
+        user.authAttempts = 0
+
+        user = await this.#userModel.editUser(user)
+        return user
+    }
+
+
     async prepareAccountDeletion(userId, authCode, invalidateCodeImmediately) {
         let user = await this.#userModel.getUserById(userId)
         if (user === null)
@@ -441,7 +540,7 @@ class AuthModel {
         const codeValidityPeriod = invalidateCodeImmediately ? 0 : this.#codeValidityPeriod
         const authExpiration = new Date(Date.now() + codeValidityPeriod * 1000)
 
-        user.authAction = 'account-deletion'
+        user.authAction = AUTH_OPERATION_ACCOUNT_DELETION
         user.authExpiration = authExpiration
         user.authCode = authCode
         user.authData = null

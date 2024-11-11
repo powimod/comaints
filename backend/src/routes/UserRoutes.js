@@ -2,7 +2,6 @@
 
 import View from '../view.js'
 import ModelSingleton from '../model.js'
-import ControllerSingleton from '../controller.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
 
 import { controlObject } from '../../../common/src/objects/object-util.mjs'
@@ -11,21 +10,20 @@ import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 class UserRoutes {
 
     initialize(expressApp) {
-        const controller = ControllerSingleton.getInstance()
         const model  = ModelSingleton.getInstance()
         
         const userModel = model.getUserModel()
 
         // TODO ajouter withAuth
         expressApp.get('/api/v1/user/list', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             const userList = await userModel.findUserList()
             view.json({ userList })
         })
 
         // TODO ajouter withAuth
         expressApp.post('/api/v1/user', async (request, response) => {
-            const view = new View(request, response)
+            const view = request.view
             try {
                 let user = request.body.user
                 if (user === undefined)
