@@ -57,10 +57,11 @@ describe('Check login', () => {
         })
 
         it ('Check context after registration', () => {
-            expect(context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator')
+            expect(context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company')
             expect(context.email).to.be.a('string').and.to.equal(userEmail)
             expect(context.connected).to.be.a('boolean').and.to.equal(true)
             expect(context.administrator).to.be.a('boolean').and.to.equal(false)
+            expect(context.company).to.be.a('boolean').and.to.equal(false)
         })
 
         it ('Logout', async () => {
@@ -69,7 +70,7 @@ describe('Check login', () => {
         })
 
         it ('Check context after logout', () => {
-            expect(context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator')
+            expect(context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company')
             expect(context.email).to.be.equal(null)
             expect(context.connected).to.be.a('boolean').and.to.equal(false)
         })
@@ -80,10 +81,11 @@ describe('Check login', () => {
         })
 
         it ('Check context after login', () => {
-            expect(context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator')
+            expect(context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company')
             expect(context.email).to.be.a('string').and.to.equal(userEmail)
             expect(context.connected).to.be.a('boolean').and.to.equal(true)
             expect(context.administrator).to.be.a('boolean').and.to.equal(false)
+            expect(context.company).to.be.a('boolean').and.to.equal(false)
         })
 
         // TODO add a self-test of the route to change email

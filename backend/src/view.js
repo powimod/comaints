@@ -91,10 +91,11 @@ class View {
     }
 
     storeRenewedContext(context) {
-        assert(context === null || context instanceof Object)
+        assert(context !== undefined || context instanceof Object)
         assert(context.email !== undefined || typeof(context.email) === 'string')
         assert(context.connected !== undefined || typeof(context.connected) === 'boolean')
         assert(context.administrator !== undefined || typeof(context.administrator) === 'boolean')
+        assert(context.company !== undefined && typeof(context.company) === 'boolean')
         this.#renewedContext = context
     }
 

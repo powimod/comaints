@@ -267,7 +267,8 @@ class AuthRoutes {
                         view.storeRenewedContext({
                             email: null,
                             connected: false,
-                            administrator: false
+                            administrator: false,
+                            company: false
                         })
                     }
                     else {
@@ -279,7 +280,8 @@ class AuthRoutes {
                         view.storeRenewedContext({
                             email: user.email,
                             connected: true,
-                            administrator: user.administrator
+                            administrator: user.administrator,
+                            company: user.companyId !== null
                         })
                     }
                 }
@@ -376,7 +378,8 @@ class AuthRoutes {
                 view.storeRenewedContext({
                     email: user.email,
                     connected: true,
-                    administrator: user.administrator
+                    administrator: user.administrator,
+                    company: user.companyId !== null
                 })
                 view.storeRenewedTokens(newAccessToken, newRefreshToken)
                 view.json({ message: 'login success'})
@@ -400,7 +403,8 @@ class AuthRoutes {
                 view.storeRenewedContext({
                     email: null,
                     connected: false,
-                    administrator: false
+                    administrator: false,
+                    company: false
                 })
                 view.json({ message: 'logout success'})
             }

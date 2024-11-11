@@ -49,10 +49,11 @@ describe('Test delete account route', () => {
                 password: PASSWORD
             })
         expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'message', 'access-token', 'refresh-token')
-        expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator')
+        expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company')
         expect(json.context.email).to.be.a('string').and.to.equal(user.email)
         expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
         expect(json.context.administrator).to.be.a('boolean').and.to.equal(false)
+        expect(json.context.company).to.be.a('boolean').and.to.equal(false)
         expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
         expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
         // check token in util.js

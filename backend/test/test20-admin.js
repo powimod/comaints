@@ -41,10 +41,11 @@ describe('Test admin', () => {
     })
  
     it(`Check login with admin account`, async () => {
-        const res = await connectWithAdminAccount()
-        expect(res).to.be.instanceOf(Object).and.to.have.keys('message', 'context', 'access-token', 'refresh-token')
-        expect(res.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator')
-        expect(res.context.administrator).to.be.a('boolean').and.to.equal(true)
+        const json= await connectWithAdminAccount()
+        expect(json).to.be.instanceOf(Object).and.to.have.keys('message', 'context', 'access-token', 'refresh-token')
+        expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company')
+        expect(json.context.administrator).to.be.a('boolean').and.to.equal(true)
+        expect(json.context.company).to.be.a('boolean').and.to.equal(false)
     })
 
     it(`Check admin access is authorized`, async () => {
