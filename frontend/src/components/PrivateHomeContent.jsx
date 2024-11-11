@@ -1,6 +1,14 @@
+import { useComaintContext } from '../ComaintContext'
+import CompanyInitialisation from './CompanyInitialisation'
+
 const PrivateHomeContent = () => {
-    return <>
-            <h1>Private home page</h1>
-        </>
+    const { comaintContext } = useComaintContext()
+
+    if (!comaintContext.company)
+        return <CompanyInitialisation/>
+
+    return (<>
+            <h1>Company initialisation</h1>
+        </>)
 }
 export default PrivateHomeContent 
