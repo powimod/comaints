@@ -119,7 +119,6 @@ const main = async () => {
     process.on('SIGINT' , stopService) // catch CTRL+C signal 
     process.on('SIGTERM', stopService) // catch CTRL+D signal (sent by SystemD)
 
-
     const port = config.server.port
     
     // use a Promise to transmit connection error to the main caller

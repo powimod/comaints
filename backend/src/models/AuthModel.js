@@ -311,13 +311,19 @@ class AuthModel {
                     reject(`Invalid token content`)
                     return
                 }
-                resolve([expired, userId, companyId, refreshTokenId, connected ])
+                const administrator = payload.administrator
+                if (administrator !== true && administrator !== false) {
+                    reject(`Invalid token content A`)
+                    return
+                }
+
+                resolve([expired, userId, companyId, refreshTokenId, connected, administrator ])
             })
         })
 
-        let expired, userId, companyId, refreshTokenId, connected
+        let expired, userId, companyId, refreshTokenId, connected, administrator
         try {
-            [ expired, userId, companyId, refreshTokenId, connected ] = await decodeAccessTokenPromise
+            [ expired, userId, companyId, refreshTokenId, connected, administrator ] = await decodeAccessTokenPromise
         }
         catch (error) {
             console.log("Access token error", error.message)
@@ -326,7 +332,7 @@ class AuthModel {
 
         if (expired)
             throw new ComaintApiErrorExpiredToken()
-        return [ userId, companyId, refreshTokenId, connected ]
+        return [ userId, companyId, refreshTokenId, connected, administrator ]
     }
 
 

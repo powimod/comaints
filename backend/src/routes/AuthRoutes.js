@@ -21,7 +21,7 @@ class AuthRoutes {
         const _renewTokens = async(refreshToken) => {
             if (typeof(refreshToken) !== 'string')
                 throw new Error('Invalid refresh token')
-            let tokenFoundInDatabase, tokenId, userId, connected, companyId
+            let tokenFoundInDatabase, tokenId, userId, connected, companyId, administrator
             [tokenFoundInDatabase, tokenId, userId, connected, companyId] = await authModel.checkRefreshToken(refreshToken)
 
             if (! tokenFoundInDatabase) {
@@ -49,12 +49,13 @@ class AuthRoutes {
                 throw new Error('User account does not exist')
             if (companyId !== user.companyId)
                 throw new Error('Invalid company ID in refresh token')
+            administrator = user.administrator
 
             assert(typeof(connected) === 'boolean')
             const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, connected)
             const newAccessToken  = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId, true)
 
-            return [ userId, companyId, connected, newRefreshTokenId, newAccessToken, newRefreshToken ]
+            return [ userId, companyId, connected, newRefreshTokenId, newAccessToken, newRefreshToken, administrator ]
         }
 
 
@@ -68,6 +69,7 @@ class AuthRoutes {
             let companyId = null
             let refreshTokenId = null
             let connected = false
+            let administrator = null 
 
             // parameter «expiredToken» to emulate expired access Token (in GET or POST request)
             let expiredAccessTokenEmulation = false
@@ -83,7 +85,7 @@ class AuthRoutes {
                 console.log(`Token middleware - refresh token found -> renew tokens`)
                 try {
                     let newAccessToken, newRefreshToken
-                    [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken ] = await _renewTokens(refreshToken)
+                    [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken, administrator ] = await _renewTokens(refreshToken)
                     view.storeRenewedTokens(newAccessToken, newRefreshToken)
                 }
                 catch (error) {
@@ -96,7 +98,7 @@ class AuthRoutes {
             else if (accessToken !== undefined) {
                 console.log(`Token middleware - access token found`)
                 try {
-                    [userId, companyId, refreshTokenId, connected] = await authModel.checkAccessToken(accessToken, expiredAccessTokenEmulation)
+                    [userId, companyId, refreshTokenId, connected, administrator] = await authModel.checkAccessToken(accessToken, expiredAccessTokenEmulation)
                 }
                 catch (error) {
                     // TODO add selftest to check invalid token
@@ -115,6 +117,7 @@ class AuthRoutes {
             request.companyId = companyId
             request.refreshTokenId = refreshTokenId
             request.userConnected = connected
+            request.isAdministrator = administrator
             next()
         })
 
@@ -498,23 +501,5 @@ const requireUserAuth = (request, response, next) => {
     next()
 }
 
-const requireAdminAuth = (request, response, next) => {
-    const view = request.view
-    assert(view !== undefined)
-    const userId = request.userId
-    const connected = request.userConnected
-    const administrator = request.administrator
-    assert(userId !== undefined)
-    assert(connected !== undefined)
-    assert(administrator !== undefined)
-    console.log(`require admin auth, userId:${userId}, connected:${connected}, administrator:${administrator}`)
-    if (userId === null || connected !== true || administrator !== true) {
-        view.error(new ComaintApiErrorUnauthorized(view.translation('error.unauthorized_access')))
-        return
-    }
-    next()
-}
-
-
-export { requireUserAuth, requireAdminAuth }
+export { requireUserAuth }
 export default AuthRoutesSingleton
