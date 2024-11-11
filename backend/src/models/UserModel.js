@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt'
 import { buildFieldArrays, controlObject, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
 import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs'
+import { AccountState } from '../../../common/src/global.mjs'
 
 class UserModel {
     #db = null
@@ -106,8 +107,9 @@ class UserModel {
     }
 
     async changePasswordHash(email, encryptedPassword) {
-        const sqlRequest = `UPDATE users SET password = ? WHERE email = ?`
-        await this.#db.query(sqlRequest, [ encryptedPassword, email])
+        // remet le compte à l'état actif (state=1) au cas où il ait été verrouillé
+        const sqlRequest = `UPDATE users SET password = ?, state = ? WHERE email = ?`
+        await this.#db.query(sqlRequest, [ encryptedPassword, AccountState.ACTIVE, email])
     }
 
 
