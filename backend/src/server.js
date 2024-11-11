@@ -38,15 +38,6 @@ const main = async () => {
     })
     app.use(middleware.handle(i18next))
 
-    // TODO remove this route
-    app.get(`/api/translation`, (request, response) => {
-        const view = new View(request, response)
-        view.json({ 
-            commun: view.translation('common:common_message'),
-            message: view.translation('backend:general.welcome') 
-        })
-    })
-
     // serve common locale files
     const __dirname = path.dirname(fileURLToPath(import.meta.url))
     app.use('/locales/common', express.static(path.join(__dirname, '../../common/locales/')))
@@ -66,6 +57,10 @@ const main = async () => {
     const mailServerFrom = env.MAIL_SERVER_FROM
     if (! mailServerFrom)
         throw new Error('MAIL_SERVER_FROM not defined')
+
+    const adminEmail = env.ADMIN_EMAIL || null
+    const adminPassword = env.ADMIN_PASSWORD || null
+
 
     // FIXME env variable values are not checked
     let config = {
@@ -91,6 +86,10 @@ const main = async () => {
             accessTokenLifespan: parseInt(env.ACCESS_TOKEN_LIFESPAN) || 120, // seconds
             codeValidityPeriod: parseInt(env.CODE_VALIDITY_PERIOD) || 600, // seconds
             maxAuthAttempts: parseInt(env.MAX_AUTH_ATTEMPTS ) || 5
+        },
+        admin : {
+            email: adminEmail,
+            password: adminPassword
         }
     }
     const mailConfig = {
