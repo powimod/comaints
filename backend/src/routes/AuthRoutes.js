@@ -52,7 +52,7 @@ class AuthRoutes {
 
             assert(typeof(connected) === 'boolean')
             const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, connected)
-            const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
+            const newAccessToken  = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId, true)
 
             return [ userId, companyId, connected, newRefreshTokenId, newAccessToken, newRefreshToken ]
         }
@@ -160,6 +160,7 @@ class AuthRoutes {
 
                 let userId = null
                 let companyId = null
+                let administrator = null
                 let registeredAccount = false
 
                 // Si le compte existe déjà pour cet email alors on va tester si le compte est en cours
@@ -179,6 +180,7 @@ class AuthRoutes {
                     }
                     userId = profile.id
                     companyId = profile.companyId
+                    administrator = profile.administrator
                 }
 
                 // if account does not exist or is not fully registered
@@ -191,15 +193,18 @@ class AuthRoutes {
                     companyId = user.companyId
                     assert(userId !== undefined)
                     assert (companyId === null) // companyId should be null
+                    assert (user.administrator !== undefined)
+                    administrator = user.administrator
 
                     if (sendCodeByEmail)
                         await authModel.sendRegisterAuthCode(authCode, email, view.translation)
                 }
 
+                assert (administrator !== null)
 
                 // generate new tokens with userConnected = false
                 const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, false)
-                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId, false)
+                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, administrator, newRefreshTokenId, false)
 
                 view.json({
                     message: 'User registration done, waiting for validation code',
@@ -266,7 +271,7 @@ class AuthRoutes {
                         // TODO delete previous refresh token stored in request.refreshTokenId ?
                         // generate a new access token with userConnected = true
                         const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(user.id, user.companyId, true)
-                        const newAccessToken  = await authModel.generateAccessToken(user.id, user.companyId, newRefreshTokenId, true)
+                        const newAccessToken  = await authModel.generateAccessToken(user.id, user.companyId, user.administrator, newRefreshTokenId, true)
                         view.storeRenewedTokens(newAccessToken, newRefreshToken)
                         view.storeRenewedContext({
                             email: user.email,
@@ -364,7 +369,7 @@ class AuthRoutes {
                 const userId = user.id
                 const companyId = user.companyId
                 const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, true)
-                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
+                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId , true)
                 view.storeRenewedContext({
                     email: user.email,
                     connected: true,
