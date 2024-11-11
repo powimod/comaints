@@ -44,9 +44,10 @@ describe('Test user login', () => {
                     password: PASSWORD
                 })
             expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'message', 'access-token', 'refresh-token')
-            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator')
             expect(json.context.email).to.be.a('string').and.to.equal(userEmail1)
             expect(json.context.connected).to.be.a('boolean').and.to.equal(true)
+            expect(json.context.administrator).to.be.a('boolean').and.to.equal(false)
             expect(json['access-token']).to.be.a('string').and.to.have.length.above(0)
             expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0)
             // check token in util.js
@@ -164,9 +165,10 @@ describe('Test user login', () => {
         it('Call logout route being connected', async () => {
             let json = await jsonPost(ROUTE_LOGOUT)
             expect(json).to.be.instanceOf(Object).to.have.keys('access-token', 'refresh-token', 'context', 'message')
-            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected')
+            expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator')
             expect(json.context.email).to.equal(null)
             expect(json.context.connected).to.be.a('boolean').and.to.equal(false)
+            expect(json.context.administrator).to.be.a('boolean').and.to.equal(false)
             expect(json.message).to.be.a('string').and.to.equal('logout success')
             expect(json['access-token']).to.equal(null)
             expect(json['refresh-token']).to.equal(null)

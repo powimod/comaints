@@ -258,7 +258,8 @@ class AuthRoutes {
                         view.storeRenewedTokens(null, null)
                         view.storeRenewedContext({
                             email: null,
-                            connected: false
+                            connected: false,
+                            administrator: false
                         })
                     }
                     else {
@@ -269,7 +270,8 @@ class AuthRoutes {
                         view.storeRenewedTokens(newAccessToken, newRefreshToken)
                         view.storeRenewedContext({
                             email: user.email,
-                            connected: true
+                            connected: true,
+                            administrator: user.administrator
                         })
                     }
                 }
@@ -364,8 +366,9 @@ class AuthRoutes {
                 const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, true)
                 const newAccessToken  = await authModel.generateAccessToken(userId, companyId, newRefreshTokenId , true)
                 view.storeRenewedContext({
-                   email: user.email,
-                   connected: true
+                    email: user.email,
+                    connected: true,
+                    administrator: user.administrator
                 })
                 view.storeRenewedTokens(newAccessToken, newRefreshToken)
                 view.json({ message: 'login success'})
@@ -388,7 +391,8 @@ class AuthRoutes {
                 view.storeRenewedTokens(null, null)
                 view.storeRenewedContext({
                     email: null,
-                    connected: false
+                    connected: false,
+                    administrator: false
                 })
                 view.json({ message: 'logout success'})
             }
