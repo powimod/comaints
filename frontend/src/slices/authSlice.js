@@ -29,6 +29,20 @@ export const validateAuthCode = createAsyncThunk(
     }
 )
 
+export const resendAuthCode = createAsyncThunk(
+    'auth/resendAuthCode',
+    async ({ email }, { rejectWithValue }) => {
+        const comaintApi = ComaintBackendApiSingleton.getInstance()
+        try {
+            return await comaintApi.auth.resendCode(email)
+        } catch (error) {
+            console.error('Can not resend auth code: ', error.message)
+            return rejectWithValue(error.message || 'Auth code error')
+        }
+    }
+)
+
+
 export const authResetPassword = createAsyncThunk(
     'auth/authResetPassword',
     async ({ email, password }, { rejectWithValue }) => {
@@ -86,6 +100,11 @@ const authSlice = createSlice({
             .addCase(validateAuthCode.pending,   (state) => { state.authStatus = STATUS.LOADING; state.authError = null })
             .addCase(validateAuthCode.fulfilled, (state) => { state.authStatus = STATUS.SUCCEEDED; state.isAuthenticated = true })
             .addCase(validateAuthCode.rejected,  (state, action) => { state.authStatus = STATUS.FAILED; state.authError = action.payload })
+
+            // resend auth code 
+            .addCase(resendAuthCode.pending,   (state) => { state.authStatus = STATUS.LOADING; state.authError = null })
+            .addCase(resendAuthCode.fulfilled, (state) => { state.authStatus = STATUS.SUCCEEDED; state.isAuthenticated = true })
+            .addCase(resendAuthCode.rejected,  (state, action) => { state.authStatus = STATUS.FAILED; state.authError = action.payload })
 
             // send reset password validation code
             .addCase(authResetPassword.pending,   (state) => { state.authStatus = STATUS.LOADING; state.authError = null })

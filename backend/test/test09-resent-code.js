@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
 import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserById } from './helpers.js'
 
-const ROUTE_RESEND_CODE = 'api/v1/auth/resendCode'
+const ROUTE_RESEND_CODE = 'api/v1/auth/resend-code'
 const ROUTE_LOGIN= 'api/v1/auth/login'
 const ROUTE_CHANGE_EMAIL = 'api/v1/account/change-email'
 const ROUTE_VALIDATE = 'api/v1/auth/validate'
@@ -39,7 +39,7 @@ describe('Test delete account route', () => {
         }
         catch (error) {
             expect(error).to.be.instanceOf(Error)
-            expect(error.message).to.equal('Unauthorized access')
+            expect(error.message).to.equal("Can't identify user by access-token or email")
         }
     })
 

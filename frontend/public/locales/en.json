@@ -56,9 +56,11 @@
 	"password-rules": "Minimum 8 characters with at least one uppercase, one lowercase, one number, and one special character",
 	"firstname-field": "Firstname",
 	"lastname-field": "Lastname",
+    "different-password-error": "Passwords are different",
 
 	"ask-code-message": "Please enter the confirmation code that was sent to you by email",
 	"resend-validation-code": "Resend validation code",
+    "code-has-been-send": "Validation code has been sent by email",
 	"validation-code": "Validation code",
 	"invalid-validation-code-error": "Validation code must be a six digits number",
 

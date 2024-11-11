@@ -280,22 +280,41 @@ class AuthRoutes {
             }
         })
 
-        // public auth
-        expressApp.post('/api/v1/auth/resendCode', requireUserAuth, async (request, response) => {
+        // public route
+        expressApp.post('/api/v1/auth/resend-code', async (request, response) => {
             const view = request.view
+            // self-test does not send validation code by email
             const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
                 request.body.sendCodeByEmail : true
             try {
-                const userId = request.userId
-                assert(userId !== null) // due to requireUserAuth
-                // self-test does not send validation code by email
+                let profile = null
 
-                const profile = await authModel.getUserProfileById(userId)
+                // try to get IDs from access token
+                const userId = request.userId
+                if (userId !== null) {
+                    profile = await authModel.getUserProfileById(userId)
+                }
+                else {
+                    // if access token was not found try to use an email in request body (used to reset password)
+                    const email = request.body.email
+                    if (email === undefined)
+                        throw new Error("Can't identify user by access-token or email") // TODO use ComaintApiError
+                    if (typeof(email) !== 'string')
+                        throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'})
+                    const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email)
+                    if (errorMsg1)
+                        throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1)
+                    profile = await authModel.getUserProfileByEmail(email)
+                }
+
+                if (profile === null)
+                    throw new Error('User not found') // FIXME silently ignore error ?
+
                 const authCode = authModel.generateRandomAuthCode()
-                // FIXME send mail before or after changing it in AuthModel ?
+                // TODO le mail à envoyer dépend de l'action en cours !!!
                 if (sendCodeByEmail)
                     await authModel.sendRegisterAuthCode(authCode, profile.email, view.translation)
-                await authModel.changeAuthCode(userId, authCode)
+                await authModel.changeAuthCode(profile.id, authCode)
 
                 view.json({ message: "Code resent"})
             }

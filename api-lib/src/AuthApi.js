@@ -61,5 +61,12 @@ class AuthApi {
         return response
     }
 
+    async resendCode(email) {
+        const ROUTE = 'api/v1/auth/resend-code'
+        const response = await this.#context.jsonPost(ROUTE, {email}, {token:false})
+        return response
+    }
+
+
 }
 export default AuthApi

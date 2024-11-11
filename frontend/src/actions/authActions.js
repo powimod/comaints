@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { registerUser, loginUser, logoutUser, validateAuthCode, authResetPassword} from '../slices/authSlice'
+import { registerUser, loginUser, logoutUser, validateAuthCode, authResetPassword, resendAuthCode } from '../slices/authSlice'
 
 const useAuthActions = () => {
     const dispatch = useDispatch()
@@ -80,6 +80,19 @@ const useAuthActions = () => {
         }
     }
 
+    const resendCodeWithEmail = async (email) => {
+        try {
+            const result = await dispatch(resendAuthCode({email}))
+            if (resendAuthCode.rejected.match(result)) {
+                const errorMessage = result.payload || 'Unknown error' // FIXME translation
+                throw new Error(errorMessage)
+            }
+        }
+        catch (error) {
+            console.error('Can not resend code: ', error.message)
+            throw error
+        }
+    }
  
     const resetPassword = async (email, password) => {
         try {
@@ -103,7 +116,8 @@ const useAuthActions = () => {
         logout,
         validateCode,
         validateCodeWithEmail,
-        resetPassword
+        resendCodeWithEmail,
+        resetPassword,
     }
 }
 

@@ -4,7 +4,7 @@
             "is_not_defined": "La propriété «{{property}}» n'est pas définie",
             "has_no_value": "La propriété«{{property}}» n'a pas de valeur",
             "is_null": "La propriété «{{property}}» est vide",
-            "is_not_an_integer": "La propriété «{{property}}» n'est pas définie",
+            "is_not_an_integer": "La propriété «{{property}}» n'est pas un entier",
             "is_too_small": "La propriété «{{property}}» est trop petite",
             "is_too_large": "La propriété «{{property}}» est trop grande",
             "is_not_a_string": "La propriété «{{property}}» n'est pas une chaîne",
