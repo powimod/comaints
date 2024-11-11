@@ -9,7 +9,6 @@ const ComaintContextProvider = ({ children }) => {
 
     useEffect(() => {
         const contextInfoCallback = (newContext) => {
-            console.log("dOm frontend ComaintContext - new context", newContext)
             setComaintContext((prevContext) => ({...newContext}))
         }
         const comaintBackendApi = ComaintBackendApiSingleton.getInstance()
