@@ -78,9 +78,15 @@ describe('Test reset password', () => {
         it(`Initialize company`, async () => {
             const companyName = 'abc'
             let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName})
-            expect(json).to.be.instanceOf(Object).and.to.have.keys('id', 'name', 'access-token', 'refresh-token')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('id', 'name', 'access-token', 'refresh-token', 'context')
             expect(json.id).to.be.a('number')
             expect(json.name).to.be.a('string').and.to.equal(companyName)
+            let context = json.context
+            expect(context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company')
+            expect(context.email).to.equal(user.email)
+            expect(context.connected).to.equal(true)
+            expect(context.administrator).to.equal(false)
+            expect(context.company).to.equal(true)
             company = json
         })
 
@@ -93,9 +99,6 @@ describe('Test reset password', () => {
             expect(profile).to.have.property('companyId')
             expect(profile.companyId).to.equal(company.id)
         })
-
-        // TODO check company in context
-        //expect(json.context.company).to.be.a('boolean').and.to.equal(false)
 
         it(`Check tokens renew`, async () => {
             expect(refreshToken).not.to.equal(initialRefreshToken)

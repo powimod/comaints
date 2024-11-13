@@ -4,7 +4,7 @@ import assert from 'assert'
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
-import { requireAdminAuth, requireUserAuth, renewTokens } from './auth.js'
+import { requireAdminAuth, requireUserAuth, renewTokens, renewContext } from './auth.js'
 
 import { controlObject, controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
 import companyObjectDef from '../../../common/src/objects/company-object-def.mjs'
@@ -74,6 +74,8 @@ class CompanyRoutes {
 
                 request.companyId = company.id
                 await renewTokens(request)
+                await renewContext(request, user)
+
                 view.json(company)
             }
             catch(error) {
