@@ -3,6 +3,8 @@
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
+import { requireAdminAuth } from './auth.js'
+import { requireUserAuth } from './auth.js'
 
 import { controlObject } from '../../../common/src/objects/object-util.mjs'
 import companyObjectDef from '../../../common/src/objects/company-object-def.mjs'
@@ -14,15 +16,13 @@ class CompanyRoutes {
         
         const companyModel = model.getCompanyModel()
 
-        // TODO ajouter withAuth
-	    expressApp.get('/api/v1/company/list', async (request, response) => {
+	    expressApp.get('/api/v1/company/list', requireAdminAuth, async (request, response) => {
             const view = request.view
 			const companyList = await companyModel.findCompanyList()
             view.json({ companyList })
         })
 
-        // TODO ajouter withAuth
-        expressApp.post('/api/v1/company', async (request, response) => {
+        expressApp.post('/api/v1/company', requireAdminAuth, async (request, response) => {
             const view = request.view
             try {
                 let company = request.body.company

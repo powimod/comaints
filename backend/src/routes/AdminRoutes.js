@@ -2,6 +2,7 @@
 
 import assert from 'assert'
 
+import { requireAdminAuth } from './auth.js'
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs'
@@ -42,22 +43,4 @@ class AdminRoutesSingleton {
     }
 }
 
-const requireAdminAuth = (request, response, next) => {
-    const view = request.view
-    assert(view !== undefined)
-    const userId = request.userId
-    const connected = request.userConnected
-    const administrator = request.isAdministrator
-    assert(userId !== undefined)
-    assert(connected !== undefined)
-    assert(administrator !== undefined)
-    console.log(`require admin auth, userId:${userId}, connected:${connected}, administrator:${administrator}`)
-    if (userId === null || connected !== true || administrator !== true) {
-        view.error(new ComaintApiErrorUnauthorized(view.translation('error.unauthorized_access')))
-        return
-    }
-    next()
-}
-
-export { requireAdminAuth }
 export default AdminRoutesSingleton
