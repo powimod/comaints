@@ -13,11 +13,15 @@ describe('Test reset password', () => {
 
     let user = null
     let company = null
+    let initialRefreshToken = null
+    let initialAccessToken = null
 
     before( async () =>  {
         loadConfig()
         await connectDb()
         user = await createUserAccount()
+        initialRefreshToken = refreshToken
+        initialAccessToken = accessToken
     })
 
     after( async () =>  {
@@ -65,10 +69,16 @@ describe('Test reset password', () => {
 
 
     describe(`Call route /${ROUTE_INITIALIZE_COMPANY} with valid data`, () => {
+
+        it(`Check initial tokens`, async () => {
+            expect(refreshToken).to.equal(initialRefreshToken)
+            expect(accessToken).to.equal(initialAccessToken)
+        })
+
         it(`Initialize company`, async () => {
             const companyName = 'abc'
             let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName})
-            expect(json).to.be.instanceOf(Object).and.to.have.keys('id', 'name')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('id', 'name', 'access-token', 'refresh-token')
             expect(json.id).to.be.a('number')
             expect(json.name).to.be.a('string').and.to.equal(companyName)
             company = json
@@ -86,7 +96,11 @@ describe('Test reset password', () => {
 
         // TODO check company in context
         //expect(json.context.company).to.be.a('boolean').and.to.equal(false)
-        // TODO check token where renewed
+
+        it(`Check tokens renew`, async () => {
+            expect(refreshToken).not.to.equal(initialRefreshToken)
+            expect(accessToken).not.to.equal(initialAccessToken)
+        })
 
         it(`Try to initialize company twice`, async () => {
             try {

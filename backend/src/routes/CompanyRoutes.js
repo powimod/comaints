@@ -4,8 +4,7 @@ import assert from 'assert'
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
-import { requireAdminAuth } from './auth.js'
-import { requireUserAuth } from './auth.js'
+import { requireAdminAuth, requireUserAuth, renewTokens } from './auth.js'
 
 import { controlObject, controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
 import companyObjectDef from '../../../common/src/objects/company-object-def.mjs'
@@ -64,9 +63,6 @@ class CompanyRoutes {
                 if (errorMsg1)
                     throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1)
 
-                // TODO control companyId is not already set
-
-                // TODO check user company ID is not already set
                 let company = {
                     managerId: request.userId,
                     name: companyName
@@ -76,9 +72,8 @@ class CompanyRoutes {
                 user.companyId = company.id
                 user = await userModel.editUser(user)
 
-
-
-                // TODO regenerate tokens with companyId set
+                request.companyId = company.id
+                await renewTokens(request)
                 view.json(company)
             }
             catch(error) {
