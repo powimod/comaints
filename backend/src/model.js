@@ -8,12 +8,15 @@ import UserModelSingleton     from './models/UserModel.js'
 import AccountModelSingleton  from './models/AccountModel.js'
 import TokenModelSingleton    from './models/TokenModel.js'
 import AuthModelSingleton     from './models/AuthModel.js'
+import AdminModelSingleton    from './models/AdminModel.js'
+import { AccountState } from '../../common/src/global.mjs'
 
 class Model {
     #config = null
     #dbPool = null
     #authModel = null
     #accountModel = null
+    #adminModel = null
     #companyModel = null
     #userModel = null
     #tokenModel = null
@@ -111,8 +114,26 @@ class Model {
         this.#accountModel = AccountModelSingleton.getInstance()
         this.#accountModel.initialize(dbPool)
 
+        this.#adminModel = AccountModelSingleton.getInstance()
+        this.#adminModel.initialize(dbPool)
+
         this.#companyModel = CompanyModelSingleton.getInstance()
         this.#companyModel.initialize(dbPool)
+
+        const adminEmail = config.admin.email
+        const adminPassword = config.admin.password
+        if (adminEmail !== null && adminPassword !== null) {
+            let adminUser = await this.#userModel.getUserByEmail(adminEmail)
+            if (adminUser === null) {
+                console.log(`Create admin user with email «${adminEmail}»`)
+                adminUser = await this.#userModel.createUser({
+                    email: adminEmail,
+                    password: adminPassword,
+                    administrator: true,
+                    state: AccountState.ACTIVE
+                })
+            }
+        }
     }
 
     async terminate() {
@@ -140,6 +161,10 @@ class Model {
 
     getUserModel() {
         return this.#userModel
+    }
+
+    getAdminModel() {
+        return this.#adminModel
     }
 
     getAccountModel() {

@@ -1,10 +1,12 @@
 'use strict'
+import assert from 'assert'
 
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
+import { requireAdminAuth, requireUserAuth, renewTokens, renewContext } from './auth.js'
 
-import { controlObject } from '../../../common/src/objects/object-util.mjs'
+import { controlObject, controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
 import companyObjectDef from '../../../common/src/objects/company-object-def.mjs'
 
 class CompanyRoutes {
@@ -13,16 +15,15 @@ class CompanyRoutes {
 	    const model  = ModelSingleton.getInstance()
         
         const companyModel = model.getCompanyModel()
+        const userModel = model.getUserModel()
 
-        // TODO ajouter withAuth
-	    expressApp.get('/api/v1/company/list', async (request, response) => {
+	    expressApp.get('/api/v1/company/list', requireAdminAuth, async (request, response) => {
             const view = request.view
 			const companyList = await companyModel.findCompanyList()
             view.json({ companyList })
         })
 
-        // TODO ajouter withAuth
-        expressApp.post('/api/v1/company', async (request, response) => {
+        expressApp.post('/api/v1/company', requireAdminAuth, async (request, response) => {
             const view = request.view
             try {
                 let company = request.body.company
@@ -40,8 +41,50 @@ class CompanyRoutes {
                 view.error(error)
             }
         })
-    }
 
+        expressApp.post('/api/v1/company/initialize', requireUserAuth, async (request, response) => {
+            const view = request.view
+            try {
+                assert(request.userId)
+                const userId = request.userId
+
+                if (request.companyId)
+                    throw new ComaintApiErrorInvalidRequest('error.company_already_initialized')
+
+                let user = await userModel.getUserById(userId)
+                assert(user !== null)
+                if (user.companyId)
+                    throw new ComaintApiErrorInvalidRequest('error.company_already_initialized')
+
+                let companyName = request.body.companyName
+                if (companyName === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'companyName'})
+                const [ errorMsg1, errorParam1 ] = controlObjectProperty(companyObjectDef, 'name', companyName)
+                if (errorMsg1)
+                    throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1)
+
+                let company = {
+                    managerId: request.userId,
+                    name: companyName
+                }
+			    company = await companyModel.createCompany(company)
+
+                user.companyId = company.id
+                user = await userModel.editUser(user)
+
+                request.companyId = company.id
+                await renewTokens(request)
+                await renewContext(request, user)
+
+                view.json(company)
+            }
+            catch(error) {
+                console.log(error)
+                view.error(error)
+            }
+        })
+
+    }
 }
 
 class CompanyRoutesSingleton {

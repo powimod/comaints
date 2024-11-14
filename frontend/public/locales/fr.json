@@ -50,7 +50,13 @@
 	"new-customer-question" : "Nouveau client",
 	"create-account-button" : "Créer un compte",
 	"close": "Fermer",
-
+    "field" : {
+        "name": "Nom"
+    },
+    "company-initialisation" : {
+        "title": "Initialisation de la compagnie",
+        "message": "Vous devez créer votre compagnie"
+    },
 	"create-account-message" : "Créez un compte",
 	"create-account-instruction": "Veuillez fournir une adresse mail valide et un mot de passe pour pouvoir vous créer un compte",
 	"password-rules": "(8 caractères minimum avec au moins une majuscule, une minuscule, un chiffre et un caractère spécial)",

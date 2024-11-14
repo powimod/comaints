@@ -51,15 +51,6 @@ objects:
         type: "string"
         minimum: 2
         maximum: 128
-    links:
-      - name: "manager"
-        target: "User"
-        mandatory: false
-    indexes:
-      - name: "name"
-        unique: true
-        keys:
-          - property : "name"
 
   - name: "User"
     attributes:
@@ -93,6 +84,9 @@ objects:
         type: "datetime"
         mandatory: false
       - name: "administrator"
+        type: "boolean"
+        default: false
+      - name: "manager"
         type: "boolean"
         default: false
 

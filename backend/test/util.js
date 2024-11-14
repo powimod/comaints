@@ -131,6 +131,8 @@ const connectDb = async () => {
 }
 
 const disconnectDb = async () => {
+    accessToken = null
+    refreshToken = null
     if (db === null)
         return
     db.end()

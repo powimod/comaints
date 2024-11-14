@@ -31,7 +31,8 @@
         "expired_code": "Code expiré",
         "same_email": "L'adresse mail est identique",
         "already_used_email": "L'adresse mail est déjà utilisée",
-        "no_auth_in_progress": "Pas d'opératon d'authentification en cours"
+        "no_auth_in_progress": "Pas d'opératon d'authentification en cours",
+        "company_already_initialized": "Compagnie déjà initialisée"
     },
     "register": {
         "mail_body": "Bonjour,\nVotre code pour la création d'un compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",

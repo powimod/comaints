@@ -3,12 +3,14 @@
 import Context from './Context.js'
 import AuthApi from './AuthApi.js'
 import AccountApi from './AccountApi.js'
+import CompanyApi from './CompanyApi.js'
 
 class ComaintBackendApi {
 
     #context = null
     #auth = null
     #account = null
+    #company = null
 
     constructor(backendUrl, contextInfoCallback = null, accountSerializeCallback = null) {
         if (! backendUrl)
@@ -24,6 +26,7 @@ class ComaintBackendApi {
         this.#context = new Context(backendUrl, contextInfoCallback, accountSerializeCallback)
         this.#auth = new AuthApi(this.#context)
         this.#account = new AccountApi(this.#context)
+        this.#company = new CompanyApi(this.#context)
     }
 
     setContextInfoCallback(contextInfoCallback) {
@@ -45,6 +48,10 @@ class ComaintBackendApi {
 
     get account() {
         return this.#account
+    }
+
+    get company() {
+        return this.#company
     }
 
     checkApiLib() {

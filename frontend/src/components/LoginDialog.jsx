@@ -13,7 +13,7 @@ import '../scss/login-dialog.scss'
 const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
 	const { t } = useTranslation()
     const { login } = useAuthActions()
-    const { comaintContext } = useComaintContext();
+    const { comaintContext } = useComaintContext()
 
 	const [ error, setError ] = useState(null)
 	const [ email, setEmail] = useState('')
@@ -21,7 +21,6 @@ const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
 	const emailRef = useRef()
 	const passwordRef = useRef()
 	const navigate = useNavigate()
-
 
 	const EMAIL_STORAGE_KEY = 'login-email'
 
@@ -77,8 +76,8 @@ const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
 			return
 		}
         [ errorMsg, errorParams ] = controlObjectProperty(userObjectDef, 'password', password)
-		if (password.length === 0) {
-			setError(t('invalid-password-error'))
+		if (errorMsg) {
+			setError(t(errorMsg, errorParams))
             setFocus(passwordRef)
 			return
 		}

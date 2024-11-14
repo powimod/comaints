@@ -249,9 +249,10 @@ class AuthModel {
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
 
-    generateAccessToken(userId, companyId, refreshTokenId, connected) {
+    generateAccessToken(userId, companyId, administrator, refreshTokenId, connected) {
         assert(userId !== undefined)
         assert(companyId !== undefined)
+        assert(administrator !== undefined)
         assert(refreshTokenId !== undefined)
         assert(connected !== undefined)
         assert(this.#tokenSecret !== undefined)
@@ -259,8 +260,9 @@ class AuthModel {
         const payload = {
             type: 'access',
             user_id: userId,
-            company_id: companyId,
             connected: connected,
+            administrator: administrator,
+            company_id: companyId,
             refresh_token_id: refreshTokenId
         }
         return jwt.sign(payload, this.#tokenSecret, {
@@ -309,13 +311,19 @@ class AuthModel {
                     reject(`Invalid token content`)
                     return
                 }
-                resolve([expired, userId, companyId, refreshTokenId, connected ])
+                const administrator = payload.administrator
+                if (administrator !== true && administrator !== false) {
+                    reject(`Invalid token content A`)
+                    return
+                }
+
+                resolve([expired, userId, companyId, refreshTokenId, connected, administrator ])
             })
         })
 
-        let expired, userId, companyId, refreshTokenId, connected
+        let expired, userId, companyId, refreshTokenId, connected, administrator
         try {
-            [ expired, userId, companyId, refreshTokenId, connected ] = await decodeAccessTokenPromise
+            [ expired, userId, companyId, refreshTokenId, connected, administrator ] = await decodeAccessTokenPromise
         }
         catch (error) {
             console.log("Access token error", error.message)
@@ -324,7 +332,7 @@ class AuthModel {
 
         if (expired)
             throw new ComaintApiErrorExpiredToken()
-        return [ userId, companyId, refreshTokenId, connected ]
+        return [ userId, companyId, refreshTokenId, connected, administrator ]
     }
 
 

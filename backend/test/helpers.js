@@ -5,6 +5,7 @@ import { expect } from 'chai'
 import { jsonGet, jsonPost, requestDb } from './util.js'
 
 const ROUTE_REGISTER = 'api/v1/auth/register'
+const ROUTE_LOGIN = 'api/v1/auth/login'
 const ROUTE_LOGOUT = 'api/v1/auth/logout'
 const ROUTE_VALIDATE = 'api/v1/auth/validate'
 
@@ -70,10 +71,18 @@ const getDatabaseUserById = async (userId) => {
     return user
 }
 
-
+const connectWithAdminAccount = async () => {
+    const adminEmail = process.env.ADMIN_EMAIL
+    if (adminEmail === undefined)
+        throw new Error('ADMIN_EMAIL not found in .env')
+    const adminPassword = process.env.ADMIN_PASSWORD
+    if (adminPassword === undefined)
+        throw new Error('ADMIN_PASSWORD not found in .env')
+    return await jsonPost(ROUTE_LOGIN, {email: adminEmail, password: adminPassword})
+}
 
 const userPublicProperties = [
-    'id', 'email', 'firstname', 'lastname', 'state', 'lastUse', 'administrator', 'companyId'
+    'id', 'email', 'firstname', 'lastname', 'state', 'lastUse', 'administrator', 'manager', 'companyId'
 ]
 
 export {
@@ -81,5 +90,6 @@ export {
     deleteUserAccount,
     getDatabaseUserByEmail,
     getDatabaseUserById,
-    userPublicProperties 
+    userPublicProperties,
+    connectWithAdminAccount 
 }

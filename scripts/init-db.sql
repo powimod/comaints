@@ -18,15 +18,11 @@ USE db_comaint
 --
 CREATE TABLE companies(
 	id INTEGER NOT NULL auto_increment,
-	id_manager INTEGER,
 	name VARCHAR(128) NOT NULL,
 	PRIMARY KEY (id)
 );
 
 
-CREATE UNIQUE INDEX idx_name ON companies(
-	name
-	);
 
 --
 -- Table users
@@ -41,6 +37,7 @@ CREATE TABLE users(
 	state INTEGER NOT NULL DEFAULT '0',
 	last_use DATETIME,
 	administrator BOOLEAN NOT NULL DEFAULT false,
+	manager BOOLEAN NOT NULL DEFAULT false,
 	auth_action VARCHAR(16),
 	auth_data VARCHAR(255),
 	auth_code INTEGER DEFAULT '0',
@@ -83,10 +80,6 @@ CREATE INDEX idx_idx_user ON tokens(
 --------------------------------------------------------------------------------
 
 
-ALTER TABLE companies ADD CONSTRAINT fk_companies_manager
-	FOREIGN KEY (id_manager)
-	REFERENCES users(id)
-	ON DELETE CASCADE;
 ALTER TABLE users ADD CONSTRAINT fk_users_company
 	FOREIGN KEY (id_company)
 	REFERENCES companies(id)
