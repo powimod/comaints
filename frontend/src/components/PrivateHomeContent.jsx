@@ -8,7 +8,8 @@ const PrivateHomeContent = () => {
         return <CompanyInitialisation/>
 
     return (<>
-            <h1>Company initialisation</h1>
+            <h1>Private home page</h1>
+            
         </>)
 }
 export default PrivateHomeContent 
