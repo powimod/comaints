@@ -5,12 +5,14 @@ import { expect } from 'chai'
 import { api, requestDb } from './util.js'
 
 const DEFAULT_PASSWORD = 'abC.dEf.GH1.lMn!'
+const ROUTE_INITIALIZE_COMPANY= 'api/v1/company/initialize'
 
 const createUserAccount = async (options = {}) => {
     let {
         email = null,
         password = DEFAULT_PASSWORD,
-        logout = false
+        logout = false,
+        withCompany = false
     } = options
 
     if (email === null) {
@@ -32,6 +34,14 @@ const createUserAccount = async (options = {}) => {
     expect(json).to.be.instanceOf(Object)
     expect(json).to.have.property('validated')
     expect(json.validated).to.be.a('boolean').and.to.equal(true)
+
+    if (withCompany) {
+        const companyName = 'My Company'
+        let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName})
+        expect(json).to.be.instanceOf(Object).and.to.have.keys('id', 'name', 'access-token', 'refresh-token', 'context')
+        expect(json.id).to.be.a('number')
+        expect(json.name).to.be.a('string').and.to.equal(companyName)
+    }
 
     if (logout) {
         json = await api.auth.logout()
