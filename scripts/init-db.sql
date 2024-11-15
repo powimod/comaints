@@ -82,10 +82,10 @@ CREATE TABLE units(
 	id_company INTEGER NOT NULL,
 	name VARCHAR(32) NOT NULL,
 	description VARCHAR(255),
-	address TEXT NOT NULL DEFAULT '',
-	city TEXT NOT NULL DEFAULT '',
-	zip_code TEXT NOT NULL DEFAULT '',
-	country TEXT NOT NULL DEFAULT '',
+	address TEXT DEFAULT '',
+	city TEXT DEFAULT '',
+	zip_code TEXT DEFAULT '',
+	country TEXT DEFAULT '',
 	PRIMARY KEY (id)
 );
 

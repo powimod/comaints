@@ -21,14 +21,14 @@ const unitObjectDef = {
         "type": "text",
         "maximum": "128",
         "default": "",
-        "mandatory": true,
+        "mandatory": false,
         "scope": "public"
     },
     "city" : {
         "type": "text",
         "maximum": "64",
         "default": "",
-        "mandatory": true,
+        "mandatory": false,
         "scope": "public"
     },
     "zipCode" : {
@@ -36,14 +36,14 @@ const unitObjectDef = {
         "field": "zip_code",
         "maximum": "16",
         "default": "",
-        "mandatory": true,
+        "mandatory": false,
         "scope": "public"
     },
     "country" : {
         "type": "text",
         "maximum": "32",
         "default": "",
-        "mandatory": true,
+        "mandatory": false,
         "scope": "public"
     }, 
     "companyId" : {
@@ -51,7 +51,7 @@ const unitObjectDef = {
         "target" : "Company",
         "field" : "id_company",
         "table" : "companies",
-        "mandatory": "true",
+        "mandatory": true,
         "scope": "public"
     },
 }

@@ -54,14 +54,15 @@ const controlObject = (objDef, object, options) => {
             continue
         const propValue = object[propName]
         if (propValue === undefined || propValue === null) {
-            if (typeof(propDef.mandatory) !== 'boolean')
-                throw new Error('Invalid mandatory property')
-            if (fullCheck && propDef.mandatory) {
-                return [ 'common:error.prop.is_not_defined', { property: propName } ]
+            if (fullCheck) {
+                if (typeof(propDef.mandatory) !== 'boolean')
+                    throw new Error('Invalid mandatory property')
+                if (propDef.mandatory === true)
+                    return [ 'common:error.prop.is_not_defined', { property: propName } ]
             }
         }
         else {
-            const controlResult = controlObjectProperty (objDef, propName, object[propName])
+            const controlResult = controlObjectProperty(objDef, propName, object[propName])
             if (controlResult[0] === true)
                 return controlResult
 
@@ -88,7 +89,7 @@ const controlObject = (objDef, object, options) => {
  * @returns {[string, object]} : returns a translation message ID and an object with it's parameters
  *
  * @example
- *  const [ errorMsg, errorParams ] = controlProperty(userDef, 'password', myPassword)
+ *  const [ errorMsg, errorParams ] = controlObjectProperty(userDef, 'password', myPassword)
  *  if (errorMsg)
  *      throw new ComaintTranslatedError(errorMsg, errorParams)
  *

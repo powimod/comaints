@@ -16,7 +16,7 @@ const tokenObjectDef = {
         "target" : "User",
         "field" : "id_user",
         "table" : "users",
-        "mandatory": "true",
+        "mandatory": true,
         "scope": "public"
     },
 }

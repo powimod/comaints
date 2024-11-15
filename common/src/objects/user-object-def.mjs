@@ -98,7 +98,7 @@ const userObjectDef = {
         "target" : "Company",
         "field" : "id_company",
         "table" : "companies",
-        "mandatory": "false",
+        "mandatory": false,
         "scope": "public"
     },
 }

@@ -169,18 +169,22 @@ objects:
       - name: "address"
         type: "text"
         default: ""
+        mandatory: false
         maximum: 128
       - name: "city"
         type: "text"
         default: ""
+        mandatory: false
         maximum: 64
       - name: "zipCode"
         type: "text"
         default: ""
+        mandatory: false
         maximum: 16
       - name: "country"
         type: "text"
         default: ""
+        mandatory: false
         maximum: 32
     links:
       - name: "company"

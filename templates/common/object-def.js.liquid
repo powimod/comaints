@@ -32,7 +32,7 @@ const {{object.name|camelCase}}ObjectDef = {
         "target" : "{{link.target.name}}",
         "field" : "id_{{link.name|snakeCase}}",
         "table" : "{{link.target.attributes.table_name}}",
-        "mandatory": "{{link.mandatory}}",
+        "mandatory": {{link.mandatory}},
         "scope": "{{ link.scope }}"
     },
 {%- endfor %}
