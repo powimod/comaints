@@ -18,10 +18,10 @@ const {{object.name|camelCase}}ObjectDef = {
         "default": "{{ property.defaultValue }}",
         {%- endif %}
         {%- if property.mandatory != nil %}
-        "mandatory": "{{ property.mandatory }}",
+        "mandatory": {{ property.mandatory }},
         {%- endif %}
         {%- if property.secret == true %}
-        "secret": "{{ property.secret }}",
+        "secret": {{ property.secret }},
         {%- endif %}
         "scope": "{{ property.scope }}"
     },

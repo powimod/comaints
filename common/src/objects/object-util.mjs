@@ -22,11 +22,11 @@
  * @returns {[string, object]} : returns a translation message ID and an object with it's parameters
  *
  * @example
- *	const myUser = {
- *		email = 'a@b.c',
- *		firstname = 'John',
- *		// ...
- *	}
+ *    const myUser = {
+ *        email = 'a@b.c',
+ *        firstname = 'John',
+ *        // ...
+ *    }
  *  const [ errorMsg, errorParams ] = controlObject(tokenObjectDef, token, {fullCheck:true, checkId:false})
  *  if (errorMsg)
  *      throw new ComaintTranslatedError(errorMsg, errorParams)
@@ -35,36 +35,39 @@
 const controlObject = (objDef, object, options) => {
     const fullCheck =  options.fullCheck === undefined ? true : options.fullCheck
     const checkId =  options.checkId === undefined ? true : options.checkId
-	if (objDef === undefined)
-		throw new Error('objDef argument is missing')
-	if (typeof(objDef) != 'object')
-		throw new Error('objDef argument is not an object')
-	if (object === undefined)
-		throw new Error('object argument is missing')
-	if (typeof(object) != 'object')
-		throw new Error('object argument is not an object')
+    if (objDef === undefined)
+        throw new Error('objDef argument is missing')
+    if (typeof(objDef) != 'object')
+        throw new Error('objDef argument is not an object')
+    if (object === undefined)
+        throw new Error('object argument is missing')
+    if (typeof(object) != 'object')
+        throw new Error('object argument is not an object')
 
-	if (typeof(fullCheck) != 'boolean')
-		throw new Error('fullCheck argument is not an boolean')
-	if (typeof(checkId) != 'boolean')
-		throw new Error('checkId argument is not an boolean')
+    if (typeof(fullCheck) != 'boolean')
+        throw new Error('fullCheck argument is not an boolean')
+    if (typeof(checkId) != 'boolean')
+        throw new Error('checkId argument is not an boolean')
 
-	for (const [propName, propDef] of Object.entries(objDef)) {
-		if (propDef.type === 'id' && checkId === false)
-			continue
-		const propValue = object[propName]
-		if (propValue === undefined || propValue === null) {
-			if (fullCheck && propDef.mandatory)
+    for (const [propName, propDef] of Object.entries(objDef)) {
+        if (propDef.type === 'id' && checkId === false)
+            continue
+        const propValue = object[propName]
+        if (propValue === undefined || propValue === null) {
+            if (typeof(propDef.mandatory) !== 'boolean')
+                throw new Error('Invalid mandatory property')
+            if (fullCheck && propDef.mandatory) {
                 return [ 'common:error.prop.is_not_defined', { property: propName } ]
-		}
-		else {
-			const controlResult = controlObjectProperty (objDef, propName, object[propName])
+            }
+        }
+        else {
+            const controlResult = controlObjectProperty (objDef, propName, object[propName])
             if (controlResult[0] === true)
                 return controlResult
 
-		}
-	}
-	return [ false ] // no error
+        }
+    }
+    return [ false ] // no error
 }
 
 /**
@@ -91,30 +94,30 @@ const controlObject = (objDef, object, options) => {
  *
  */
 const controlObjectProperty = (objDef, propName, propValue) => {
-	if (objDef === undefined)
-		throw new Error('objDef argument is missing')
-	if (typeof(objDef) != 'object')
-		throw new Error('objDef argument is not an object')
-	if (propName === undefined)
-		throw new Error('propName argument is missing')
-	if (typeof(propName) != 'string')
-		throw new Error('propName argument is not a string')
-	const propDef = objDef[propName]
-	if (propDef === undefined)
-		throw new Error(`Invalid property name [${propName}]`)
+    if (objDef === undefined)
+        throw new Error('objDef argument is missing')
+    if (typeof(objDef) != 'object')
+        throw new Error('objDef argument is not an object')
+    if (propName === undefined)
+        throw new Error('propName argument is missing')
+    if (typeof(propName) != 'string')
+        throw new Error('propName argument is not a string')
+    const propDef = objDef[propName]
+    if (propDef === undefined)
+        throw new Error(`Invalid property name [${propName}]`)
 
-	if (propValue === undefined)
-		return ['common:error.prop.has_no_value', {property: propName}]
+    if (propValue === undefined)
+        return ['common:error.prop.has_no_value', {property: propName}]
 
-	if (propValue === null) {
-		if (propDef.mandatory)
-			return ['common:error.prop.is_null', {property: propName}]
-		else
-			return null // FIXME 
-	}
+    if (propValue === null) {
+        if (propDef.mandatory)
+            return ['common:error.prop.is_null', {property: propName}]
+        else
+            return null // FIXME 
+    }
 
 
-	if (propName === 'password')  {
+    if (propName === 'password')  {
         if (propDef.minimum && propValue.length < propDef.minimum )
             return ['common:error.prop.password_to_small', {property: propName, size: propDef.minimum}]
         let nLower = 0
@@ -138,61 +141,61 @@ const controlObjectProperty = (objDef, propName, propValue) => {
         return [ false ] // no error
     }
 
-	switch (propDef.type) {
+    switch (propDef.type) {
 
-		case 'id':
-		case 'link':
-			if (typeof(propValue) !== 'number' )
-				return ['common:error.prop.is_not_an_integer', {property: propName}]
+        case 'id':
+        case 'link':
+            if (typeof(propValue) !== 'number' )
+                return ['common:error.prop.is_not_an_integer', {property: propName}]
             return [ false ] // no error
 
-		case 'integer':
-			if (typeof(propValue) !== 'number' )
-				return ['common:error.prop.is_not_an_integer', {property: propName}]
-			if (propDef.minimum && propValue < propDef.minimum )
-				return ['common:error.prop.is_too_small', {property: propName, size: propDef.minimum}]
-			if (propDef.maximum && propValue > propDef.maximum )
-				return ['common:error.prop.is_too_large', {property: propName, size: propDef.maximum}]
+        case 'integer':
+            if (typeof(propValue) !== 'number' )
+                return ['common:error.prop.is_not_an_integer', {property: propName}]
+            if (propDef.minimum && propValue < propDef.minimum )
+                return ['common:error.prop.is_too_small', {property: propName, size: propDef.minimum}]
+            if (propDef.maximum && propValue > propDef.maximum )
+                return ['common:error.prop.is_too_large', {property: propName, size: propDef.maximum}]
             return [ false ] // no error
 
-		case 'string':
-		case 'text':
-		case 'image':
-			if (typeof(propValue) !== 'string' )
-				return ['common:error.prop.is_not_a_string', {property: propName}]
-			if (propDef.minimum && propValue.length < propDef.minimum )
-				return ['common:error.prop.is_too_short', {property: propName, size: propDef.minimum}]
-			if (propDef.maximum && propValue.length > propDef.maximum )
-				return ['common:error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
-			if (propDef.type !== 'text' && propValue.includes('\n'))
-				return ['common:error.prop.contains_line_feeds',  {property: propName, size: propDef.maximum}]
+        case 'string':
+        case 'text':
+        case 'image':
+            if (typeof(propValue) !== 'string' )
+                return ['common:error.prop.is_not_a_string', {property: propName}]
+            if (propDef.minimum && propValue.length < propDef.minimum )
+                return ['common:error.prop.is_too_short', {property: propName, size: propDef.minimum}]
+            if (propDef.maximum && propValue.length > propDef.maximum )
+                return ['common:error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
+            if (propDef.type !== 'text' && propValue.includes('\n'))
+                return ['common:error.prop.contains_line_feeds',  {property: propName, size: propDef.maximum}]
             return [ false ] // no error
 
-		case 'email':
-			if (typeof(propValue) !== 'string' )
-				return ['common:error.prop.is_not_a_string', {property: propName}]
-			if (propDef.minimum && propValue.length < propDef.minimum )
-				return ['common:error.prop.is_too_short', {property: propName, size: propDef.minimum}]
-			if (propDef.maximum && propValue.length > propDef.maximum )
-				return ['common:error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
-			if (propValue.match(/\S+@\S+\.\S+/) === null)
-				return ['common:error.prop.is_malformed_email', {property: 'email'}]
+        case 'email':
+            if (typeof(propValue) !== 'string' )
+                return ['common:error.prop.is_not_a_string', {property: propName}]
+            if (propDef.minimum && propValue.length < propDef.minimum )
+                return ['common:error.prop.is_too_short', {property: propName, size: propDef.minimum}]
+            if (propDef.maximum && propValue.length > propDef.maximum )
+                return ['common:error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
+            if (propValue.match(/\S+@\S+\.\S+/) === null)
+                return ['common:error.prop.is_malformed_email', {property: 'email'}]
             return [ false ] // no error
 
-		case 'date':
-		case 'datetime':
-			if (typeof(propValue) !== 'object' || propValue.constructor.name !== 'date')
-				return ['common:error.prop.is_not_a_date', {property: propName}]
+        case 'date':
+        case 'datetime':
+            if (typeof(propValue) !== 'object' || propValue.constructor.name !== 'date')
+                return ['common:error.prop.is_not_a_date', {property: propName}]
             return [ false ] // no error
 
-		case 'boolean':
-			if (typeof(propValue) !== 'boolean')
-				return ['common:error.prop.is_not_a_boolean', {property: propName}]
+        case 'boolean':
+            if (typeof(propValue) !== 'boolean')
+                return ['common:error.prop.is_not_a_boolean', {property: propName}]
             return [ false ] // no error
 
-		default:
-			throw new Error(`Property type [${propDef.type}] not supported`)
-	}
+        default:
+            throw new Error(`Property type [${propDef.type}] not supported`)
+    }
 }
 
 
@@ -206,25 +209,25 @@ const controlObjectProperty = (objDef, propName, propValue) => {
  * @param {Object} object - object to convert into a DB record
  */
 const convertObjectToDb = (objDef, object) => {
-	if (objDef === undefined)
-		throw new Error('objDef argument is missing')
-	if (typeof(objDef) != 'object')
-		throw new Error('objDef argument is not an object')
+    if (objDef === undefined)
+        throw new Error('objDef argument is missing')
+    if (typeof(objDef) != 'object')
+        throw new Error('objDef argument is not an object')
 
-	if (object === undefined)
-		throw new Error('object argument is missing')
-	if (typeof(object) != 'object')
-		throw new Error('object argument is not an object')
+    if (object === undefined)
+        throw new Error('object argument is missing')
+    if (typeof(object) != 'object')
+        throw new Error('object argument is not an object')
 
-	const dbRecord = {}
-	for (const [propName, propDef] of Object.entries(objDef)) {
-		let propValue = object[propName]
-		if (propValue === undefined)
-			continue
-		const fieldName = propDef.field ? propDef.field : propName
-		dbRecord[fieldName] = propValue
-	}
-	return dbRecord
+    const dbRecord = {}
+    for (const [propName, propDef] of Object.entries(objDef)) {
+        let propValue = object[propName]
+        if (propValue === undefined)
+            continue
+        const fieldName = propDef.field ? propDef.field : propName
+        dbRecord[fieldName] = propValue
+    }
+    return dbRecord
 }
 
 /**
@@ -236,38 +239,38 @@ const convertObjectToDb = (objDef, object) => {
  * @param {Object} dbRecord - object containing values issued from MySQL.
  */
 const convertObjectFromDb = (objDef, dbRecord) => {
-	if (objDef === undefined)
-		throw new Error('objDef argument is missing')
-	if (typeof(objDef) != 'object')
-		throw new Error('objDef argument is not an object')
+    if (objDef === undefined)
+        throw new Error('objDef argument is missing')
+    if (typeof(objDef) != 'object')
+        throw new Error('objDef argument is not an object')
 
-	if (dbRecord === undefined)
-		throw new Error('dbRecord argument is missing')
-	if (typeof(dbRecord) != 'object')
-		throw new Error('dbRecord argument is not an object')
+    if (dbRecord === undefined)
+        throw new Error('dbRecord argument is missing')
+    if (typeof(dbRecord) != 'object')
+        throw new Error('dbRecord argument is not an object')
 
-	const object = {}
-	for (const [propName, propDef] of Object.entries(objDef)) {
-	    if (propDef.secret)
+    const object = {}
+    for (const [propName, propDef] of Object.entries(objDef)) {
+        if (propDef.secret)
             continue
-		const fieldName = (propDef.field === undefined) ? propName : propDef.field
-		let fieldValue = dbRecord[fieldName]
-		if (fieldValue === undefined)  // should never happen
-			throw new Error(`Property [${fieldName}] is not defined in DB record`)
-		if (fieldValue !== null) {
-			if (propDef.type === 'boolean') 
-				fieldValue = (fieldValue === 1) ? true : false
-			// FIXME remove this if no error is thrown
-			if (propDef.type === 'date' || propDef.type === 'datetime') {
-				if (typeof(fieldValue) !== 'object')
-					throw new Error(`Property [${propName}] it not an object`)
-				if (fieldValue.constructor.name !== 'Date')
-					throw new Error(`Property [${propName}] it not a date`)
-			}
-		}
-		object[propName] = fieldValue
-	}
-	return object
+        const fieldName = (propDef.field === undefined) ? propName : propDef.field
+        let fieldValue = dbRecord[fieldName]
+        if (fieldValue === undefined)  // should never happen
+            throw new Error(`Property [${fieldName}] is not defined in DB record`)
+        if (fieldValue !== null) {
+            if (propDef.type === 'boolean') 
+                fieldValue = (fieldValue === 1) ? true : false
+            // FIXME remove this if no error is thrown
+            if (propDef.type === 'date' || propDef.type === 'datetime') {
+                if (typeof(fieldValue) !== 'object')
+                    throw new Error(`Property [${propName}] it not an object`)
+                if (fieldValue.constructor.name !== 'Date')
+                    throw new Error(`Property [${propName}] it not a date`)
+            }
+        }
+        object[propName] = fieldValue
+    }
+    return object
 }
 
 /**
@@ -283,7 +286,7 @@ const convertObjectFromDb = (objDef, dbRecord) => {
  *
  * @example
  *
- * 	static async getUserList(filters) {
+ *     static async getUserList(filters) {
  *     const [ sqlValues, sqlFilters ] = buildFieldArrays(userObjectDef, filters)
  *     const whereClause = sqlFilters.length === 0 ? '' :
  *         'WHERE ' + sqlFilters.map(f => `${f} = ?`).join(' AND ')
@@ -292,36 +295,36 @@ const convertObjectFromDb = (objDef, dbRecord) => {
  *
  */
 const buildFieldArrays = (objDef, object) => {
-	if (objDef === undefined)
-		throw new Error('objDef argument is missing')
-	if (typeof(objDef) != 'object')
-		throw new Error('objDef argument is not an object')
-	if (object === undefined)
-		throw new Error('object argument is missing')
-	if (typeof(object) != 'object')
-		throw new Error('object argument is not an object')
-	const fieldNames = []
-	const fieldValues = []
-	for (const [propName, propDef] of Object.entries(objDef)) {
-		let fieldValue = object[propName]
-		if (fieldValue === undefined)
-			continue
-		const fieldName = propDef.field ? propDef.field : propName
-		fieldNames.push(fieldName)
-		fieldValues.push(fieldValue)
-	}
-	return [fieldNames, fieldValues]
+    if (objDef === undefined)
+        throw new Error('objDef argument is missing')
+    if (typeof(objDef) != 'object')
+        throw new Error('objDef argument is not an object')
+    if (object === undefined)
+        throw new Error('object argument is missing')
+    if (typeof(object) != 'object')
+        throw new Error('object argument is not an object')
+    const fieldNames = []
+    const fieldValues = []
+    for (const [propName, propDef] of Object.entries(objDef)) {
+        let fieldValue = object[propName]
+        if (fieldValue === undefined)
+            continue
+        const fieldName = propDef.field ? propDef.field : propName
+        fieldNames.push(fieldName)
+        fieldValues.push(fieldValue)
+    }
+    return [fieldNames, fieldValues]
 }
 
 const buildPublicObjectVersion = (objDef, object) => {
-	if (objDef === undefined)
-		throw new Error('objDef argument is missing')
-	if (typeof(objDef) != 'object')
-		throw new Error('objDef argument is not an object')
-	if (object === undefined)
-		throw new Error('object argument is missing')
-	if (typeof(object) != 'object')
-		throw new Error('object argument is not an object')
+    if (objDef === undefined)
+        throw new Error('objDef argument is missing')
+    if (typeof(objDef) != 'object')
+        throw new Error('objDef argument is not an object')
+    if (object === undefined)
+        throw new Error('object argument is missing')
+    if (typeof(object) != 'object')
+        throw new Error('object argument is not an object')
     const publicObject = Object.fromEntries(
         Object.entries(object).filter( ([propName, propValue]) => {
             const propDef = objDef[propName]
@@ -330,13 +333,13 @@ const buildPublicObjectVersion = (objDef, object) => {
             return true
         })
     )
-	return publicObject
+    return publicObject
 }
 
 export {
     controlObject,
     controlObjectProperty,
-	convertObjectToDb,
+    convertObjectToDb,
     convertObjectFromDb,
     buildFieldArrays,
     buildPublicObjectVersion 

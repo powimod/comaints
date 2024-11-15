@@ -2,13 +2,13 @@
 const tokenObjectDef = {
     "id" : {
         "type": "id",
-        "mandatory": "true",
+        "mandatory": true,
         "scope": "public"
     },
     "expiresAt" : {
         "type": "datetime",
         "field": "expires_at",
-        "mandatory": "true",
+        "mandatory": true,
         "scope": "public"
     }, 
     "userId" : {
