@@ -1,6 +1,5 @@
 'use strict'
 
-
 /**
  * Contrôle les propriétés de l'objet passé en second argument en accord avec la définition d'objet passée
  * en premier argument.
@@ -59,7 +58,10 @@ const controlObject = (objDef, object, options) => {
                 return [ 'common:error.prop.is_not_defined', { property: propName } ]
 		}
 		else {
-			return controlObjectProperty (objDef, propName, object[propName])
+			const controlResult = controlObjectProperty (objDef, propName, object[propName])
+            if (controlResult[0] === true)
+                return controlResult
+
 		}
 	}
 	return [ false ] // no error
