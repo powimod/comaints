@@ -9,6 +9,7 @@ import AccountModelSingleton  from './models/AccountModel.js'
 import TokenModelSingleton    from './models/TokenModel.js'
 import AuthModelSingleton     from './models/AuthModel.js'
 import AdminModelSingleton    from './models/AdminModel.js'
+import UnitModelSingleton     from './models/UnitModel.js'
 import { AccountState } from '../../common/src/global.mjs'
 
 class Model {
@@ -20,6 +21,7 @@ class Model {
     #companyModel = null
     #userModel = null
     #tokenModel = null
+    #unitModel = null
 
     async initialize(config) {
         this.#config = config
@@ -120,6 +122,9 @@ class Model {
         this.#companyModel = CompanyModelSingleton.getInstance()
         this.#companyModel.initialize(dbPool)
 
+        this.#unitModel = UnitModelSingleton.getInstance()
+        this.#unitModel.initialize(dbPool)
+        
         const adminEmail = config.admin.email
         const adminPassword = config.admin.password
         if (adminEmail !== null && adminPassword !== null) {
@@ -177,6 +182,10 @@ class Model {
 
     getAuthModel() {
         return this.#authModel
+    }
+
+    getUnitModel() {
+        return this.#unitModel
     }
 }
 
