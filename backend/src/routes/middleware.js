@@ -37,15 +37,15 @@ const requireAdminAuth = (request, _ , next) => {
 }
 
 
-const checkPagination = (request, _, next) => {
+const requestPagination = (request, _, next) => {
     const DEFAULT_PAGE = 1
     const DEFAULT_LIMIT = 10
     const view = request.view
     assert(view !== undefined)
     let page, limit
     if (request.method === 'GET') {
-        page = request?.page || DEFAULT_PAGE
-        limit = request.query?.limit || DEFAULT_LIMIT
+        page = parseInt(request.query?.page || DEFAULT_PAGE)
+        limit = parseInt(request.query?.limit || DEFAULT_LIMIT)
     }
     else {
         page = request.body?.page || DEFAULT_PAGE
@@ -60,7 +60,31 @@ const checkPagination = (request, _, next) => {
         return
     }
     const offset = (page - 1) * limit
-    request.pagination = { page, limit, offset }
+    request.requestPagination = { page, limit, offset }
+    next()
+}
+
+const requestFilters = (request, _, next) => {
+    const view = request.view
+    assert(view !== undefined)
+    const filters = request.body.filters || {}
+    if (typeof(filters) !== 'object') {
+        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'filters'}))
+        return
+    }
+    request.requestFilters = filters  
+    next()
+}
+
+const requestProperties = (request, _, next) => {
+    const view = request.view
+    assert(view !== undefined)
+    const properties = request.body.properties || null
+    if (properties !== null && ! (properties instanceof Array)) {
+        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'properties'}))
+        return
+    }
+    request.requestProperties = properties
     next()
 }
 
@@ -125,4 +149,12 @@ const renewContext = async (request, user) => {
 }
 
 
-export { requireAdminAuth, requireUserAuth, renewTokens, renewContext, checkPagination }
+export { 
+    requireAdminAuth, 
+    requireUserAuth, 
+    renewTokens, 
+    renewContext, 
+    requestPagination,
+    requestFilters,
+    requestProperties
+}

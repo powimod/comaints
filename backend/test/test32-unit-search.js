@@ -73,7 +73,7 @@ describe('Test units', () => {
                 }
                 catch (error) {
                     expect(error).to.be.instanceOf(Error)
-                    expect(error.message).to.equal('Invalid value for «page» parameter in request body')
+                    expect(error.message).to.equal('Invalid value for «page» parameter in request')
                 }
             })
 
@@ -86,7 +86,7 @@ describe('Test units', () => {
                 }
                 catch (error) {
                     expect(error).to.be.instanceOf(Error)
-                    expect(error.message).to.equal('Invalid value for «limit» parameter in request body')
+                    expect(error.message).to.equal('Invalid value for «limit» parameter in request')
                 }
             })
 
@@ -177,7 +177,7 @@ describe('Test units', () => {
                 }
                 catch (error) {
                     expect(error).to.be.instanceOf(Error)
-                    expect(error.message).to.equal('Invalid value for «properties» parameter in request body')
+                    expect(error.message).to.equal('Invalid value for «properties» parameter in request')
                 }
             })
 
@@ -217,7 +217,7 @@ describe('Test units', () => {
                 }
                 catch (error) {
                     expect(error).to.be.instanceOf(Error)
-                    expect(error.message).to.equal('Invalid value for «filters» parameter in request body')
+                    expect(error.message).to.equal('Invalid value for «filters» parameter in request')
                 }
             })
 

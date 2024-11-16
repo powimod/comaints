@@ -2,7 +2,7 @@
 import assert from 'assert'
 
 import ModelSingleton from '../model.js'
-import { requireUserAuth, checkPagination  } from './middleware.js'
+import { requireUserAuth, requestPagination, requestFilters, requestProperties } from './middleware.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
 import { controlObject } from '../../../common/src/objects/object-util.mjs'
 import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs'
@@ -15,10 +15,14 @@ class UnitRoutes {
         
         const unitModel = model.getUnitModel()
 
-        expressApp.get('/api/v1/unit/list', requireUserAuth, checkPagination, async (request) => {
+        expressApp.get('/api/v1/unit/list', requireUserAuth, requestProperties, requestPagination, async (request) => {
             const view = request.view
+            const properties = request.requestProperties
+            assert(properties !== undefined)
+            const pagination = request.requestPagination
+            assert(pagination !== undefined)
             try {
-                const result = await unitModel.findUnitList(null, null, request.pagination)
+                const result = await unitModel.findUnitList(properties, null, pagination)
                 view.json(result)
             }
             catch(error) {
@@ -27,21 +31,20 @@ class UnitRoutes {
             }
         })
 
-        expressApp.post('/api/v1/unit/search', requireUserAuth, checkPagination,  async (request) => {
+        expressApp.post('/api/v1/unit/search', requireUserAuth, requestProperties, requestFilters, requestPagination,  async (request) => {
             const view = request.view
+            const properties = request.requestProperties
+            assert(properties !== undefined)
+            const filters = request.requestFilters
+            assert(filters !== undefined)
+            const pagination = request.requestPagination
+            assert(pagination !== undefined)
             try {
-                let properties = request.body.properties || null
-                if (properties !== null && ! (properties instanceof Array))
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'properties'})
-                let filters = request.body.filters || {}
-                if (typeof(filters) !== 'object')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'filters'})
-
                 // return only units of user company !
                 assert(request.companyId)
                 filters.companyId = request.companyId
 
-                const result = await unitModel.findUnitList(properties, filters, request.pagination)
+                const result = await unitModel.findUnitList(properties, filters, pagination)
                 view.json(result)
             }
             catch(error) {

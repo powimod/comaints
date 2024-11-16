@@ -32,18 +32,18 @@ describe('Test reset password', () => {
 
     describe(`Call route /${ROUTE_INITIALIZE_COMPANY} with invalid data`, () => {
 
-        it(`Should detect missing company name in request body`, async () => {
+        it(`Should detect missing company name in request`, async () => {
             try {
                 let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {})
                 expect.fail("Missing parameter not detected")
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Parameter «companyName» not found in request body`)
+                expect(error.message).to.equal(`Parameter «companyName» not found in request`)
             }
         })
 
-        it(`Should detect invalid company name in request body`, async () => {
+        it(`Should detect invalid company name in request`, async () => {
             try {
                 let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName: 123})
                 expect.fail("Invalid company name not detected")
@@ -54,7 +54,7 @@ describe('Test reset password', () => {
             }
         })
 
-        it(`Should detect empty company name in request body`, async () => {
+        it(`Should detect empty company name in request`, async () => {
             try {
                 let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName: ''})
                 expect.fail("Empty company name not detected")

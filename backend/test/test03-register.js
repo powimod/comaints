@@ -39,7 +39,7 @@ describe('Test user registration', () => {
 
     describe(`Call route /${ROUTE_REGISTER} with invalid data`, () => {
 
-        it(`Should detect missing email in request body`, async () => {
+        it(`Should detect missing email in request`, async () => {
             try {
                 const json = await jsonPost(ROUTE_REGISTER, {
                         email_missing:'',
@@ -50,12 +50,12 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Parameter «email» not found in request body`)
+                expect(error.message).to.equal(`Parameter «email» not found in request`)
             }
         })
 
 
-        it(`Should detect empty email in request body`, async () => {
+        it(`Should detect empty email in request`, async () => {
             try {
                 const json = await jsonPost(ROUTE_REGISTER, {
                         email:'',
@@ -70,7 +70,7 @@ describe('Test user registration', () => {
             }
         })
 
-        it(`Should detect malformed email in request body`, async () => {
+        it(`Should detect malformed email in request`, async () => {
             try {
                 const json = await jsonPost(ROUTE_REGISTER, {
                         email:'abcdef',
@@ -86,7 +86,7 @@ describe('Test user registration', () => {
         })
 
 
-        it('Should detect missing password in request body', async () => {
+        it('Should detect missing password in request', async () => {
             try {
                 const json = await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
@@ -97,11 +97,11 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Parameter «password» not found in request body')
+                expect(error.message).to.equal('Parameter «password» not found in request')
             }
         })
 
-        it('Should detect too small password in request body', async () => {
+        it('Should detect too small password in request', async () => {
             try {
                 const json = await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
@@ -116,7 +116,7 @@ describe('Test user registration', () => {
             }
         })
 
-        it('Should detect password with no uppercase letter in request body', async () => {
+        it('Should detect password with no uppercase letter in request', async () => {
             try {
                 const json = await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
@@ -131,7 +131,7 @@ describe('Test user registration', () => {
             }
         })
 
-        it('Should detect password with no digit character in request body', async () => {
+        it('Should detect password with no digit character in request', async () => {
             try {
                 const json = await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
@@ -146,7 +146,7 @@ describe('Test user registration', () => {
             }
         })
 
-        it('Should detect password with no special character in request body', async () => {
+        it('Should detect password with no special character in request', async () => {
             try {
                 const json = await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
@@ -253,7 +253,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Parameter «code» not found in request body`)
+                expect(error.message).to.equal(`Parameter «code» not found in request`)
             }
         })
 
@@ -264,7 +264,7 @@ describe('Test user registration', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Invalid value for «code» parameter in request body`)
+                expect(error.message).to.equal(`Invalid value for «code» parameter in request`)
             }
         })
 

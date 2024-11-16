@@ -32,7 +32,7 @@ describe('Test reset password', () => {
 
     describe(`Call route /${ROUTE_RESET_PASSWORD} with invalid data`, () => {
 
-        it(`Should detect missing email in request body`, async () => {
+        it(`Should detect missing email in request`, async () => {
             try {
                 let json = await jsonPost(ROUTE_RESET_PASSWORD, {
                         email_missing:'',
@@ -42,11 +42,11 @@ describe('Test reset password', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Parameter «email» not found in request body`)
+                expect(error.message).to.equal(`Parameter «email» not found in request`)
             }
         })
 
-        it(`Should detect empty email in request body`, async () => {
+        it(`Should detect empty email in request`, async () => {
             try {
                 let json = await jsonPost(ROUTE_RESET_PASSWORD, {
                         email:'',
@@ -60,7 +60,7 @@ describe('Test reset password', () => {
             }
         })
 
-        it(`Should detect malformed email in request body`, async () => {
+        it(`Should detect malformed email in request`, async () => {
             try {
                 let json = await jsonPost(ROUTE_RESET_PASSWORD, {
                         email:'abcdef',
@@ -74,7 +74,7 @@ describe('Test reset password', () => {
             }
         })
 
-        it('Should detect missing password in request body', async () => {
+        it('Should detect missing password in request', async () => {
             try {
                 let json = await jsonPost(ROUTE_RESET_PASSWORD, {
                         email:'a@b.c',
@@ -85,12 +85,12 @@ describe('Test reset password', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Parameter «password» not found in request body')
+                expect(error.message).to.equal('Parameter «password» not found in request')
             }
         })
 
 
-        it('Should detect too small password in request body', async () => {
+        it('Should detect too small password in request', async () => {
             try {
                 let json = await jsonPost(ROUTE_RESET_PASSWORD, {
                         email:'a@b.c',
@@ -105,7 +105,7 @@ describe('Test reset password', () => {
             }
         })
 
-        it('Should detect password with no uppercase letter in request body', async () => {
+        it('Should detect password with no uppercase letter in request', async () => {
             try {
                 let json = await jsonPost(ROUTE_RESET_PASSWORD, {
                         email:'a@b.c',
@@ -120,7 +120,7 @@ describe('Test reset password', () => {
             }
         })
 
-        it('Should detect password with no digit character in request body', async () => {
+        it('Should detect password with no digit character in request', async () => {
             try {
                 let json = await jsonPost(ROUTE_RESET_PASSWORD, {
                         email:'a@b.c',
@@ -135,7 +135,7 @@ describe('Test reset password', () => {
             }
         })
 
-        it('Should detect password with no special character in request body', async () => {
+        it('Should detect password with no special character in request', async () => {
             try {
                 let json = await jsonPost(ROUTE_RESET_PASSWORD, {
                         email:'a@b.c',
