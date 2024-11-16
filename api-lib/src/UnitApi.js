@@ -16,5 +16,12 @@ class UnitApi {
         return result.unit
     }
 
+    async listUnit() {
+        const LIST_UNIT_ROUTE = '/api/v1/unit/list'
+        const result = await this.#context.jsonGet(LIST_UNIT_ROUTE , {}, {token:true})
+        return result.unitList
+    }
+
+
 }
 export default UnitApi
