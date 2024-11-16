@@ -4,7 +4,7 @@ import assert from 'assert'
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
-import { requireAdminAuth, requireUserAuth, renewTokens, renewContext } from './auth.js'
+import { requireAdminAuth, requireUserAuth, renewTokens, renewContext } from './middleware.js'
 
 import { controlObject, controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
 import companyObjectDef from '../../../common/src/objects/company-object-def.mjs'

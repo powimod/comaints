@@ -4,7 +4,7 @@ import assert from 'assert'
 
 import View from '../view.js'
 import ModelSingleton from '../model.js'
-import { requireUserAuth } from './auth.js'
+import { requireUserAuth } from './middleware.js'
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs'
 import { controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'

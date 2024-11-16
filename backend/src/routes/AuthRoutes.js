@@ -2,7 +2,7 @@
 
 import assert from 'assert'
 
-import { requireUserAuth } from './auth.js'
+import { requireUserAuth } from './middleware.js'
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized,

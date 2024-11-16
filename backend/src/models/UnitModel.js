@@ -2,10 +2,12 @@
 
 import assert from 'assert'
 
-import { buildFieldNameArray, buildFieldArrays, controlObject, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs'
+import { buildFieldNameArray, buildFieldArrays, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs'
 import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs'
 import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs'
-import { AccountState } from '../../../common/src/global.mjs'
+
+const defaultResultPropertyList = [ 'id', 'name' ]
+const defaultOrderPropertyList = [ 'name', 'description' ]
 
 class UnitModel {
     #db = null
@@ -15,51 +17,55 @@ class UnitModel {
         this.#db = db
     }
 
-    /*TODO à supprimer
-    async findUnitList() {
-        let sql = `SELECT * FROM units ORDER BY name`
-        const result = await this.#db.query(sql)
-        const unitList = []
-        for (let unitRecord of result) {
-            const unit = convertObjectFromDb(unitObjectDef, unitRecord)
-            unitList.push(unit)
-        }
-        return unitList
-    }
-    */
-
-    async findUnitList(properties = [], filters = null) {
-		assert(this.#db !== null)
-        if (! (properties instanceof Array))
+    async findUnitList(properties = null, filters = null, pagination = null) {
+        assert(this.#db !== null)
+        if (properties === null)
+            properties = defaultResultPropertyList
+        if (!(properties instanceof Array))
             throw new Error("Parameter «properties» is not an array")
         if (typeof(filters) !== 'object')
             throw new Error("Parameter «filters» is not an object")
 
+
         const sqlFields = buildFieldNameArray(unitObjectDef, properties)
-        console.log("dOm sqlFields", sqlFields)
 
-        console.log("dOm filters", filters)
-        console.log("dOm C")
-		const [ fieldNames, fieldValues ] = buildFieldArrays(unitObjectDef, filters)
-		const sqlWhere = fieldNames.length === 0 ? '' :
-			'WHERE ' + fieldNames.map(f => `${f} = ?`).join(' AND ')
-        console.log("dOm sqlWHERE", sqlWhere)
+        const [ fieldNames, fieldValues ] = buildFieldArrays(unitObjectDef, filters)
+        const sqlWhere = fieldNames.length === 0 ? '' :
+            'WHERE ' + fieldNames.map(f => `${f} = ?`).join(' AND ')
 
-        // TODO order clause 
-		let sql = `SELECT ${sqlFields} FROM units ${sqlWhere}`
-        console.log("dOm SQL", sql)
+        const sortProperties = defaultOrderPropertyList
+        const sortFieldNames = buildFieldNameArray(unitObjectDef, sortProperties)
+        const sqlSort = sortFieldNames.map === 0 ? '' :
+            'ORDER BY ' + sortFieldNames.map(f => `${f}`).join(', ')
 
-		const result = await this.#db.query(sql, fieldValues)
-		if (result.code) 
-			throw new Error(result.code)
-        // TODO page filtering
-		const unitList = []
-        for (let unitRecord of result) {
-            const unit = convertObjectFromDb(unitObjectDef, unitRecord)
-            unitList.push(unit)
+        // get record counts
+        let sql = `SELECT COUNT(*) as count FROM units ${sqlWhere}`
+        const result = await this.#db.query(sql, fieldValues)
+        let recordCount = result[0]['count']
+
+        const unitList = []
+
+        // get record of selected page
+        if ( recordCount > 0 ) {
+            sql = `SELECT ${sqlFields} FROM units ${sqlWhere} ${sqlSort} LIMIT ? OFFSET ?`
+            console.log("dOm sql", sql)
+            console.log("dOm params", fieldValues)
+            fieldValues.push(pagination.limit, pagination.offset)
+            const result = await this.#db.query(sql, fieldValues)
+
+            for (let unitRecord of result) {
+                const unit = convertObjectFromDb(unitObjectDef, unitRecord)
+                unitList.push(unit)
+            }
         }
-		return unitList
-	}
+
+        return {
+            unitList,
+            page: pagination.page,
+            limit: pagination.limit,
+            count: recordCount
+        }
+    }
 
 
 

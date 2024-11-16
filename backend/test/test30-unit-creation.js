@@ -1,9 +1,8 @@
 'use strict'
 import { expect } from 'chai'
-import assert from 'assert'
 
-import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
-import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserByEmail } from './helpers.js'
+import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb } from './util.js'
+import { createUserAccount, deleteUserAccount } from './helpers.js'
 
 const ROUTE_UNIT_LIST = '/api/v1/unit/list'
 const ROUTE_UNIT_SEARCH = '/api/v1/unit/search'
@@ -17,7 +16,6 @@ describe('Test units', () => {
     const unit2Description = 'Unit B description'
 
     let user = null
-    let company = null
     let unit1 = null
     let unit2 = null
     let unit3 = null
@@ -39,7 +37,10 @@ describe('Test units', () => {
     describe('Check unit creation', () => {
         it(`Check unit list is empty`, async () => {
             let json = await jsonGet(ROUTE_UNIT_LIST )
-            expect(json).to.be.instanceOf(Object).and.to.have.keys('unitList')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('unitList', 'count', 'page', 'limit')
+            expect(json.count).to.be.a('number').and.to.equal(0)
+            expect(json.page).to.be.a('number').and.to.equal(1)
+            expect(json.limit).to.be.a('number').and.to.equal(10)
             const unitList = json.unitList
             expect(unitList).to.be.instanceOf(Array).and.to.have.lengthOf(0)
         })
@@ -101,7 +102,9 @@ describe('Test units', () => {
 
         it(`Check unit list`, async () => {
             let json = await jsonGet(ROUTE_UNIT_LIST )
-            expect(json).to.be.instanceOf(Object).and.to.have.keys('unitList')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('unitList', 'count', 'page', 'limit')
+            expect(json.page).to.be.a('number').and.to.equal(1)
+            expect(json.limit).to.be.a('number').and.to.equal(10)
             const unitList = json.unitList
             expect(unitList).to.be.instanceOf(Array).and.to.have.lengthOf(3)
 
@@ -127,7 +130,7 @@ describe('Test units', () => {
 
         it(`Check unit search without filtering`, async () => {
             let json = await jsonPost(ROUTE_UNIT_SEARCH)
-            expect(json).to.be.instanceOf(Object).and.to.have.keys('unitList')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('unitList', 'count', 'page', 'limit')
             const unitList = json.unitList
             expect(unitList).to.be.instanceOf(Array).and.to.have.lengthOf(3)
             let unit = unitList[0]
@@ -138,7 +141,7 @@ describe('Test units', () => {
 
         it(`Try unit search with invalid properties`, async () => {
             try {
-                let json = await jsonPost(ROUTE_UNIT_SEARCH, {
+                await jsonPost(ROUTE_UNIT_SEARCH, {
                     properties: 'abc'
                 })
                 throw new Error('Invalid properties not detected')
@@ -153,7 +156,7 @@ describe('Test units', () => {
             let json = await jsonPost(ROUTE_UNIT_SEARCH, {
                 properties: [ 'id', 'name', 'description', 'companyId' ]
             })
-            expect(json).to.be.instanceOf(Object).and.to.have.keys('unitList')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('unitList', 'count', 'page', 'limit')
             const unitList = json.unitList
             expect(unitList).to.be.instanceOf(Array).and.to.have.lengthOf(3)
             let unit = unitList[0]
@@ -173,7 +176,7 @@ describe('Test units', () => {
 
         it(`Try unit search with invalid filters`, async () => {
             try {
-                let json = await jsonPost(ROUTE_UNIT_SEARCH, {
+                await jsonPost(ROUTE_UNIT_SEARCH, {
                     filters: 'abc'
                 })
                 throw new Error('Invalid properties not detected')
@@ -189,7 +192,10 @@ describe('Test units', () => {
             let json = await jsonPost(ROUTE_UNIT_SEARCH, { 
                 filters: { name: unit2.name }
             })
-            expect(json).to.be.instanceOf(Object).and.to.have.keys('unitList')
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('unitList', 'count', 'page', 'limit')
+            expect(json.count).to.be.a('number').and.to.equal(1)
+            expect(json.page).to.be.a('number').and.to.equal(1)
+            expect(json.limit).to.be.a('number').and.to.equal(10)
             const unitList = json.unitList
             expect(unitList).to.be.instanceOf(Array).and.to.have.lengthOf(1)
             let unit = unitList[0]
