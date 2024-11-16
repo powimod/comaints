@@ -8,7 +8,7 @@ export const initializeCompanyThunk = createAsyncThunk(
     async ({ companyName }, { rejectWithValue }) => {
         const comaintApi = ComaintBackendApiSingleton.getInstance()
         try {
-            return await comaintApi.company.initializeCompany({companyName})
+            return await comaintApi.company.initializeCompany(companyName)
         } catch (error) {
             return rejectWithValue(error.message)
         }

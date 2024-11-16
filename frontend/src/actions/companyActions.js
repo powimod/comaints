@@ -6,7 +6,7 @@ const useCompanyActions = () => {
     const authState = useSelector((state) => state.auth)
 
     const initializeCompany = async (companyName) => {
-        const result = await dispatch(initializeCompanyThunk({companyName}))
+        const result = await dispatch(initializeCompanyThunk({ companyName }))
         if (initializeCompanyThunk.rejected.match(result)) 
             throw new Error(result.payload)
     }
