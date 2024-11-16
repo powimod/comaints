@@ -26,8 +26,9 @@ class UnitModel {
         if (typeof(filters) !== 'object')
             throw new Error("Parameter «filters» is not an object")
 
-
         const sqlFields = buildFieldNameArray(unitObjectDef, properties)
+        if (sqlFields.length === 0)
+            throw new Error("No request properties found")
 
         const [ fieldNames, fieldValues ] = buildFieldArrays(unitObjectDef, filters)
         const sqlWhere = fieldNames.length === 0 ? '' :
