@@ -43,12 +43,13 @@ const createUserAccount = async (options = {}) => {
     if (withCompany) {
         const companyName = 'My Company'
         let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName})
-        expect(json).to.be.instanceOf(Object).and.to.have.keys('id', 'name', 'access-token', 'refresh-token', 'context')
-        expect(json.id).to.be.a('number')
-        expect(json.name).to.be.a('string').and.to.equal(companyName)
-        companyId = json.id
+        expect(json).to.be.instanceOf(Object).and.to.have.keys('company', 'access-token', 'refresh-token', 'context')
+        const company = json.company
+        expect(company).to.be.instanceOf(Object).and.to.have.keys('id', 'name')
+        expect(company.id).to.be.a('number')
+        expect(company.name).to.be.a('string').and.to.equal(companyName)
+        companyId = company.id
     }
-
 
     if (logout)
         await jsonPost(ROUTE_LOGOUT)

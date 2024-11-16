@@ -388,13 +388,13 @@ const buildFieldNameArray = (objDef, propNameArray ) => {
  */
 const buildPublicObjectVersion = (objDef, object) => {
     if (objDef === undefined)
-        throw new Error('objDef argument is missing')
+        throw new Error('Argument «objDef» is missing')
     if (typeof(objDef) != 'object')
-        throw new Error('objDef argument is not an object')
+        throw new Error('Argument «objDef»  is not an object')
     if (object === undefined)
-        throw new Error('object argument is missing')
+        throw new Error('Argument «object» argument is missing')
     if (typeof(object) != 'object')
-        throw new Error('object argument is not an object')
+        throw new Error('Argument «argument» is not an object')
     const publicObject = Object.fromEntries(
         Object.entries(object).filter( ([propName, propValue]) => {
             const propDef = objDef[propName]

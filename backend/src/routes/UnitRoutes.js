@@ -1,4 +1,4 @@
-'use strict'
+'initializeuse strict'
 import assert from 'assert'
 
 import ModelSingleton from '../model.js'
@@ -21,8 +21,12 @@ class UnitRoutes {
             assert(properties !== undefined)
             const pagination = request.requestPagination
             assert(pagination !== undefined)
+
+            assert(request.companyId)
+            const filters = { companyId: request.companyId }
+
             try {
-                const result = await unitModel.findUnitList(properties, null, pagination)
+                const result = await unitModel.findUnitList(properties, filters, pagination)
                 view.json(result)
             }
             catch(error) {
@@ -48,7 +52,6 @@ class UnitRoutes {
                 view.json(result)
             }
             catch(error) {
-                console.log(error)
                 view.error(error)
             }
         })
@@ -73,6 +76,7 @@ class UnitRoutes {
                 view.json({unit})
             }
             catch(error) {
+                console.log(error)
                 view.error(error)
             }
         })

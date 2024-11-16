@@ -6,7 +6,7 @@ import ModelSingleton from '../model.js'
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
 import { requireAdminAuth, requireUserAuth, renewTokens, renewContext } from './middleware.js'
 
-import { controlObject, controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
+import { controlObject, controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs'
 import companyObjectDef from '../../../common/src/objects/company-object-def.mjs'
 
 class CompanyRoutes {
@@ -76,10 +76,10 @@ class CompanyRoutes {
                 await renewTokens(request)
                 await renewContext(request, user)
 
-                view.json(company)
+                company = buildPublicObjectVersion(companyObjectDef, company)
+                view.json({company})
             }
             catch(error) {
-                console.log(error)
                 view.error(error)
             }
         })
