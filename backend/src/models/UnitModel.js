@@ -2,7 +2,7 @@
 
 import assert from 'assert'
 
-import { buildFieldArrays, controlObject, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs'
+import { buildFieldNameArray, buildFieldArrays, controlObject, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs'
 import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs'
 import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs'
 import { AccountState } from '../../../common/src/global.mjs'
@@ -15,6 +15,7 @@ class UnitModel {
         this.#db = db
     }
 
+    /*TODO à supprimer
     async findUnitList() {
         let sql = `SELECT * FROM units ORDER BY name`
         const result = await this.#db.query(sql)
@@ -25,6 +26,41 @@ class UnitModel {
         }
         return unitList
     }
+    */
+
+    async findUnitList(properties = [], filters = null) {
+		assert(this.#db !== null)
+        if (! (properties instanceof Array))
+            throw new Error("Parameter «properties» is not an array")
+        if (typeof(filters) !== 'object')
+            throw new Error("Parameter «filters» is not an object")
+
+        const sqlFields = buildFieldNameArray(unitObjectDef, properties)
+        console.log("dOm sqlFields", sqlFields)
+
+        console.log("dOm filters", filters)
+        console.log("dOm C")
+		const [ fieldNames, fieldValues ] = buildFieldArrays(unitObjectDef, filters)
+		const sqlWhere = fieldNames.length === 0 ? '' :
+			'WHERE ' + fieldNames.map(f => `${f} = ?`).join(' AND ')
+        console.log("dOm sqlWHERE", sqlWhere)
+
+        // TODO order clause 
+		let sql = `SELECT ${sqlFields} FROM units ${sqlWhere}`
+        console.log("dOm SQL", sql)
+
+		const result = await this.#db.query(sql, fieldValues)
+		if (result.code) 
+			throw new Error(result.code)
+        // TODO page filtering
+		const unitList = []
+        for (let unitRecord of result) {
+            const unit = convertObjectFromDb(unitObjectDef, unitRecord)
+            unitList.push(unit)
+        }
+		return unitList
+	}
+
 
 
     async getUnitById(unitId) {

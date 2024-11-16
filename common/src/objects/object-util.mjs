@@ -1,25 +1,30 @@
 'use strict'
 
 /**
- * Contrôle les propriétés de l'objet passé en second argument en accord avec la définition d'objet passée
- * en premier argument.
- * Renvoie un tableau de deux éléments.
- * Le premier élément est soit un booléen contenant la valeur «false» si toutes les propriétés de l'objet 
+ * Cette fonction contrôle les propriétés de l'objet passé en second argument en accord avec la 
+ * définition d'objet passée en premier argument.
+ *
+ * Elle renvoie un tableau de deux éléments :
+ * - Le premier élément est soit un booléen contenant la valeur «false» si toutes les propriétés de l'objet 
  * sont valides, soit un identifiant de message d'erreur indiquant le problème rencontré.
- * Le deuxième élément du tableau est un objet contenant les clés/valeurs des différents paramètres du
+ * - Le deuxième élément du tableau est un objet contenant les clés/valeurs des différents paramètres du
  * message d'erreur.
- * La fonction accepte troisième argument des options qui indiquent si toutes les propriétes doivent 
+ *
+ * La fonction accepte en troisième argument des options qui indiquent si toutes les propriétes doivent 
  * être présentes ou pas et si l'identifiant de l'objet doit être contrôlé ou pas.
  *
  * @function
  * @param {Object} objDef - objet contenant la définition des propriétés de l'objet
  * @param {Object} object - objet à contrôler
  * @param {Object} options
- * @param {boolean} [options.fullCheck=true] - indicates if all properties must be present or not.
- * @param {boolean} [options.checkId=true] - indicates if object ID property should be controlled or not
- *                  (useful with a newly created object for which the ID is not yet valued).
- * @returns {[boolean|string, null] } - returns false if all properties are correct (never returns true)
- * @returns {[string, object]} : returns a translation message ID and an object with it's parameters
+ * @param {boolean} [options.fullCheck=true] - indique si toutes les propriétés doivent être présentes.
+ * @param {boolean} [options.checkId=true] - indique si la propriété ID doit être testée.
+ *                  (utile avec les objets nouvellement créés et pas encore stockés en base car 
+ *                  l'ID est alors inconnu).
+ * @returns {[boolean|string, null] } - renvoie «false» si toutes les propriétés sont correctes
+ *                  (la fonction ne renvoie jamais la valeur «true».
+ * @returns {[string, object]} : retourne un identifiant de message de traduction et un tableau contenant
+ *                  les paramètres associés à ce message.
  *
  * @example
  *    const myUser = {
@@ -72,21 +77,23 @@ const controlObject = (objDef, object, options) => {
 }
 
 /**
- * Contrôle une propriété d'un objet dont le nom est passé en deuxième argument et dont la valeur est passée
- * en troisième argument avec la définition d'objet passée en premier argument.
- * Renvoie un tableau de deux éléments.
- * Le premier élément est soit un booléen contenant la valeur «false» si la propriété contrôlée est valide
+ * Cette fonction contrôle une propriété d'un objet dont le nom est passé en deuxième argument et dont la 
+ * valeur est passée en troisième argument. La définition d'objet passée en premier argument.
+ *
+ * Elle renvoie un tableau de deux éléments :
+ * - Le premier élément est soit un booléen contenant la valeur «false» si la propriété contrôlée est valide
  * soit un identifiant de message d'erreur indiquant le problème rencontré.
- * Le deuxième élément du tableau est un objet contenant les clés/valeurs des différents paramètres du
+ * - Le deuxième élément du tableau est un objet contenant les clés/valeurs des différents paramètres du
  * message d'erreur.
  
  * @function
- * @param {Object} objDef - object definition containing the property to control.
- * @param {string} propName - name of the property to control (will be searched in object definition).
- * @param {variant} propValue - the value of the property.
+ * @param {Object} objDef - définition d'objet.
+ * @param {string} propName - nom de la propriété à contrôler.
+ * @param {variant} propValue - valeur de la propriété à contrôler.
  *
- * @returns {[boolean|string, null] } - returns false if all properties are correct (never returns true)
- * @returns {[string, object]} : returns a translation message ID and an object with it's parameters
+ * @returns {[boolean|string, null] } - retourne «false» si la propriété est correcte.
+ * @returns {[string, object]} : retourne un identifiant de message de traduction et ses paramètres
+ *                  permettant de la valoriser.
  *
  * @example
  *  const [ errorMsg, errorParams ] = controlObjectProperty(userDef, 'password', myPassword)
@@ -202,12 +209,14 @@ const controlObjectProperty = (objDef, propName, propValue) => {
 
 
 /**
- * Returns an DB record object corresponding to the object argument according with the object definition passed as parameter.
- * Only properties included in object definition will be transfered from object to DB record.
- * It converts Object properties to DB field names.
+ * Cette fonction permet de préparer le stockage d'un objet en base de données.
+ * Seules les propriétés connues de la définition d'objet sont retournées par la fonction.
+ * Les noms de propriétés sont convertis en nom de champ (déduits de la définition d'objet).
  * @function
- * @param {Object} objDef - object containing definition of each properties of the object.
- * @param {Object} object - object to convert into a DB record
+ * @param {Object} objDef - définition de l'objet
+ * @param {Object} object - objet à convertir
+ *
+ * @returns {object} : retourne un objet contenant les noms de champs et leurs valeurs.
  */
 const convertObjectToDb = (objDef, object) => {
     if (objDef === undefined)
@@ -232,12 +241,14 @@ const convertObjectToDb = (objDef, object) => {
 }
 
 /**
- * Returns an object corresponding with the dbRecord argument according with the object definition passed as parameter.
- * Only properties included in object definition will be transfered from DB record to result object.
- * Boolean properties will be converted from integer (as returned by MySQL) in to Javascript boolean.
+ * Cette fonction permet de préparer un objet à partir d'un enregistrement extrait de la base de données.
+ * Seules les propriétés communes à la définition d'objet et à l'enregistrement sont retournées par la fonction.
+ * Les noms de champs sont convertis en nom de propriétés (déduits de la définition d'objet).
  * @function
- * @param {Object} objDef - object containing definition of each properties of the object.
- * @param {Object} dbRecord - object containing values issued from MySQL.
+ * @param {Object} objDef - définition de l'objet
+ * @param {Object} object - enregistrement extrait de la table associée à l'objet
+ *
+ * @returns {object} : retourne un objet contenant les noms de champs et leurs valeurs.
  */
 const convertObjectFromDb = (objDef, dbRecord) => {
     if (objDef === undefined)
@@ -256,8 +267,8 @@ const convertObjectFromDb = (objDef, dbRecord) => {
             continue
         const fieldName = (propDef.field === undefined) ? propName : propDef.field
         let fieldValue = dbRecord[fieldName]
-        if (fieldValue === undefined)  // should never happen
-            throw new Error(`Property [${fieldName}] is not defined in DB record`)
+        if (fieldValue === undefined)
+            continue // record should not have all properties
         if (fieldValue !== null) {
             if (propDef.type === 'boolean') 
                 fieldValue = (fieldValue === 1) ? true : false
@@ -275,35 +286,47 @@ const convertObjectFromDb = (objDef, dbRecord) => {
 }
 
 /**
- * Returns two arrays containing field names and field values for the properties which are present in
- * the object passed as parameter.
- * For each properties of the given object, there will be an entry in each array.
- * This function is used to build WHERE clause from filters array argument in models (see example bellow).
+ * Cette fonction attend en argument une définition d'objet et une liste (sous forme d'objet) associant des
+ * noms des propriétés de filtrage et des valeurs de filtre associées.
+ *
+ * Elle est utilisée pour faciliter la construction de requête SQL :
+ * - soit dans les requêtes «SELECT» pour la partie «WHERE».
+ * - soit dans les requêtes «INSERT».
  *
  * @function
- * @param {<Object>} objDef - object properties definition
- * @param {Array.<Object>} object - object containing filters
- * @returns {Array.<string>, Array.<string>} : two arrays, one with field names and one with field values.
+ * @param {<Object>} objDef - définition d'un objet 
+ * @param {Array.<Object>} object - liste des noms de propriétés et de valeurs de propriétés pour le filtrage.
+ * @returns {Array.<string>, Array.<string>} : deux tableaux, contenant d'un côté les noms de champs en base 
+ *      de données et de l'autre les valeurs associées à ces champs.
  *
  * @example
+ *      const filters = [
+ *          'firstname', firstname,
+ *          'lastname', lastname
+ *      ]
+ *      const [ sqlValues, sqlFilters ] = buildFieldArrays(userObjectDef, filters)
+ *      const whereClause = sqlFilters.length === 0 ? '' :
+ *          'WHERE ' + sqlFilters.map(f => `${f} = ?`).join(' AND ')
+ *      let sql = `SELECT * FROM users ${whereClause}`
  *
- *     static async getUserList(filters) {
- *     const [ sqlValues, sqlFilters ] = buildFieldArrays(userObjectDef, filters)
- *     const whereClause = sqlFilters.length === 0 ? '' :
- *         'WHERE ' + sqlFilters.map(f => `${f} = ?`).join(' AND ')
- *     let sql = `SELECT * FROM users ${whereClause}`
- *     const result = await db.query(sql, sqlValues)
+ * @example
+ *      const [ fieldNames, fieldValues ] = buildFieldArrays(userObjectDef, user)
+ *      const markArray = Array(fieldValues.length).fill('?').join(',')
+ *      const sqlRequest = `
+ *          INSERT INTO users(${fieldNames.join(', ')}) VALUES (${markArray})
  *
  */
-const buildFieldArrays = (objDef, object) => {
+const buildFieldArrays = (objDef, object = {}) => {
     if (objDef === undefined)
         throw new Error('objDef argument is missing')
     if (typeof(objDef) != 'object')
         throw new Error('objDef argument is not an object')
     if (object === undefined)
-        throw new Error('object argument is missing')
-    if (typeof(object) != 'object')
-        throw new Error('object argument is not an object')
+        throw new Error('Argument «object» is missing')
+    if (object === null)
+        object = {}
+    if (typeof(object) !== 'object')
+        throw new Error('Argument«object» is not an object')
     const fieldNames = []
     const fieldValues = []
     for (const [propName, propDef] of Object.entries(objDef)) {
@@ -317,6 +340,52 @@ const buildFieldArrays = (objDef, object) => {
     return [fieldNames, fieldValues]
 }
 
+/**
+ * Cette fonction attend en argument une définition d'objet et un tableau contenant des noms des propriétés.
+ * Elle renvoie un tableau contenant les noms des champs associés en base de données.
+ *
+ * Cette fonction est utilisée pour faciliter la construction de requête SQL 
+ *  «SELECT» pour dresser la liste des champs à renvoyer.
+ *
+ * @function
+ * @param {<Object>} objDef - définition d'un objet 
+ * @param {Array.<string>} object - tableau des noms de propriétés.
+ * @returns {Array.<string>} : tableau contenant les noms de champs en base 
+ * 
+ */
+const buildFieldNameArray = (objDef, propNameArray ) => {
+    if (objDef === undefined)
+        throw new Error('objDef argument is missing')
+    if (typeof(objDef) != 'object')
+        throw new Error('objDef argument is not an object')
+    if (propNameArray === undefined)
+        throw new Error('Argument «propNameArray» is missing')
+    if (propNameArray === null)
+        return '*'
+    if (! (propNameArray instanceof Array))
+        throw new Error('Argument «propNameArray» is not an array')
+    const fieldNames = []
+    for (const [propName, propDef] of Object.entries(objDef)) {
+        if (propNameArray.indexOf(propName) === -1)
+            continue
+        const fieldName = propDef.field ? propDef.field : propName
+        fieldNames.push(fieldName)
+    }
+    return fieldNames
+}
+
+
+/**
+ * Cette fonction permet de filtrer de préparer un résultat renvoyé par l'API
+ * en ne gardant que les propriétés de portée publique («public») : 
+ * les propriétés privées («private») et protégées («protected») sont filtrées.
+ *
+ * @function
+ * @param {<Object>} objDef - définition d'un objet 
+ * @param {<Object>} objet - objet à filtrer
+ * @returns {<Object>} : objet avec les propriétés filtrées
+ 
+ */
 const buildPublicObjectVersion = (objDef, object) => {
     if (objDef === undefined)
         throw new Error('objDef argument is missing')
@@ -343,5 +412,6 @@ export {
     convertObjectToDb,
     convertObjectFromDb,
     buildFieldArrays,
+    buildFieldNameArray,
     buildPublicObjectVersion 
 }

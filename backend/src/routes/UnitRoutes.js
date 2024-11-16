@@ -8,6 +8,8 @@ import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
 import { controlObject } from '../../../common/src/objects/object-util.mjs'
 import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs'
 
+const defaultPropertyList = [ 'id', 'name' ]
+
 class UnitRoutes {
 
     initialize(expressApp) {
@@ -17,9 +19,34 @@ class UnitRoutes {
 
         expressApp.get('/api/v1/unit/list', requireUserAuth, async (request, response) => {
             const view = request.view
-            const unitList = await unitModel.findUnitList()
-            view.json({ unitList })
+            try {
+                const unitList = await unitModel.findUnitList(defaultPropertyList, null)
+                view.json({ unitList })
+            }
+            catch(error) {
+                console.log(error)
+                view.error(error)
+            }
         })
+
+        expressApp.post('/api/v1/unit/search', requireUserAuth, async (request, response) => {
+            const view = request.view
+            try {
+                let properties = request.body.properties || defaultPropertyList
+                if (properties !== null && ! (properties instanceof Array))
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'properties'})
+                let filters = request.body.filters || null 
+                if (filters !== null && typeof(filters) !== 'object')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'filters'})
+                const unitList = await unitModel.findUnitList(properties, filters)
+                view.json({ unitList })
+            }
+            catch(error) {
+                console.log(error)
+                view.error(error)
+            }
+        })
+
 
         expressApp.post('/api/v1/unit', requireUserAuth, async (request, response) => {
             const view = request.view
@@ -37,7 +64,7 @@ class UnitRoutes {
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
 
                 unit = await unitModel.createUnit(unit)
-                view.json(unit)
+                view.json({unit})
             }
             catch(error) {
                 view.error(error)
