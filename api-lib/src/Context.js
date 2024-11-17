@@ -241,8 +241,8 @@ class Context{
             if (contextData !== null)
                 count++
             if (count != 0 && count != 3) {
-                console.error('Problème de contexte invalide')
-                throw new Error('Incorrent ontext data ')
+                console.error('Incoherent context data detected')
+                throw new Error('Incoherent context data detected')
             }
             this.#refreshToken = refreshToken
             this.#accessToken = accessToken
@@ -252,7 +252,7 @@ class Context{
             this.#refreshToken = null
             this.#accessToken = null
             this.#contextData = null
-            console.error('Réinitialisation du contexte')
+            console.error('Context reset')
             this.#saveAccount()
             throw (error)
         }

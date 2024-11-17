@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
 
 import UnitEditor from '../components/UnitEditor'
@@ -6,41 +6,47 @@ import useUnitActions from '../actions/unitActions'
 import { useComaintContext } from '../ComaintContext'
 
 const UnitPage = () => {
-
+    let { id } = useParams()
+    if (id === undefined) // no unit ID specified in URL path
+        id = null
     const navigate = useNavigate()
     const { comaintContext } = useComaintContext()
-    const { listUnit, getUnitById } = useUnitActions()
-    const { id } = useParams()
-    const [ unitList, setUnitList ] = useState(null)
-    const [ selectedUnit, setSelectedUnit ] = useState(null)
+    const { updateUnitList, getUnitList, getUnitById } = useUnitActions()
+    const unitList = getUnitList()
     const [ error, setError ] = useState(null)
+    const componentInitializedRef = useRef(false)
 
     useEffect(() => {
-        if (comaintContext !== null && comaintContext.connected === false)
+        if (comaintContext === null || comaintContext.connected === false)
             navigate('/')
     }, [comaintContext])
 
     useEffect(() => {
+        // detect react strict mode 
+        if ( componentInitializedRef.current  === true)
+            return
+        componentInitializedRef.current = true
+
         const getUnitList = async () => {
             try {
-                setUnitList(await listUnit())
+                await updateUnitList()
             }
             catch (error) {
                 setError(error.message)
-                setUnitList(null)
             }
         }
         getUnitList()
     }, [])
 
     useEffect(() => {
+        if (id === null) // no unit ID specified in URL
+            return
         const getUnit = async () => {
             try {
-                setSelectedUnit(await getUnitById(id))
+                await getUnitById(id)
             }
             catch (error) {
                 setError(error.message)
-                setSelectedUnit(null)
             }
         }
         getUnit()
@@ -66,9 +72,7 @@ const UnitPage = () => {
                         </ul>
                     </>
             }
-            { selectedUnit !== null && 
-                <UnitEditor unitId={selectedUnit.id}/>
-            }
+            <UnitEditor/>
         </>)
 }
 

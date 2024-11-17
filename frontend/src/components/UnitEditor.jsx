@@ -7,13 +7,13 @@ import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs'
 
 const UnitEditor = () => {
 	const { t } = useTranslation()
-    const { getSelectedUnit } = useUnitActions()
+    const { getSelectedUnit, editUnit } = useUnitActions()
     const selectedUnit = getSelectedUnit()
     const [ unit, setUnit ] = useState(null)
 	const [ error, setError ] = useState(null)
 
     useEffect( () => {
-        setUnit({...selectedUnit})
+        setUnit(selectedUnit === null ? null : {...selectedUnit})
 		setError(null)
     }, [selectedUnit])
  
@@ -32,7 +32,15 @@ const UnitEditor = () => {
     }
 
     const onValidateButtonClick = () => {
-        console.log("validate")
+        if (unit === null)
+            return
+        try {
+            editUnit(unit)
+            setError(null)
+        }
+        catch(error) {
+            setError(error.message)
+        }
     }
 
     return (<>
