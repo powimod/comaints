@@ -61,11 +61,6 @@ const Header = () => {
 		setIsAccessibilityDialogOpen(true)
 	}
 
-	const onRegisterAccount = () => {
-		setIsLoginDialogOpen(false)
-		setIsRegisterAccountDialogOpen(true);
-	}
-
 	const onRegisterAccountDialogClose = () => {
 		setIsRegisterAccountDialogOpen(false);
 	}
@@ -92,7 +87,7 @@ const Header = () => {
                 <div onClick={onLogoutMenuClick}>{t('action.logout')}</div>
             </PopupMenu>
 		    <AccessibilityDialog isOpen={isAccessibilityDialogOpen} onClose={onAccessibilityDialogClose} /> 
-		    <LoginDialog isOpen={isLoginDialogOpen} onClose={onLoginDialogClose} onRegisterAccount={onRegisterAccount} /> 
+		    <LoginDialog isOpen={isLoginDialogOpen} onClose={onLoginDialogClose} /> 
 		    <LogoutDialog isOpen={isLogoutDialogOpen} onResponse={onLogoutDialogResponse}/>
 		    <RegisterAccountDialog isOpen={isRegisterAccountDialogOpen} onClose={onRegisterAccountDialogClose} /> 
         </>

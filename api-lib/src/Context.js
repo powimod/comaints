@@ -226,15 +226,37 @@ class Context{
         if (! (result instanceof Object))
             throw new Error('Serialize function does not return an object')
         const {refreshToken, accessToken, contextData} = result
-        if (refreshToken !== null && typeof(refreshToken) !== 'string')
-            throw new Error('Invalid refresh token')
-        if (accessToken !== null && typeof(accessToken) !== 'string')
-            throw new Error('Invalid access token')
-        if (contextData !== null && typeof(contextData) !== 'object')
-            throw new Error('Invalid context')
-        this.#refreshToken = refreshToken
-        this.#accessToken = accessToken
-        this.#contextData = contextData
+        try {
+            if (refreshToken !== null && typeof(refreshToken) !== 'string')
+                throw new Error('Invalid refresh token')
+            if (accessToken !== null && typeof(accessToken) !== 'string')
+                throw new Error('Invalid access token')
+            if (contextData !== null && typeof(contextData) !== 'object')
+                throw new Error('Invalid context')
+            let count = 0
+            if (refreshToken !== null)
+                count++
+            if (accessToken !== null)
+                count++
+            if (contextData !== null)
+                count++
+            if (count != 0 && count != 3) {
+                console.error('Problème de contexte invalide')
+                throw new Error('Incorrent ontext data ')
+            }
+            this.#refreshToken = refreshToken
+            this.#accessToken = accessToken
+            this.#contextData = contextData
+        }
+        catch (error) {
+            this.#refreshToken = null
+            this.#accessToken = null
+            this.#contextData = null
+            console.error('Réinitialisation du contexte')
+            this.#saveAccount()
+            throw (error)
+        }
+
     }
 
     #saveAccount() {

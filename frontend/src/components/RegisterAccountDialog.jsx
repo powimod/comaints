@@ -1,6 +1,5 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
 import CustomDialog from './dialog/CustomDialog'
 import { useComaintContext } from '../ComaintContext'
@@ -8,7 +7,7 @@ import useAuthActions from '../actions/authActions'
 
 import '../scss/register-account-dialog.scss'
 
-const RegisterAccountDialog = ({isOpen, onClose, onRegisterAccount}) => {
+const RegisterAccountDialog = ({isOpen, onClose }) => {
 	const { t } = useTranslation()
     const { register, validateCode} = useAuthActions()
     const { comaintContext } = useComaintContext();

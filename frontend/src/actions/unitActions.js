@@ -1,17 +1,22 @@
 import { useDispatch } from 'react-redux'
-import { createUnitThunk } from '../slices/unitSlice'
+import { listUnitThunk, createUnitThunk } from '../slices/unitSlice'
 
 const useUnitActions = () => {
     const dispatch = useDispatch()
 
-    const createUnit = async (unitName) => {
-        const result = await dispatch(createUnitThunk({ unitName }))
-        if (createUnitThunk.rejected.match(result)) 
-            throw new Error(result.payload)
+    const createUnit = async ({unitName}) => {
+        return await dispatch(createUnitThunk({unitName})).unwrap()
+    }
+
+    const listUnit = async () => {
+        const unitList = await dispatch(listUnitThunk()).unwrap()
+        console.log(unitList)
+        return unitList
     }
 
     return {
-        createUnit
+        createUnit,
+        listUnit
     }
 }
 
