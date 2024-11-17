@@ -5,7 +5,6 @@ import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb } from './util.j
 import { createUserAccount, deleteUserAccount } from './helpers.js'
 
 const ROUTE_UNIT_LIST = '/api/v1/unit/list'
-const ROUTE_UNIT_SEARCH = '/api/v1/unit/search'
 const ROUTE_UNIT_CREATE = '/api/v1/unit'
 
 describe('Test units', () => {
@@ -32,7 +31,6 @@ describe('Test units', () => {
     })
 
     // TODO tentative création avec propriétés manquantes ou invalides
-    // TODO tentative création avec doublon
 
     describe('Check unit creation', () => {
         it(`Check unit list is empty`, async () => {
@@ -81,6 +79,23 @@ describe('Test units', () => {
             unit2 = unit
         })
 
+        it(`Try to create a unit with an already used name`, async () => {
+            try {
+                await jsonPost(ROUTE_UNIT_CREATE, {
+                    unit: {
+                        name: unit2Name, // already created
+                        description: unit2Description
+                    }
+                })
+                throw new Error('Duplicated name not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Duplicated «idx_company_name» field for object «user»')
+            }
+        })
+
+
         it(`Create third unit`, async () => {
             const json = await jsonPost(ROUTE_UNIT_CREATE, {
                 unit: {
@@ -123,6 +138,8 @@ describe('Test units', () => {
             expect(unit.id).to.be.a('number').and.to.equal(unit3.id)
             expect(unit.name).to.be.a('string').and.to.equal(unit3.name)
         })
+
+
     })
 
 })

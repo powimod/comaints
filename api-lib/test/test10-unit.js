@@ -45,7 +45,7 @@ describe('Check login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Object)
-                expect(error.message).to.equal('Duplicated «idx_company_name» field for object «unit»')
+                expect(error.message).to.equal('Duplicated «idx_company_name» field for object «user»')
             }
         })
 
@@ -121,6 +121,54 @@ describe('Check login', () => {
             expect(unit.id).to.equal(unitRef.id)
             expect(unit.companyId).to.equal(unitRef.companyId)
         })
+    })
+
+    describe('Edit unit', () => {
+
+        it ('Get unit by ID', async () => {
+            const unitRef = unitPool[0]
+            let unit = {... unitRef}
+            const newName = unit.name + '_edited'
+            unit.name = newName
+            unit = await api.unit.editUnit(unit)
+            expect(unit).to.be.instanceOf(Object)
+                .to.have.keys(['id', 'name', 'description', 'address', 'city', 'zipCode', 'country', 'companyId'])
+            expect(unit.name).to.equal(newName)
+            expect(unit.id).to.equal(unitRef.id)
+            expect(unit.companyId).to.equal(unitRef.companyId)
+        })
+
+
+        it ('Try to edit unit with invalid company ID', async () => {
+            const unitRef = unitPool[0]
+            let unit = {... unitRef}
+            const newName = unit.name + '_edited'
+            unit.companyId = unit.id + 999
+            unit.name = newName
+            try {
+                unit = await api.unit.editUnit(unit)
+                throw new Error('Invalid ID not detected')
+            }
+            catch(error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Invalid ID «companyid» in object «unit»')
+            }
+        })
+
+        it ('Try to edit unit with already used name', async () => {
+            const unitRef = unitPool[0]
+            let unit = {... unitRef}
+            unit.name = unitPool[1].name
+            try {
+                unit = await api.unit.editUnit(unit)
+                throw new Error('Invalid ID not detected')
+            }
+            catch(error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Duplicated «idx_company_name» field for object «user»')
+            }
+        })
+
 
     })
 

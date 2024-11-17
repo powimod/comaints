@@ -8,7 +8,7 @@
         "access_token_error": "Invalid access token ({{error}})",
         "request_param_not_found": "Parameter «{{parameter}}» not found in request",
         "request_param_invalid": "Invalid value for «{{parameter}}» parameter in request",
-        "invalid_id": "Invalid ID «{{id}}» in object «{{object}}»",
+        "invalid_object_id": "Invalid ID «{{id}}» in object «{{object}}»",
         "not_found_error": "TODO change message",
         "invalid_request_error": "TODO change message",
         "internal_error": "TODO change message",

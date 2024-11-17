@@ -33,6 +33,15 @@ class UnitApi {
         return result.unit
     }
 
+    async editUnit(unit) {
+        if (typeof(unit) !== 'object')
+            throw new Error("Argument «unit» is not an object")
+        const EDIT_UNIT_ROUTE = '/api/v1/unit/{{unitId}}'
+        const route = this.#context.prepareRequestPath(EDIT_UNIT_ROUTE, { unitId: unit.id })
+        const result = await this.#context.jsonPost(route, { unit }, {token:true})
+        return result.unit
+    }
+
 
 }
 export default UnitApi

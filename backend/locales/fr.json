@@ -8,7 +8,7 @@
         "access_token_error": "Jeton d'accès invalide({{error}})",
         "request_param_not_found": "Paramètre «{{parameter}}» non trouvé dans la requête",
         "request_param_invalid": "Paramètre «{{parameter}}» invalide dans la requête", 
-        "invalid_id": "Identifiant «{{id}}» invalide pour l'objet «{{object}}»",
+        "invalid_object_id": "Identifiant «{{id}}» invalide pour l'objet «{{object}}»",
         "not_found_error": "TODO change message",
         "invalid_request_error": "TODO change message",
         "internal_error": "TODO change message",

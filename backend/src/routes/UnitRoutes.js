@@ -102,6 +102,7 @@ class UnitRoutes {
 
             try {
                 let unitId = request.params.id
+                console.log('dOm unitId',  unitId)
                 if (isNaN(unitId))
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'id'})
                 unitId = parseInt(unitId)
@@ -112,11 +113,14 @@ class UnitRoutes {
                 if (typeof(unit) !== 'object')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'unit'})
 
+                console.log('dOm =======> A')
                 if (unit.id !== unitId)
                     throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'unit', id: 'id'})
+                console.log('dOm =======> B')
 
                 if (unit.companyId !== request.companyId)
-                    throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'unit', id: 'companyId'})
+                    throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'unit', id: 'companyid'})
+                console.log('dOm =======> C')
 
                 const [ errorMsg, errorParam ] = controlObject(unitObjectDef, unit, { fullCheck:true, checkId:false })
                 if (errorMsg)

@@ -4,7 +4,7 @@ import assert from 'assert'
 
 import { buildFieldNameArray, buildFieldArrays, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs'
 import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs'
-import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs'
+import { convertError } from '../../../common/src/error.mjs'
 
 const defaultResultPropertyList = [ 'id', 'name' ]
 const defaultOrderPropertyList = [ 'name', 'description' ]
@@ -68,8 +68,6 @@ class UnitModel {
         }
     }
 
-
-
     async getUnitById(unitId) {
         if (unitId === undefined)
             throw new Error('Argument <unitId> required')
@@ -81,7 +79,6 @@ class UnitModel {
             return null
         const unitRecord = result[0]
         const unit = convertObjectFromDb(unitObjectDef, unitRecord)
-        // TODO filter properties
         return unit
     }
 
@@ -94,7 +91,6 @@ class UnitModel {
             return null
         const unitRecord = result[0]
         const unit = convertObjectFromDb(unitObjectDef, unitRecord)
-        // TODO filter properties
         return unit
     }
 
@@ -111,17 +107,7 @@ class UnitModel {
             return unit
         }
         catch (error) {
-            // TODO duplicated code
-            if (error.code === 'ER_DUP_ENTRY') {
-                const match = error.message.match(/Duplicate entry '.*' for key '(\w+)'/)
-                if (match) {
-                    let field = match[1]
-                    if (field.startsWith("idx_"))
-                        field = field.slice(4)
-                    error = buildComaintError(comaintErrors.CONFLICT_ERROR, {field, object: 'unit'})
-                }
-            }
-            throw error
+            throw convertError(error)
         }
     }
 
@@ -130,12 +116,15 @@ class UnitModel {
         const [ fieldNames, fieldValues ] = buildFieldArrays(unitObjectDef, unit)
         const sqlRequest = `UPDATE units SET ${fieldNames.map(field => `${field}=?`).join(', ')} WHERE id = ?`
         fieldValues.push(unit.id) // WHERE clause
-        const result = await this.#db.query(sqlRequest, fieldValues)
-        // TODO control result
-        console.log("dOm edit result", result)
-        const unitId = unit.id
-        unit = this.getUnitById(unitId)
-        return unit
+        try {
+            await this.#db.query(sqlRequest, fieldValues)
+            const unitId = unit.id
+            unit = this.getUnitById(unitId)
+            return unit
+        }
+        catch (error) {
+            throw convertError(error)
+        }
     }
 
     async deleteUnitById(unitId){
