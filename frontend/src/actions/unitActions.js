@@ -1,8 +1,13 @@
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { listUnitThunk, createUnitThunk, getUnitByIdThunk } from '../slices/unitSlice'
 
 const useUnitActions = () => {
     const dispatch = useDispatch()
+    const selectedUnitState = useSelector((state) => state.unit.selectedUnit)
+
+    const getSelectedUnit = () => {
+        return selectedUnitState
+    }
 
     const createUnit = async ({unitName}) => {
         return await dispatch(createUnitThunk({unitName})).unwrap()
@@ -13,11 +18,11 @@ const useUnitActions = () => {
     }
 
     const getUnitById = async (unitId) => {
-        console.log("dOm action getUnitById", unitId)
         return await dispatch(getUnitByIdThunk({unitId})).unwrap()
     }
 
     return {
+        getSelectedUnit,
         createUnit,
         listUnit,
         getUnitById

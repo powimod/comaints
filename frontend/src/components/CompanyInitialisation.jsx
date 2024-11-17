@@ -41,7 +41,6 @@ const CompanyInitialisation = () => {
             setError(error.message)
             setFocus(nameFieldRef)
         }
-
     }
 
     if (comaintContext === null || comaintContext.company)

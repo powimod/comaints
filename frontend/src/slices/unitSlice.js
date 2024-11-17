@@ -18,7 +18,6 @@ const listUnitThunk = createAsyncThunk(
 const getUnitByIdThunk = createAsyncThunk(
     'unit/getById',
     async ({ unitId }, { rejectWithValue }) => {
-        console.log("dOm SLICE get unit by ID", unitId)
         const comaintApi = ComaintBackendApiSingleton.getInstance()
         try {
             return await comaintApi.unit.getUnitById(unitId)
@@ -84,7 +83,7 @@ const unitSlice = createSlice({
             })
             .addCase(getUnitByIdThunk.fulfilled, (state, action) => {
                 state.status = STATUS.SUCCEEDED
-                state.unit = action.payload
+                state.selectedUnit = action.payload
             })
             .addCase(getUnitByIdThunk.rejected, (state, action) => {
                 console.error("thunk unit get failed", action.payload)
