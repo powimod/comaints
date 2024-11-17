@@ -94,8 +94,44 @@ class UnitRoutes {
                 view.error(error)
             }
         })
-    }
 
+        expressApp.post('/api/v1/unit/:id', requireUserAuth, async (request) => {
+            assert(request.userId)
+            assert(request.companyId)
+            const view = request.view
+
+            try {
+                let unitId = request.params.id
+                if (isNaN(unitId))
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'id'})
+                unitId = parseInt(unitId)
+
+                let unit = request.body.unit
+                if (unit === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'unit'})
+                if (typeof(unit) !== 'object')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'unit'})
+
+                if (unit.id !== unitId)
+                    throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'unit', id: 'id'})
+
+                if (unit.companyId !== request.companyId)
+                    throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'unit', id: 'companyId'})
+
+                const [ errorMsg, errorParam ] = controlObject(unitObjectDef, unit, { fullCheck:true, checkId:false })
+                if (errorMsg)
+                    throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
+
+                unit = await unitModel.editUnit(unit)
+                view.json({unit})
+            }
+            catch(error) {
+                console.log(error)
+                view.error(error)
+            }
+        })
+
+    }
 }
 
 class UnitRoutesSingleton {

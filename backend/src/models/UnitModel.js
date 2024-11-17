@@ -130,8 +130,9 @@ class UnitModel {
         const [ fieldNames, fieldValues ] = buildFieldArrays(unitObjectDef, unit)
         const sqlRequest = `UPDATE units SET ${fieldNames.map(field => `${field}=?`).join(', ')} WHERE id = ?`
         fieldValues.push(unit.id) // WHERE clause
-
         const result = await this.#db.query(sqlRequest, fieldValues)
+        // TODO control result
+        console.log("dOm edit result", result)
         const unitId = unit.id
         unit = this.getUnitById(unitId)
         return unit
