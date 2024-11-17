@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { listUnitThunk, createUnitThunk } from '../slices/unitSlice'
+import { listUnitThunk, createUnitThunk, getUnitByIdThunk } from '../slices/unitSlice'
 
 const useUnitActions = () => {
     const dispatch = useDispatch()
@@ -9,14 +9,18 @@ const useUnitActions = () => {
     }
 
     const listUnit = async () => {
-        const unitList = await dispatch(listUnitThunk()).unwrap()
-        console.log(unitList)
-        return unitList
+        return await dispatch(listUnitThunk()).unwrap()
+    }
+
+    const getUnitById = async (unitId) => {
+        console.log("dOm action getUnitById", unitId)
+        return await dispatch(getUnitByIdThunk({unitId})).unwrap()
     }
 
     return {
         createUnit,
-        listUnit
+        listUnit,
+        getUnitById
     }
 }
 

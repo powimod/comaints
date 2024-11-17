@@ -20,6 +20,7 @@ const createRouter = () => {
             children: [
                 { index:true                 , element:<Home/> },
                 { path: '/unit'              , element:<UnitPage/> },
+                { path: '/unit/:id'          , element:<UnitPage/> },
                 { path: '/forgotten-password', element:<ForgottenPasswordPage/> },
                 { path: '/about'             , element:<About/> },
                 { path: '/privacy-policy'    , element:<PrivacyPolicy/> },

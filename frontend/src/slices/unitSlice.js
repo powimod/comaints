@@ -15,6 +15,20 @@ const listUnitThunk = createAsyncThunk(
     }
 )
 
+const getUnitByIdThunk = createAsyncThunk(
+    'unit/getById',
+    async ({ unitId }, { rejectWithValue }) => {
+        console.log("dOm SLICE get unit by ID", unitId)
+        const comaintApi = ComaintBackendApiSingleton.getInstance()
+        try {
+            return await comaintApi.unit.getUnitById(unitId)
+        }
+        catch (error) {
+            return rejectWithValue(error.message)
+        }
+    }
+)
+
 
 const createUnitThunk = createAsyncThunk(
     'unit/create',
@@ -63,6 +77,22 @@ const unitSlice = createSlice({
                 state.error = action.payload
             })
 
+            // getUnitById
+            .addCase(getUnitByIdThunk.pending, (state) => {
+                state.status = STATUS.LOADING
+                state.error = null
+            })
+            .addCase(getUnitByIdThunk.fulfilled, (state, action) => {
+                state.status = STATUS.SUCCEEDED
+                state.unit = action.payload
+            })
+            .addCase(getUnitByIdThunk.rejected, (state, action) => {
+                console.error("thunk unit get failed", action.payload)
+                state.status = STATUS.FAILED
+                state.error = action.payload
+            })
+
+
 
             // createUnit
             .addCase(createUnitThunk.pending, (state) => {
@@ -82,5 +112,5 @@ const unitSlice = createSlice({
     }
 })
 
-export { listUnitThunk , createUnitThunk }
+export { listUnitThunk , createUnitThunk, getUnitByIdThunk }
 export default unitSlice.reducer
