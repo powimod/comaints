@@ -118,6 +118,13 @@ const jsonDelete = async (routeUrl, options) => {
     return await jsonFull(routeUrl, 'DELETE', options)
 }
 
+const prepareRequestPath = (path, params) => {
+    for (const [paramName, paramValue] of Object.entries(params))
+        path = path.replace(`{{${paramName}}}`, paramValue)
+    return path
+}
+
+
 const connectDb = async () => {
     db = await promise_mysql.createConnection({
         host: dbHost,
@@ -170,6 +177,7 @@ export {
     jsonPut,
     jsonPatch,
     jsonDelete,
+    prepareRequestPath,
     connectDb,
     disconnectDb,
     requestDb,

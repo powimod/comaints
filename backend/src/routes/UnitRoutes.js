@@ -56,7 +56,6 @@ class UnitRoutes {
             }
         })
 
-
         expressApp.post('/api/v1/unit', requireUserAuth, async (request) => {
             const view = request.view
             try {
@@ -73,6 +72,21 @@ class UnitRoutes {
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
 
                 unit = await unitModel.createUnit(unit)
+                view.json({unit})
+            }
+            catch(error) {
+                console.log(error)
+                view.error(error)
+            }
+        })
+
+        expressApp.get('/api/v1/unit/:id', requireUserAuth, async (request) => {
+            const unitId = request.params.id
+            const view = request.view
+            try {
+                assert(request.userId)
+                assert(request.companyId)
+                const unit = await unitModel.getUnitById(unitId)
                 view.json({unit})
             }
             catch(error) {
