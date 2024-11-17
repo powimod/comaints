@@ -22,6 +22,17 @@ class UnitApi {
         return result.unitList
     }
 
+    async getUnitById(unitId) {
+        if (unitId === undefined)
+            throw new Error("Argument «unit» required")
+        if (isNaN(unitId))
+            throw new Error("Argument «unit» is not valid")
+        const GET_UNIT_ROUTE = '/api/v1/unit/{{unitId}}'
+        const route = this.#context.prepareRequestPath(GET_UNIT_ROUTE, { unitId })
+        const result = await this.#context.jsonGet(route, {}, {token:true})
+        return result.unit
+    }
+
 
 }
 export default UnitApi

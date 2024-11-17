@@ -80,5 +80,48 @@ describe('Check login', () => {
             expect(unit.id).to.equal(unitRef.id)
         })
     })
- 
+
+    describe('Check unit details', () => {
+
+        it ('Try to get unit without ID', async () => {
+            try {
+                await api.unit.getUnitById()
+                throw new Error('Missing ID not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Argument «unit» required')
+            }
+        })
+
+        it ('Try to get unit with invalid ID', async () => {
+            try {
+                await api.unit.getUnitById('abc')
+                throw new Error('Invalid ID not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Argument «unit» is not valid')
+            }
+        })
+
+
+        it ('Try to get unit by non existent ID', async () => {
+            const unitRef = unitPool[0]
+            const unit = await api.unit.getUnitById(unitRef.id + 9999)
+            expect(unit).to.equal(null)
+        })
+
+        it ('Get unit by ID', async () => {
+            const unitRef = unitPool[0]
+            const unit = await api.unit.getUnitById(unitRef.id)
+            expect(unit).to.be.instanceOf(Object)
+                .to.have.keys(['id', 'name', 'description', 'address', 'city', 'zipCode', 'country', 'companyId'])
+            expect(unit.name).to.equal(unitRef.name)
+            expect(unit.id).to.equal(unitRef.id)
+            expect(unit.companyId).to.equal(unitRef.companyId)
+        })
+
+    })
+
 })

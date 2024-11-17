@@ -271,6 +271,12 @@ class Context{
             this.#contextInfoCallback(this.#contextData)
         }
     }
+
+    prepareRequestPath(path, params) {
+        for (const [paramName, paramValue] of Object.entries(params))
+            path = path.replace(`{{${paramName}}}`, paramValue)
+        return path
+    }
 }
 
 export default Context
