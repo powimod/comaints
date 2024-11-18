@@ -24,7 +24,7 @@ describe('Test units', () => {
 
     after( async () =>  {
         await deleteUserAccount(user1)
-        await deleteUserAccount(user1)
+        await deleteUserAccount(user2)
         await disconnectDb()
     })
 

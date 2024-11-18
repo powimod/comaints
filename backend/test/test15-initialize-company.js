@@ -10,6 +10,7 @@ const ROUTE_LOGOUT = 'api/v1/auth/logout'
 
 describe('Test reset password', () => {
 
+    const companyName = 'abc'
     let user = null
     let company = null
     let initialRefreshToken = null
@@ -75,7 +76,6 @@ describe('Test reset password', () => {
         })
 
         it(`Initialize company`, async () => {
-            const companyName = 'abc'
             let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName})
             expect(json).to.be.instanceOf(Object).and.to.have.keys('company', 'access-token', 'refresh-token', 'context')
             company = json.company
@@ -95,6 +95,7 @@ describe('Test reset password', () => {
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('profile')
             const profile = json.profile
+            user = profile // to delete company when user account is deleted
             expect(profile).to.be.instanceOf(Object)
             expect(profile).to.have.property('companyId')
             expect(profile.companyId).to.equal(company.id)

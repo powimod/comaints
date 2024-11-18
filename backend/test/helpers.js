@@ -70,8 +70,13 @@ const createUserAccount = async (options = {}) => {
 const deleteUserAccount = async (user) => {
     if (user === null || typeof(user) !== 'object')
         return
-    if (user.companyId !== null)
-        await requestDb('DELETE FROM companies WHERE id=?', user.companyId)
+    let companyId = null
+    if (user.companyId)
+        companyId = user.companyId
+    if (user.id_company)
+        companyId = user.id_company
+    if (companyId)
+        await requestDb('DELETE FROM companies WHERE id=?', companyId)
     await requestDb('DELETE FROM users WHERE id=?', user.id)
 }
 
