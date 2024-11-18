@@ -42,6 +42,16 @@ class UnitApi {
         return result.unit
     }
 
+    async deleteUnitById(unitId) {
+        if (unitId === undefined)
+            throw new Error("Argument «unit» required")
+        if (isNaN(unitId))
+            throw new Error("Argument «unit» is not valid")
+        const DELETE_UNIT_ROUTE = '/api/v1/unit/{{unitId}}/delete'
+        const route = this.#context.prepareRequestPath(DELETE_UNIT_ROUTE, { unitId })
+        const result = await this.#context.jsonDelete(route, {token:true})
+        return result.deleted
+    }
 
 }
 export default UnitApi

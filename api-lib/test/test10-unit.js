@@ -168,7 +168,31 @@ describe('Check login', () => {
                 expect(error.message).to.equal('Duplicated «idx_company_name» field for object «user»')
             }
         })
+    })
 
+    describe('Delete unit', () => {
+
+        it ('Check unit access', async () => {
+            const refUnit = unitPool[1]
+            const unit = await api.unit.getUnitById(refUnit.id)
+            expect(unit).to.be.instanceOf(Object)
+                .to.have.keys(['id', 'name', 'description', 'address', 'city', 'zipCode', 'country', 'companyId'])
+            expect(unit.name).to.equal(refUnit.name)
+            expect(unit.id).to.equal(refUnit.id)
+        })
+
+
+        it ('Delete unit by ID', async () => {
+            const unit = unitPool[1]
+            const res = await api.unit.deleteUnitById(unit.id)
+            expect(res).to.be.a('boolean').and.to.equal(true)
+        })
+
+        it ('Check unit was deleted', async () => {
+            const refUnit = unitPool[1]
+            const unit = await api.unit.getUnitById(refUnit.id)
+            expect(unit).to.equal(null)
+        })
 
     })
 
