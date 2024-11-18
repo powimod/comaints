@@ -31,10 +31,8 @@ describe('Test unit edition', () => {
         await disconnectDb()
     })
 
-    // TODO tentative d'édition avec propriétés manquantes ou invalides
 
-    describe('Check unit creation', () => {
-
+    describe('Create two units to work with', () => {
         it(`Create first unit`, async () => {
             const json = await jsonPost(ROUTE_UNIT_CREATE, {
                 unit: {
@@ -44,7 +42,6 @@ describe('Test unit edition', () => {
             expect(json).to.have.keys('unit')
             unit1 = json.unit
         })
-
         it(`Create second unit`, async () => {
             const json = await jsonPost(ROUTE_UNIT_CREATE, {
                 unit: {
@@ -55,6 +52,69 @@ describe('Test unit edition', () => {
             expect(json).to.have.keys('unit')
             unit2 = json.unit
         })
+    })
+
+    describe('Check unit edition with invalid request', () => {
+
+        it(`Try to edit unit with no unit parameter`, async () => {
+            try {
+                const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: unit1.id})
+                const json = await jsonPost(route, { })
+                console.log(json)
+                throw new Error('Missing unit parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Parameter «unit» not found in request')
+            }
+        })
+
+        it(`Try to edit unit with invalid unit parameter`, async () => {
+            try {
+                const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: unit1.id})
+                const json = await jsonPost(route, { unit: 'abc' })
+                console.log(json)
+                throw new Error('Invalid unit parameter not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Invalid value for «unit» parameter in request')
+            }
+        })
+
+        it(`Try to edit unit with missing ID`, async () => {
+            const unit = {... unit1}
+            delete unit.id
+            try {
+                const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: unit1.id})
+                const json = await jsonPost(route, { unit })
+                console.log(json)
+                throw new Error('Missing ID not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Invalid ID «id» in object «unit»')
+            }
+        })
+
+        it(`Try to edit unit with empty name property`, async () => {
+            const unit = {... unit1}
+            unit.name = ''
+            try {
+                const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: unit1.id})
+                const json = await jsonPost(route, { unit })
+                console.log(json)
+                throw new Error('Empty name property not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Error)
+                expect(error.message).to.equal('Property «name» is too short')
+            }
+        })
+    })
+
+    describe('Check unit creation', () => {
+
 
         it(`Edit first unit`, async () => {
             const refUnit = unit1

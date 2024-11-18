@@ -151,7 +151,7 @@ describe('Check login', () => {
             }
             catch(error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Invalid ID «companyid» in object «unit»')
+                expect(error.message).to.equal('Your company is not owner of this ressource')
             }
         })
 

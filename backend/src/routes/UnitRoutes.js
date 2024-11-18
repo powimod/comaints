@@ -12,7 +12,7 @@ class UnitRoutes {
 
     initialize(expressApp) {
         const model  = ModelSingleton.getInstance()
-        
+
         const unitModel = model.getUnitModel()
 
         expressApp.get('/api/v1/unit/list', requireUserAuth, requestProperties, requestPagination, async (request) => {
@@ -47,7 +47,6 @@ class UnitRoutes {
             // filter units own by user company
             assert(request.companyId)
             filters.companyId = request.companyId
-            console.log("dOm filters", filters)
 
             try {
                 // return only units of user company !
@@ -73,6 +72,7 @@ class UnitRoutes {
                 if (typeof(unit) !== 'object')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'unit'})
                 unit.companyId = request.companyId
+
                 const [ errorMsg, errorParam ] = controlObject(unitObjectDef, unit, { fullCheck:true, checkId:false })
                 if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam)
@@ -181,4 +181,4 @@ class UnitRoutesSingleton {
     }
 }
 
-export default UnitRoutesSingleton 
+export default UnitRoutesSingleton
