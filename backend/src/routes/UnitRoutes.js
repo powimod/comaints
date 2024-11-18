@@ -3,7 +3,7 @@ import assert from 'assert'
 
 import ModelSingleton from '../model.js'
 import { requireUserAuth, requestPagination, requestFilters, requestProperties } from './middleware.js'
-import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs'
+import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs'
 import { controlObject } from '../../../common/src/objects/object-util.mjs'
 import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs'
 
@@ -30,7 +30,6 @@ class UnitRoutes {
                 view.json(result)
             }
             catch(error) {
-                console.log(error)
                 view.error(error)
             }
         })
@@ -75,7 +74,6 @@ class UnitRoutes {
                 view.json({unit})
             }
             catch(error) {
-                console.log(error)
                 view.error(error)
             }
         })
@@ -90,7 +88,6 @@ class UnitRoutes {
                 view.json({unit})
             }
             catch(error) {
-                console.log(error)
                 view.error(error)
             }
         })
@@ -102,7 +99,6 @@ class UnitRoutes {
 
             try {
                 let unitId = request.params.id
-                console.log('dOm unitId',  unitId)
                 if (isNaN(unitId))
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'id'})
                 unitId = parseInt(unitId)
@@ -113,14 +109,11 @@ class UnitRoutes {
                 if (typeof(unit) !== 'object')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'unit'})
 
-                console.log('dOm =======> A')
                 if (unit.id !== unitId)
                     throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'unit', id: 'id'})
-                console.log('dOm =======> B')
 
                 if (unit.companyId !== request.companyId)
                     throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'unit', id: 'companyid'})
-                console.log('dOm =======> C')
 
                 const [ errorMsg, errorParam ] = controlObject(unitObjectDef, unit, { fullCheck:true, checkId:false })
                 if (errorMsg)
@@ -130,10 +123,36 @@ class UnitRoutes {
                 view.json({unit})
             }
             catch(error) {
-                console.log(error)
                 view.error(error)
             }
         })
+
+        expressApp.delete('/api/v1/unit/:id/delete', requireUserAuth, async (request) => {
+            assert(request.userId)
+            assert(request.companyId)
+            const view = request.view
+
+            try {
+                let unitId = request.params.id
+                if (isNaN(unitId))
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'id'})
+                unitId = parseInt(unitId)
+
+                let unit = await unitModel.getUnitById(unitId)
+                if (unit === null)
+                    throw new ComaintApiErrorUnauthorized('error.not_found')
+                if (unit.companyId !== request.companyId)
+                    throw new ComaintApiErrorUnauthorized('error.not_owner')
+                unit = null
+
+                const deleted = await unitModel.deleteUnitById(unitId)
+                view.json({deleted})
+            }
+            catch(error) {
+                view.error(error)
+            }
+        })
+
 
     }
 }

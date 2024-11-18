@@ -130,9 +130,9 @@ class UnitModel {
     async deleteUnitById(unitId){
         assert(unitId !== undefined)
         if (typeof(unitId) !== 'number')
-            throw new Error('Argument <unitId> is not a number');
-        const sql = `DELETE FROM units WHERE id = ?`;
-        const result = await this.#db.query(sql, [unitId]);
+            throw new Error('Argument <unitId> is not a number')
+        const sql = `DELETE FROM units WHERE id = ?`
+        const result = await this.#db.query(sql, [unitId])
         return (result.affectedRows !== 0)
     }
 }
