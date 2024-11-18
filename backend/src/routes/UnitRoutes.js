@@ -131,7 +131,6 @@ class UnitRoutes {
             assert(request.userId)
             assert(request.companyId)
             const view = request.view
-
             try {
                 let unitId = request.params.id
                 if (isNaN(unitId))

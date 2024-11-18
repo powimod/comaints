@@ -1,9 +1,7 @@
 'use strict'
 
-import fs from 'fs'
 import dotenv from 'dotenv'
 import promise_mysql from 'promise-mysql'
-
 
 const CONF_FILE = './test/.env'
 dotenv.config({ path: CONF_FILE });
@@ -23,7 +21,6 @@ const loadConfig = () => {
     backendUrl = process.env.BACKEND_URL
     if (backendUrl === undefined)
         throw new Error(`Parameter «BACKEND_URL» not found in «${CONF_FILE}»`)
-
     dbHost = process.env.DB_HOST || 'localhost'
     dbPort = process.env.DB_PORT || 3306
     dbDatabase = process.env.DB_DATABASE || 'db_comaint'
@@ -155,6 +152,15 @@ const requestDb = async (sqlQuery, sqlValues = []) => {
     return result
 }
 
+const getTokens = () => {
+    return {accessToken, refreshToken}
+}
+
+const setTokens = (tokens) => {
+    accessToken = tokens.accessToken
+    refreshToken = tokens.refreshToken
+}
+
 const util = {
     loadConfig,
     jsonGet,
@@ -182,6 +188,7 @@ export {
     disconnectDb,
     requestDb,
     accessToken,
+    getTokens,
+    setTokens,
     refreshToken
 }
-

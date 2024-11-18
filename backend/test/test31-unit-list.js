@@ -2,7 +2,7 @@
 import { expect } from 'chai'
 
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb } from './util.js'
-import { createUserAccount, deleteUserAccount } from './helpers.js'
+import { createUserAccount, deleteUserAccount, changeUser } from './helpers.js'
 
 const ROUTE_UNIT_LIST = '/api/v1/unit/list'
 const ROUTE_UNIT_CREATE = '/api/v1/unit'
@@ -10,18 +10,21 @@ const ROUTE_UNIT_CREATE = '/api/v1/unit'
 describe('Test units', () => {
 
 
-    let user = null
+    let user1 = null
+    let user2 = null
     const unitCount = 15
     let unitPool = []
 
     before( async () =>  {
         loadConfig()
         await connectDb()
-        user = await createUserAccount({withCompany:true})
+        user2 = await createUserAccount({withCompany:true})
+        user1 = await createUserAccount({withCompany:true})
     })
 
     after( async () =>  {
-        await deleteUserAccount(user)
+        await deleteUserAccount(user1)
+        await deleteUserAccount(user2)
         await disconnectDb()
     })
 
@@ -170,21 +173,6 @@ describe('Test units', () => {
 
 
         describe('Check unit list with properties', () => {
-        /*
-            it(`Try unit list with invalid properties`, async () => {
-                try {
-                    await jsonGet(ROUTE_UNIT_LIST, {
-                        properties: 123
-                    })
-                    throw new Error('Invalid properties not detected')
-                }
-                catch (error) {
-                    expect(error).to.be.instanceOf(Error)
-                    expect(error.message).to.equal('Invalid value for «properties» parameter in request')
-                }
-            })
-            */
-
             it(`Check unit list without properties`, async () => {
                 let unit, unitRef
                 let json = await jsonGet(ROUTE_UNIT_LIST, {
@@ -198,7 +186,7 @@ describe('Test units', () => {
                 expect(unit).to.be.instanceOf(Object).and.to.have.keys([ 'id', 'name', 'description', 'companyId' ])
                 expect(unit.id).to.be.a('number').and.to.equal(unitRef.id)
                 expect(unit.name).to.be.a('string').and.to.equal(unitRef.name)
-                expect(unit.companyId).to.be.a('number').and.to.equal(user.companyId)
+                expect(unit.companyId).to.be.a('number').and.to.equal(user1.companyId)
                 expect(unit.description).to.be.equal(unitRef.description)
 
                 unit = unitList[1]
@@ -206,11 +194,52 @@ describe('Test units', () => {
                 expect(unit).to.be.instanceOf(Object).and.to.have.keys([ 'id', 'name', 'description', 'companyId' ])
                 expect(unit.id).to.be.a('number').and.to.equal(unitRef.id)
                 expect(unit.name).to.be.a('string').and.to.equal(unitRef.name)
-                expect(unit.companyId).to.be.a('number').and.to.equal(user.companyId)
+                expect(unit.companyId).to.be.a('number').and.to.equal(user1.companyId)
                 expect(unit.description).to.be.equal(unitRef.description)
             })
         })
 
     })
+
+    describe('Check unit with two companies', () => {
+        it(`Check owner can access its unit`, async () => {
+            await changeUser(user1)
+            let json = await jsonGet(ROUTE_UNIT_LIST)
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('count', 15)
+        })
+        it(`Check other user does not access this units`, async () => {
+            await changeUser(user2)
+            let json = await jsonGet(ROUTE_UNIT_LIST)
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('count', 0)
+        })
+        it(`Create a unit for second user`, async () => {
+            const json = await jsonPost(ROUTE_UNIT_CREATE, {
+                unit: {
+                    name: `Other unit`
+                }
+            })
+            expect(json).to.have.keys('unit')
+            unitPool.push(json.unit)
+        })
+        it(`Check owner can access this unit`, async () => {
+            let json = await jsonGet(ROUTE_UNIT_LIST)
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('count', 1)
+            expect(json).to.have.property('unitList')
+            const unit = json.unitList[0]
+            expect(unit).to.have.property('name', 'Other unit')
+            // FIXME companyId it not present
+        })
+         it(`Check other user does not access this unit`, async () => {
+            await changeUser(user1)
+            let json = await jsonGet(ROUTE_UNIT_LIST)
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('count', 15)
+        })
+ 
+    })
+
 
 })

@@ -2,7 +2,7 @@
 
 import { expect } from 'chai'
 
-import { jsonGet, jsonPost, requestDb } from './util.js'
+import { jsonPost, requestDb, getTokens, setTokens } from './util.js'
 
 const ROUTE_REGISTER = 'api/v1/auth/register'
 const ROUTE_LOGIN = 'api/v1/auth/login'
@@ -11,6 +11,9 @@ const ROUTE_VALIDATE = 'api/v1/auth/validate'
 const ROUTE_INITIALIZE_COMPANY= 'api/v1/company/initialize'
 
 const DEFAULT_PASSWORD = 'abC.dEf.GH1.lMn!'
+
+const tokensCache = {}
+let currentUser = null
 
 const createUserAccount = async (options = {}) => {
     let {
@@ -51,6 +54,9 @@ const createUserAccount = async (options = {}) => {
         companyId = company.id
     }
 
+    currentUser = user
+    tokensCache[currentUser.id] = getTokens()
+
     if (logout)
         await jsonPost(ROUTE_LOGOUT)
 
@@ -67,6 +73,21 @@ const deleteUserAccount = async (user) => {
     if (user.companyId !== null)
         await requestDb('DELETE FROM companies WHERE id=?', user.companyId)
     await requestDb('DELETE FROM users WHERE id=?', user.id)
+}
+
+const changeUser = async (user) => {
+    if (user === null || typeof(user) !== 'object')
+        throw new Error('Invalid «user» argument')
+    if (currentUser.id === user.id)
+        return currentUser
+    if (currentUser !== null) 
+        tokensCache[currentUser.id] = getTokens()
+    const tokens = tokensCache[user.id]
+    if (tokens === undefined)
+        throw new Error('Tokens not found')
+    currentUser = user
+    setTokens(tokens)
+    return currentUser
 }
 
 const getDatabaseUserByEmail = async (email) => {
@@ -105,8 +126,10 @@ const userPublicProperties = [
 export {
     createUserAccount,
     deleteUserAccount,
+    changeUser,
     getDatabaseUserByEmail,
     getDatabaseUserById,
     userPublicProperties,
-    connectWithAdminAccount 
+    connectWithAdminAccount,
+    currentUser
 }
