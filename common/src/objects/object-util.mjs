@@ -68,9 +68,8 @@ const controlObject = (objDef, object, options) => {
         }
         else {
             const controlResult = controlObjectProperty(objDef, propName, object[propName])
-            if (controlResult[0] === true)
+            if (controlResult[0] !== false) 
                 return controlResult
-
         }
     }
     return [ false ] // no error
@@ -171,7 +170,7 @@ const controlObjectProperty = (objDef, propName, propValue) => {
         case 'image':
             if (typeof(propValue) !== 'string' )
                 return ['common:error.prop.is_not_a_string', {property: propName}]
-            if (propDef.minimum && propValue.length < propDef.minimum )
+            if (propDef.minimum && propValue.length < propDef.minimum ) 
                 return ['common:error.prop.is_too_short', {property: propName, size: propDef.minimum}]
             if (propDef.maximum && propValue.length > propDef.maximum )
                 return ['common:error.prop.is_too_long',  {property: propName, size: propDef.maximum}]

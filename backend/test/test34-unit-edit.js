@@ -2,10 +2,9 @@
 import { expect } from 'chai'
 
 import { loadConfig, jsonGet, jsonPost, prepareRequestPath, connectDb, disconnectDb } from './util.js'
-import { createUserAccount, deleteUserAccount } from './helpers.js'
+import { createUserAccount, deleteUserAccount, changeUser } from './helpers.js'
 
 const ROUTE_UNIT_CREATE = '/api/v1/unit'
-const ROUTE_UNIT_DETAILS = '/api/v1/unit/{{unitId}}'
 const ROUTE_UNIT_EDIT = '/api/v1/unit/{{unitId}}'
 
 describe('Test unit edition', () => {
@@ -14,18 +13,21 @@ describe('Test unit edition', () => {
     const unit2Name = `Unit B`
     const unit2Description = 'Unit B description'
 
-    let user = null
+    let user1 = null
+    let user2 = null
     let unit1 = null
     let unit2 = null
 
     before( async () =>  {
         loadConfig()
         await connectDb()
-        user = await createUserAccount({withCompany:true})
+        user2 = await createUserAccount({withCompany:true})
+        user1 = await createUserAccount({withCompany:true})
     })
 
     after( async () =>  {
-        await deleteUserAccount(user)
+        await deleteUserAccount(user1)
+        await deleteUserAccount(user2)
         await disconnectDb()
     })
 
@@ -86,4 +88,38 @@ describe('Test unit edition', () => {
 
     })
 
+    describe('Check unit with two companies', () => {
+        it(`Check owner can edit its units`, async () => {
+            await changeUser(user1)
+            const refUnit = unit2
+            const editedUnit = {... refUnit}
+            const newName = editedUnit.name + '_edited'
+            editedUnit.name = newName
+            const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: refUnit.id})
+            const json = await jsonPost(route, { unit: editedUnit })
+            expect(json).to.have.keys('unit')
+            const unit = json.unit
+            expect(unit).to.have.property('id', refUnit.id)
+            expect(unit).to.have.property('name', newName)
+            expect(unit).to.have.property('companyId', refUnit.companyId)
+            unit2 = editedUnit
+        })
+        it(`Check other user can not edit this units`, async () => {
+            await changeUser(user2)
+            const refUnit = unit2
+            const editedUnit = {... refUnit}
+            const newName = editedUnit.name + '_edited'
+            editedUnit.name = newName
+            const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: refUnit.id})
+            try {
+                const json = await jsonPost(route, { unit: editedUnit })
+                console.log(json)
+                throw new Error('Unauthorized acces non detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Object)
+                expect(error.message).to.equal('Your company is not owner of this ressource')
+            }
+        })
+    })
 })

@@ -22,6 +22,7 @@ class UnitRoutes {
             const pagination = request.requestPagination
             assert(pagination !== undefined)
 
+            // filter units own by user company
             assert(request.companyId)
             const filters = { companyId: request.companyId }
 
@@ -42,6 +43,12 @@ class UnitRoutes {
             assert(filters !== undefined)
             const pagination = request.requestPagination
             assert(pagination !== undefined)
+
+            // filter units own by user company
+            assert(request.companyId)
+            filters.companyId = request.companyId
+            console.log("dOm filters", filters)
+
             try {
                 // return only units of user company !
                 assert(request.companyId)
@@ -84,7 +91,10 @@ class UnitRoutes {
             try {
                 assert(request.userId)
                 assert(request.companyId)
-                const unit = await unitModel.getUnitById(unitId)
+                let unit = await unitModel.getUnitById(unitId)
+                // silently ignore tentative to access not owned unit
+                if (unit !== null && unit.companyId !== request.companyId)
+                    unit = null
                 view.json({unit})
             }
             catch(error) {
@@ -113,7 +123,7 @@ class UnitRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'unit', id: 'id'})
 
                 if (unit.companyId !== request.companyId)
-                    throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'unit', id: 'companyid'})
+                    throw new ComaintApiErrorUnauthorized('error.not_owner')
 
                 const [ errorMsg, errorParam ] = controlObject(unitObjectDef, unit, { fullCheck:true, checkId:false })
                 if (errorMsg)

@@ -2,26 +2,28 @@
 import { expect } from 'chai'
 
 import { loadConfig, jsonPost, connectDb, disconnectDb } from './util.js'
-import { createUserAccount, deleteUserAccount } from './helpers.js'
+import { createUserAccount, deleteUserAccount, changeUser } from './helpers.js'
 
 const ROUTE_UNIT_SEARCH = '/api/v1/unit/search'
 const ROUTE_UNIT_CREATE = '/api/v1/unit'
 
-describe('Test units', () => {
+describe('Test units search', () => {
 
-
-    let user = null
+    let user1 = null
+    let user2 = null
     const unitCount = 15
     let unitPool = []
 
     before( async () =>  {
         loadConfig()
         await connectDb()
-        user = await createUserAccount({withCompany:true})
+        user2 = await createUserAccount({withCompany:true})
+        user1 = await createUserAccount({withCompany:true})
     })
 
     after( async () =>  {
-        await deleteUserAccount(user)
+        await deleteUserAccount(user1)
+        await deleteUserAccount(user2)
         await disconnectDb()
     })
 
@@ -194,7 +196,7 @@ describe('Test units', () => {
                 expect(unit).to.be.instanceOf(Object).and.to.have.keys([ 'id', 'name', 'description', 'companyId' ])
                 expect(unit.id).to.be.a('number').and.to.equal(unitRef.id)
                 expect(unit.name).to.be.a('string').and.to.equal(unitRef.name)
-                expect(unit.companyId).to.be.a('number').and.to.equal(user.companyId)
+                expect(unit.companyId).to.be.a('number').and.to.equal(user1.companyId)
                 expect(unit.description).to.be.equal(unitRef.description)
 
                 unit = unitList[1]
@@ -202,7 +204,7 @@ describe('Test units', () => {
                 expect(unit).to.be.instanceOf(Object).and.to.have.keys([ 'id', 'name', 'description', 'companyId' ])
                 expect(unit.id).to.be.a('number').and.to.equal(unitRef.id)
                 expect(unit.name).to.be.a('string').and.to.equal(unitRef.name)
-                expect(unit.companyId).to.be.a('number').and.to.equal(user.companyId)
+                expect(unit.companyId).to.be.a('number').and.to.equal(user1.companyId)
                 expect(unit.description).to.be.equal(unitRef.description)
             })
         })
@@ -251,6 +253,21 @@ describe('Test units', () => {
                 expect(unitList).to.be.instanceOf(Array).and.to.have.lengthOf(0)
             })
  
+        })
+    })
+
+    describe('Check unit with two companies', () => {
+        it(`Check owner can access its unit`, async () => {
+            await changeUser(user1)
+            let json = await jsonPost(ROUTE_UNIT_SEARCH, {})
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('count', 15)
+        })
+        it(`Check other user does not access this units`, async () => {
+            await changeUser(user2)
+            let json = await jsonPost(ROUTE_UNIT_SEARCH, {})
+            expect(json).to.be.instanceOf(Object)
+            expect(json).to.have.property('count', 0)
         })
     })
 

@@ -2,7 +2,7 @@
 import { expect } from 'chai'
 
 import { loadConfig, jsonGet, jsonPost, prepareRequestPath, connectDb, disconnectDb } from './util.js'
-import { createUserAccount, deleteUserAccount } from './helpers.js'
+import { createUserAccount, deleteUserAccount, changeUser } from './helpers.js'
 
 const ROUTE_UNIT_DETAILS = '/api/v1/unit/{{unitId}}'
 const ROUTE_UNIT_CREATE = '/api/v1/unit'
@@ -10,18 +10,21 @@ const ROUTE_UNIT_CREATE = '/api/v1/unit'
 describe('Test units', () => {
 
 
-    let user = null
+    let user1 = null
+    let user2 = null
     const unitCount = 3
     let unitPool = []
 
     before( async () =>  {
         loadConfig()
         await connectDb()
-        user = await createUserAccount({withCompany:true})
+        user2 = await createUserAccount({withCompany:true})
+        user1 = await createUserAccount({withCompany:true})
     })
 
     after( async () =>  {
-        await deleteUserAccount(user)
+        await deleteUserAccount(user1)
+        await deleteUserAccount(user1)
         await disconnectDb()
     })
 
@@ -66,6 +69,26 @@ describe('Test units', () => {
             expect(json).to.be.instanceOf(Object).and.to.have.keys([ 'unit' ])
             const unit = json.unit
             expect(unit).to.equal(null)
+        })
+    })
+
+    describe('Check unit with two companies', () => {
+        it(`Check owner can access its unit`, async () => {
+            await changeUser(user1)
+            const refUnit = unitPool[0]
+            const route = prepareRequestPath(ROUTE_UNIT_DETAILS, { unitId: refUnit.id})
+            const json = await jsonGet(route)
+            expect(json).to.be.instanceOf(Object).and.to.have.keys([ 'unit' ])
+            const unit = json.unit
+            expect(unit).to.be.instanceOf(Object)
+        })
+        it(`Check other user does not access this units`, async () => {
+            await changeUser(user2)
+            const refUnit = unitPool[0]
+            const route = prepareRequestPath(ROUTE_UNIT_DETAILS, { unitId: refUnit.id})
+            const json = await jsonGet(route)
+            expect(json).to.be.instanceOf(Object).and.to.have.keys([ 'unit' ])
+            expect(json.unit).to.equal(null)
         })
     })
 

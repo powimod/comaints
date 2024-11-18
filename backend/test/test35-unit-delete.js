@@ -2,7 +2,7 @@
 import { expect } from 'chai'
 
 import { loadConfig, jsonGet, jsonPost, jsonDelete, prepareRequestPath, connectDb, disconnectDb } from './util.js'
-import { createUserAccount, deleteUserAccount } from './helpers.js'
+import { createUserAccount, deleteUserAccount, changeUser } from './helpers.js'
 
 const ROUTE_UNIT_CREATE = '/api/v1/unit'
 const ROUTE_UNIT_DELETE= '/api/v1/unit/{{unitId}}/delete'
@@ -14,18 +14,21 @@ describe('Test unit suppression', () => {
     const unit2Name = `Unit B`
     const unit2Description = 'Unit B description'
 
-    let user = null
+    let user1 = null
+    let user2 = null
     let unit1 = null
     let unit2 = null
 
     before( async () =>  {
         loadConfig()
         await connectDb()
-        user = await createUserAccount({withCompany:true})
+        user2 = await createUserAccount({withCompany:true})
+        user1 = await createUserAccount({withCompany:true})
     })
 
     after( async () =>  {
-        await deleteUserAccount(user)
+        await deleteUserAccount(user1)
+        await deleteUserAccount(user2)
         await disconnectDb()
     })
 
@@ -50,7 +53,6 @@ describe('Test unit suppression', () => {
                 }
             })
             expect(json).to.have.keys('unit')
-            unit2 = json.unit
         })
 
 
@@ -91,7 +93,54 @@ describe('Test unit suppression', () => {
                 expect(error.message).to.equal('Ressource not found')
             }
         })
-
     })
+
+
+    describe('Check unit suppression with two companies', () => {
+
+        const unitName = 'Unit to delete'
+        let unit = null
+
+        it(`Check owner can delete its units`, async () => {
+            await changeUser(user1)
+            // create a unit
+            let json = await jsonPost(ROUTE_UNIT_CREATE, {
+                unit: {
+                    name: unitName
+                }
+            })
+            expect(json).to.have.keys('unit')
+            unit = json.unit
+            // delete this unit with same user with same user
+            const route = prepareRequestPath(ROUTE_UNIT_DELETE, { unitId: unit.id})
+            json = await jsonDelete(route)
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('deleted')
+            expect(json.deleted).to.be.a('boolean').and.to.equal(true)
+        })
+        it(`Check other user can not delete this units`, async () => {
+            // create a unit with first user
+            await changeUser(user1)
+            let json = await jsonPost(ROUTE_UNIT_CREATE, {
+                unit: {
+                    name: unitName
+                }
+            })
+            expect(json).to.have.keys('unit')
+            unit = json.unit
+            // delete this unit with same user with other user
+            await changeUser(user2)
+            try {
+                const route = prepareRequestPath(ROUTE_UNIT_DELETE, { unitId: unit.id})
+                json = await jsonDelete(route)
+                console.log(json)
+                throw new Error('Unauthorized access not detected')
+            }
+            catch (error) {
+                expect(error).to.be.instanceOf(Object)
+                expect(error.message).to.equal('Your company is not owner of this ressource')
+            }
+        })
+    })
+
 
 })
