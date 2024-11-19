@@ -18,17 +18,17 @@ import '../scss/header.scss'
 
 const Header = () => {
     const { t } = useTranslation()
-	const [connected, setConnected] = useState(false)
-	const [isAccountMenuVisible, setAccountMenuVisible] = useState(false)
-	const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
-	const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
-	const [isAccessibilityDialogOpen, setIsAccessibilityDialogOpen] = useState(false)
-	const [isRegisterAccountDialogOpen, setIsRegisterAccountDialogOpen] = useState(false);
+    const [connected, setConnected] = useState(false)
+    const [isAccountMenuVisible, setAccountMenuVisible] = useState(false)
+    const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
+    const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
+    const [isAccessibilityDialogOpen, setIsAccessibilityDialogOpen] = useState(false)
+    const [isRegisterAccountDialogOpen, setIsRegisterAccountDialogOpen] = useState(false);
     const { comaintContext } = useComaintContext()
     const [ accountLabel, setAccountLabel ] = useState('')
 
     useEffect( ()=> {
-	    setAccountLabel( comaintContext ? comaintContext.email : '')
+        setAccountLabel( comaintContext ? comaintContext.email : '')
         setConnected( comaintContext ? comaintContext.connected : false)
     }, [comaintContext])
 
@@ -40,30 +40,33 @@ const Header = () => {
             setIsLoginDialogOpen(true)
     }
 
-	const onLogoutMenuClick = () => {
-		setIsLogoutDialogOpen(true)
+    const onLogoutMenuClick = () => {
+        setIsLogoutDialogOpen(true)
     }
-
 
     const onLoginDialogClose = () => {
-		setIsLoginDialogOpen(false)
+        setIsLoginDialogOpen(false)
     }
 
-	const onLogoutDialogResponse = (confirmation) => {
-		setIsLogoutDialogOpen(false)
-	}
+    const onLogoutDialogResponse = () => {
+        setIsLogoutDialogOpen(false)
+    }
 
-	const onAccessibilityDialogClose = () => {
-		setIsAccessibilityDialogOpen(false)
-	}
+    const onRegisterAccount = () => {
+        setIsRegisterAccountDialogOpen(true)
+    }
 
-	const onAccessibilityButtonClick = () => {
-		setIsAccessibilityDialogOpen(true)
-	}
+    const onAccessibilityDialogClose = () => {
+        setIsAccessibilityDialogOpen(false)
+    }
 
-	const onRegisterAccountDialogClose = () => {
-		setIsRegisterAccountDialogOpen(false);
-	}
+    const onAccessibilityButtonClick = () => {
+        setIsAccessibilityDialogOpen(true)
+    }
+
+    const onRegisterAccountDialogClose = () => {
+        setIsRegisterAccountDialogOpen(false);
+    }
 
     return (
         <>
@@ -80,16 +83,16 @@ const Header = () => {
                         inverse/>
                 </span>
                 <StockButton icon='user' onClick={onAccountButtonClick}/>
-			    <span className="userid">{accountLabel}</span>
+                <span className="userid">{accountLabel}</span>
 
             </header>
             <PopupMenu isVisible={isAccountMenuVisible} setVisible={setAccountMenuVisible}>
                 <div onClick={onLogoutMenuClick}>{t('action.logout')}</div>
             </PopupMenu>
-		    <AccessibilityDialog isOpen={isAccessibilityDialogOpen} onClose={onAccessibilityDialogClose} /> 
-		    <LoginDialog isOpen={isLoginDialogOpen} onClose={onLoginDialogClose} /> 
-		    <LogoutDialog isOpen={isLogoutDialogOpen} onResponse={onLogoutDialogResponse}/>
-		    <RegisterAccountDialog isOpen={isRegisterAccountDialogOpen} onClose={onRegisterAccountDialogClose} /> 
+            <AccessibilityDialog isOpen={isAccessibilityDialogOpen} onClose={onAccessibilityDialogClose} /> 
+            <LoginDialog isOpen={isLoginDialogOpen} onClose={onLoginDialogClose} onRegisterAccount={onRegisterAccount}/> 
+            <LogoutDialog isOpen={isLogoutDialogOpen} onResponse={onLogoutDialogResponse}/>
+            <RegisterAccountDialog isOpen={isRegisterAccountDialogOpen} onClose={onRegisterAccountDialogClose} /> 
         </>
     )
 }
