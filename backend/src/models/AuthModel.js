@@ -17,18 +17,16 @@ const AUTH_OPERATION_ACCOUNT_DELETION = 'account-deletion'
 const AUTH_OPERATION_RESET_PASSWORD = 'reset-password'
 
 class AuthModel {
-    #db = null
     #userModel = null
     #tokenModel = null
+    #companyModel = null
     #tokenSecret = null
-    #tokenHashSalt = null
     #codeValidityPeriod = null
     #maxAuthAttempts = null
     #refreshTokenLifespan = null
     #accessTokenLifespan = null
 
-    initialize (db, securityConfig) {
-        assert(db !== undefined)
+    initialize (_, securityConfig) {
         assert(securityConfig !== undefined)
 
         // check «security» configuration section
@@ -39,16 +37,16 @@ class AuthModel {
         }
 
         this.#tokenSecret = securityConfig.tokenSecret
-        this.#tokenHashSalt =  securityConfig.tokenHashSalt
         this.#codeValidityPeriod  = securityConfig.codeValidityPeriod
         this.#maxAuthAttempts = securityConfig.maxAuthAttempts
         this.#refreshTokenLifespan = securityConfig.refreshTokenLifespan
         this.#accessTokenLifespan = securityConfig.accessTokenLifespan
 
-        this.#db = db
         const model  = ModelSingleton.getInstance()
         this.#userModel = model.getUserModel()
         this.#tokenModel = model.getTokenModel()
+        this.#companyModel = model.getCompanyModel()
+        assert(this.#companyModel !== null)
     }
 
     generateRandomAuthCode() {
@@ -73,6 +71,7 @@ class AuthModel {
             // update user registration
             user = await this.#userModel.editUser({
                 id: user.id,
+                manager: true,
                 password,
                 state: AccountState.PENDING,
                 authCode,
@@ -85,6 +84,7 @@ class AuthModel {
             // case where user does not exist
             user = await this.#userModel.createUser({
                 email,
+                manager: true,
                 password,
                 state: AccountState.PENDING,
                 authCode,
@@ -149,8 +149,18 @@ class AuthModel {
                 user.email = user.authData
                 break
             case AUTH_OPERATION_ACCOUNT_DELETION :
+                const companyId = user.companyId
                 await this.#userModel.deleteUserById(user.id)
                 user = null
+                if (companyId !== null) {
+                    try {
+                        await this.#companyModel.deleteCompanyById(companyId)
+                    }
+                    catch (error) {
+                        // ignore errors can_not_delete_company_with_managers
+                        console.log('Company not deleted')
+                    }
+                }
                 break
             case AUTH_OPERATION_RESET_PASSWORD:
                 const data = JSON.parse(user.authData)

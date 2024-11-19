@@ -34,7 +34,8 @@
         "no_auth_in_progress": "Pas d'opératon d'authentification en cours",
         "company_already_initialized": "Compagnie déjà initialisée",
         "not_owner": "Votre compagnie n'est pas propriétaire de cette ressource",
-        "not_found": "Ressource introuvable"
+        "not_found": "Ressource introuvable",
+        "can_not_delete_company_with_managers": "Impossible de supprimer une compagnie qui a toujours des gestionnaires"
     },
     "register": {
         "mail_body": "Bonjour,\nVotre code pour la création d'un compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",

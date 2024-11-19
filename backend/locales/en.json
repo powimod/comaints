@@ -34,7 +34,8 @@
         "no_auth_in_progress": "No authentification operation in progress",
         "company_already_initialized": "Company already initialized",
         "not_owner": "Your company is not owner of this ressource",
-        "not_found": "Ressource not found"
+        "not_found": "Ressource not found",
+        "can_not_delete_company_with_managers": "Can not delete a company that always has managers" 
     },
     "register": {
         "mail_body": "Hello,\nYour validation code for the creation of an account is {{code}}.\nIf your are not the initiator of this request, simply ignore this message.",
