@@ -71,9 +71,7 @@ const Header = () => {
     return (
         <>
             <header className="root_header">
-                <Link to='/' className='logo'>
-                    <Logo/>
-                </Link>
+                <Logo/>
                 <h1>{t('header_title')}</h1>
                 <h2>{t('header_subtitle')}</h2>
                 <span className='stock-button'>
