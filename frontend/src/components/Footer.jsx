@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -6,7 +5,6 @@ import '../scss/footer.scss'
 
 const Footer = () => {
 	const { t } = useTranslation()
-    const [backendVersion, setBackendVersion ]  = useState('?')
 
     return (
         <footer className="root_footer">
