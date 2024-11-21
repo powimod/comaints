@@ -10,10 +10,30 @@ const PageNavigator = ({list = null, onPageNavigate = null}) => {
     const pageCount = parseInt(list.count / list.limit +1)
 
     const callPageNavigate = (action) => {
-        if (typeof(onPageNavigate) === 'function')
-            onPageNavigate(action)
-        else
+        if (typeof(onPageNavigate) !== 'function') {
             console.error('Callback pageNavigate is not defined')
+            return
+        }
+        let page = currentPage
+        switch (action) {
+            case NAVIGATE_FIRST:
+                page = 1
+                break
+            case NAVIGATE_PREVIOUS:
+                page--
+                break
+            case NAVIGATE_NEXT:
+                page++
+                break
+            case NAVIGATE_LAST:
+                page = pageCount
+                break
+        }
+        if (page < 1)
+            page = 1
+        if (page > pageCount)
+            page = pageCount
+        onPageNavigate({action, page})
     }
 
     const onFirstPageButtonClick = () => {

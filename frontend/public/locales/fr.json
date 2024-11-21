@@ -71,6 +71,9 @@
     "invalid-validation-code-error": "Le code de validation doit être un nombre de six chiffres",
     "list-is-empty": "La liste est vide",
 
+    "page-title": {
+        "unit": "Unités"
+    },
     "editor": {
         "title": "Propriétés",
         "delete-done": "La suppression a été effectuée avec succès",

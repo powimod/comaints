@@ -54,9 +54,9 @@ const useUnitActions = () => {
     }
 
 
-    const updateUnitList = async () => {
+    const updateUnitList = async (page = 1) => {
         try {
-            return await dispatch(listUnitThunk()).unwrap()
+            return await dispatch(listUnitThunk({page})).unwrap()
         }
         catch (errorMessage) {
             throw new Error(errorMessage)

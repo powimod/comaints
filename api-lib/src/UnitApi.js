@@ -45,10 +45,15 @@ class UnitApi {
         return result.deleted
     }
 
-    async listUnit() {
+    async listUnit(page = 1) {
         const LIST_UNIT_ROUTE = '/api/v1/unit/list'
-        const result = await this.#context.jsonGet(LIST_UNIT_ROUTE , {}, {token:true})
-        return result.unitList
+        const result = await this.#context.jsonGet(LIST_UNIT_ROUTE , {page}, {token:true})
+        return {
+            list: result.unitList,
+            page: result.page,
+            count: result.count,
+            limit: result.limit
+        }
     }
 
     async getUnitById(unitId) {

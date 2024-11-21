@@ -1,4 +1,4 @@
-'initializeuse strict'
+'use strict'
 import assert from 'assert'
 
 import ModelSingleton from '../model.js'

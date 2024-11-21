@@ -31,11 +31,8 @@ const UnitEditor = ({ onClose = null }) => {
 
 
     useEffect( () => {
-        console.log("dOm editor action", editorAction)
-        if (editorAction === undefined)
-            console.error("EDITOR ACTION NULL")
         // FIXME pourquoi au chargement on reçoit une action «none»
-        const { action, actionNumber } = editorAction
+        const { action } = editorAction
         if (action === EditorToolbarActions.none)
             return
         if (editedUnit === null) {
@@ -73,7 +70,6 @@ const UnitEditor = ({ onClose = null }) => {
     }, [ editorMode ])
 
     const validateChange = async () => {
-       console.log("dOm Edited unit ID", editedUnit.id)
        try {
             if (editedUnit.id)
                 await editUnit(editedUnit)
@@ -99,7 +95,6 @@ const UnitEditor = ({ onClose = null }) => {
             bubbleMessage.show({message: t('editor.delete-done'), duration:1500})
         }
         catch (error) {
-            console.log(error)
             let errorMessage = error.message
             if (error instanceof ComaintTranslatedError)
                 errorMessage = error.translate(t)

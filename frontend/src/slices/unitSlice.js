@@ -4,10 +4,10 @@ import ComaintBackendApiSingleton from '../ComaintApi.js'
 
 const listUnitThunk = createAsyncThunk(
     'unit/list',
-    async (_, { rejectWithValue }) => {
+    async ({page = 1}, { rejectWithValue }) => {
         const comaintApi = ComaintBackendApiSingleton.getInstance()
         try {
-            return await comaintApi.unit.listUnit()
+            return await comaintApi.unit.listUnit(page)
         }
         catch (error) {
             return rejectWithValue(error.message)
@@ -73,7 +73,7 @@ const deleteUnitThunk = createAsyncThunk(
 const unitSlice = createSlice({
     name: 'unit',
     initialState: {
-        unitList: [],
+        unitList: null,
         selectedUnit : null,
         status: STATUS.IDLE,
         error: null,
@@ -124,7 +124,7 @@ const unitSlice = createSlice({
                 const newUnit = action.payload
                 // update unit list to reflect change
                 state.selectedUnit = newUnit
-                state.unitList.push(newUnit)
+                state.unitList.list.push(newUnit)
             })
             .addCase(createUnitThunk.rejected, (state, action) => {
                 state.status = STATUS.FAILED
@@ -141,10 +141,10 @@ const unitSlice = createSlice({
                 const editedUnit = action.payload
                 state.selectedUnit = editedUnit
                 // update unit list to reflect change
-                state.unitList = state.unitList.map(unit => unit.id === editedUnit.id ? editedUnit : unit)
+                state.unitList.list = state.unitList.list.map(unit => unit.id === editedUnit.id ? editedUnit : unit)
                 /* variante possible : 
-                const index = state.unitList.findIndex((unit) => unit.id === editedUnit.id)
-                if (index !== -1) state.unitList[index] = editedUnit
+                const index = state.unitList.list.findIndex((unit) => unit.id === editedUnit.id)
+                if (index !== -1) state.unitList.list[index] = editedUnit
                 */
             })
             .addCase(editUnitThunk.rejected, (state, action) => {
@@ -163,7 +163,7 @@ const unitSlice = createSlice({
                 const deletedUnit = action.payload.unit
                 state.selectedUnit = null
                 // update unit list to reflect change
-                state.unitList = state.unitList.filter(unit => unit.id !== deletedUnit.id)
+                state.unitList = state.unitList.list.filter(unit => unit.id !== deletedUnit.id)
             })
             .addCase(deleteUnitThunk.rejected, (state, action) => {
                 state.status = STATUS.FAILED

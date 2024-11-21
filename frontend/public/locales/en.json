@@ -71,6 +71,9 @@
     "invalid-validation-code-error": "Validation code must be a six digits number",
     "list-is-empty": "List is empty",
 
+    "page-title": {
+        "unit": "Units"
+    },
     "editor": {
         "delete-done": "Deletion completed successfully",
         "confirm-delete-question": "Are you sure you want to delete this item ?",

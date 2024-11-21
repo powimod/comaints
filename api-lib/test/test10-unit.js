@@ -60,20 +60,19 @@ describe('Check login', () => {
             unitPool.push(unit)
         })
 
-
     })
 
     describe('Check unit list', () => {
         it ('List unit', async () => {
             let unit, unitRef
             const unitList = await api.unit.listUnit()
-            expect(unitList).to.be.instanceOf(Array)
-            unit = unitList[0]
+            expect(unitList.list).to.be.instanceOf(Array)
+            unit = unitList.list[0]
             unitRef = unitPool[0]
             expect(unit).to.be.instanceOf(Object).to.have.keys(['id', 'name'])
             expect(unit.name).to.equal(unitRef.name)
             expect(unit.id).to.equal(unitRef.id)
-            unit = unitList[1]
+            unit = unitList.list[1]
             unitRef = unitPool[1]
             expect(unit).to.be.instanceOf(Object).to.have.keys(['id', 'name'])
             expect(unit.name).to.equal(unitRef.name)
