@@ -19,20 +19,22 @@ const StandardDialog = () => {
     const _showDialog = (dialogType, message, resolve)  => {
         validationRef.current = false
         setDialogData({ type:dialogType, message, resolve })
-        dialogRef.current.showModal()
     }
 
     useEffect(() => {
-        dialogDataRef.current = dialogData;
-    }, [dialogData])
-
-    useEffect( () => {
         const modalDialog = dialogRef.current
+        if (modalDialog  === null) {
+            console.error('Dialog is null')
+            return
+        }
+        dialogDataRef.current = dialogData
+        dialogRef.current.showModal()
         modalDialog.addEventListener('close', evDialogClose)
         return () => {
             modalDialog.removeEventListener('close', evDialogClose)
         }
-    }, [])
+    }, [dialogData])
+
 
 	useEffect( () => {
 		for (const request of dialogState) {
@@ -62,9 +64,8 @@ const StandardDialog = () => {
     }
 
 	return ( <>
-        <dialog ref={dialogRef} className='standard-dialog'>
         { dialogData !== null && (
-            <>
+            <dialog ref={dialogRef} className='standard-dialog'>
                 <div>{dialogData.message}</div>
                 <div>
                     { dialogData.type === 'message' && 
@@ -83,9 +84,8 @@ const StandardDialog = () => {
                             </>
                     }
                 </div>
-            </>
+            </dialog>
         ) }
-        </dialog>
     </>)
 }
 

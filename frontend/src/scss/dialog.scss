@@ -1,14 +1,14 @@
 div.popup-stack {
-	pointer-events: none; /* popup stack must not respond to click */
-	position: absolute;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-	max-width: 50%;
-	min-width: 15rem;
-	top:10%;
-	height: 80%;
-	right:10%;
+    pointer-events: none; /* popup stack must not respond to click */
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    max-width: 50%;
+    min-width: 15rem;
+    top:10%;
+    height: 80%;
+    right:10%;
 
     & > div{
         pointer-events: auto; /* popup (with close button) must respond to click */
@@ -36,29 +36,30 @@ div.popup-stack {
 }
 
 div.bubble-message {
-	padding: 1rem;
-	position: absolute;
-	max-width: 40%;
-	bottom:15rem;
-	left: 0;
-	right: 0;
-	margin-left: auto;
-	margin-right: auto;
-	text-align: center;
-	border-radius: 0.5rem;
-	box-shadow: 0 0 0.5rem 0.25rem hsl(0 0% 0% / 60%);
-	color: white;
-	background-color: black;
+    padding: 1rem;
+    position: absolute;
+    max-width: 40%;
+    bottom:15rem;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0.5rem 0.25rem hsl(0 0% 0% / 60%);
+    color: white;
+    background-color: black;
 }
 
 dialog.standard-dialog {
-	position: relative;
+    position: absolute;
+    z-index: 99;
     display: flex;
     flex-direction: column;
-	margin: auto; /* horizontal and vertical center of the dialog box */
-	padding: 1rem;
-	border: 0;
-	border-radius: 0.5rem;
+    margin: auto; /* horizontal and vertical center of the dialog box */
+    padding: 1rem;
+    border: 0;
+    border-radius: 0.5rem;
 
     &::backdrop {
         background: hsl(0 0% 0% / 70%);
@@ -86,26 +87,24 @@ dialog.standard-dialog {
 }
 
 .input-container {
-	display: flex;
-	flex-direction: column;
-	margin-top:0.4rem;
-	margin-top:0.2rem;
+    display: flex;
+    flex-direction: column;
+    margin-top:0.4rem;
+    margin-top:0.2rem;
 
 }
 
 .button-bar {
-	display: flex;
+    display: flex;
     gap:1rem;
-	justify-content: center;
-	margin: 1rem 0.3rem;
+    justify-content: center;
+    margin: 1rem 0.3rem;
 }
 
 .button-bar-right {
-	display: flex;
+    display: flex;
     gap:1rem;
-	justify-content: end;
-	margin: 1rem 0.3rem;
+    justify-content: end;
+    margin: 1rem 0.3rem;
 }
-
-
 
