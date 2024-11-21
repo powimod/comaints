@@ -2,7 +2,7 @@
 
 div.editor-toolbar{
 	display: grid;
-	grid-template-columns: 1fr auto auto auto; /* caption + 3 buttons */
+	grid-template-columns: 1fr repeat(4, auto); /* caption + 4 buttons */
 	background-color: var(--global-color-1);
     color: var(--global-color-0);
 	justify-items: start;

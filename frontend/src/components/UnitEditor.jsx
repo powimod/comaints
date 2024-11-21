@@ -12,7 +12,7 @@ import { ComaintTranslatedError } from '@common/error.mjs'
 
 import '../scss/editor.scss'
 
-const UnitEditor = ({ onClose = null }) => {
+const UnitEditor = ({ id=null,  className='', onClose = null }) => {
     const { t } = useTranslation()
     const bubbleMessage = useBubbleMessage()
     const standardDialog = useStandardDialog()
@@ -50,6 +50,8 @@ const UnitEditor = ({ onClose = null }) => {
                 //no specific action to do for «cancel» and «close» action
                 break
             case EditorToolbarActions.close:
+                if (onClose !== null && typeof(onClose) === 'function')
+                    onClose()
                 //no specific action to do for «cancel» and «close» action
                 break
         }
@@ -121,8 +123,9 @@ const UnitEditor = ({ onClose = null }) => {
         setEditedUnit(updatedUnit)
     }
 
+    className = `editor ${className}`
 
-    return (<div className='editor'>
+    return (<div id={id} className='editor'>
             <EditorToolbar
                 title={t('editor.title')}
                 mode={editorMode}

@@ -19,6 +19,8 @@ const UnitPage = () => {
     const { updateUnitList, getSelectedUnit, getUnitList, getUnitById } = useUnitActions()
     const unitList = getUnitList()
     const [ error, setError ] = useState(null)
+    //const activeElementRef = useRef('list')
+    const [ activeElement, setActiveElement ] = useState('list')
     const componentInitializedRef = useRef(false)
 
     const selectedUnit = getSelectedUnit()
@@ -60,40 +62,79 @@ const UnitPage = () => {
             getUnit()
     }, [id])
 
+
+    useEffect( () => {
+        console.log("dOm activation : ", activeElement)
+        const elElementList = document.getElementById('element-list')
+        const elElementEditor = document.getElementById('element-editor')
+        if ( elElementList === null || elElementEditor  === null)
+            return
+        switch (activeElement) {
+            case 'editor':
+                console.log("dOm editor")
+                elElementList.classList.add('inactive-element')
+                elElementEditor.classList.remove('inactive-element')
+                break;
+            case 'list':
+                console.log("dOm list")
+                elElementList.classList.remove('inactive-element')
+                elElementEditor.classList.add('inactive-element')
+                break;
+            default:
+                console.error('Invalid active element', activeElement)
+        }
+        console.log("dOm style list ", elElementList.classList)
+        console.log("dOm style editor", elElementEditor.classList)
+    }, [activeElement])
+
+
     const onPageNavigate = (action) => {
         refreshUnitList(action.page)
+    }
+
+    const onUnitLinkClick = () => {
+        //activeElementRef.current = 'editor'
+        console.log("dOm click unit link")
+        setActiveElement('editor')
+    }
+
+    const onEditorClose = () => {
+        //activeElementRef.current = 'list'
+        console.log("dOm click close button")
+        setActiveElement(() => 'list')
     }
 
     if (! unitList || unitList.list === null)
         return <>Unit list not initialized</>
 
     return (<div className='list-page'>
-
-            <div className='list-container'>
-                <h1>{t('page-title.unit')} (x{unitList.count})</h1>
-                <div>
-                    { error !== null && <div className='error-message'>{error}</div>}
-                    {  unitList.list.length === 0 ?
-                        <div>{t('list-is-empty')}</div>
-                        :
-                        <>
-                            <ul>
-                            { unitList.list.map (unit =>
-                                    <li key={unit.id}>
-                                        <Link to={`/unit/${unit.id}`}>
-                                            {unit.name}
-                                        </Link>
-                                    </li>
-                                )
-                            }
-                            </ul>
-                            <PageNavigator list={unitList} onPageNavigate={onPageNavigate}/>
-                        </>
-                    }
+                <div id='element-list' className='list-container'>
+                    <h1>{t('page-title.unit')} (x{unitList.count})</h1>
+                    <div>
+                        { error !== null && <div className='error-message'>{error}</div>}
+                        {  unitList.list.length === 0 ?
+                            <div>{t('list-is-empty')}</div>
+                            :
+                            <>
+                                <ul>
+                                { unitList.list.map (unit =>
+                                        <li key={unit.id}>
+                                            <Link to={`/unit/${unit.id}`} onClick={onUnitLinkClick }>
+                                                {unit.name}
+                                            </Link>
+                                        </li>
+                                    )
+                                }
+                                </ul>
+                                <PageNavigator list={unitList} onPageNavigate={onPageNavigate}/>
+                            </>
+                        }
+                    </div>
                 </div>
-            </div>
-            <UnitEditor/>
-        </div>)
+                <div id='element-editor'>
+                    <UnitEditor onClose={onEditorClose}/>
+                </div>
+            </div>)
 }
 
 

@@ -33,8 +33,16 @@ div.list-page {
         grid-area: editor;
     }
 }
-@media (min-width: variables.$screen-size-small)  {
+
+@media (min-width: variables.$screen-size-medium)  {
     div.list-page {
-        grid-template-areas: "list  editor";
+        grid-template-areas: "list editor";
     }
+    .inactive-element {
+        display:block !important;  /*cancel display none */
+    }
+}
+
+.inactive-element {
+    display:none;
 }
