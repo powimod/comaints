@@ -69,6 +69,12 @@
     "code-has-been-send": "Le code de validation a été envoyé par mail",
 	"validation-code": "Code de validation",
 	"invalid-validation-code-error": "Le code de validation doit être un nombre de six chiffres",
+    "editor": {
+        "delete-done": "La suppression a été effectuée avec succès",
+        "confirm-delete-question": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+        "no-element-selected": "Aucun élément sélectionné",
+        "display-mode": "Cliquer sur le bouton de création ou d'édition"
+    },
 
     "error": {
         "invalid-email": "Adresse mail invalide",

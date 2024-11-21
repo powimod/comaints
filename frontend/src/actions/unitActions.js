@@ -1,5 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { listUnitThunk, createUnitThunk, getUnitByIdThunk, editUnitThunk } from '../slices/unitSlice'
+import { listUnitThunk, createUnitThunk, getUnitByIdThunk, editUnitThunk, deleteUnitThunk } from '../slices/unitSlice'
+import { controlObject } from '@common/objects/object-util.mjs'
+import unitObjectDef from '@common/objects/unit-object-def.mjs'
+import { ComaintTranslatedError } from '@common/error.mjs'
 
 const useUnitActions = () => {
     const dispatch = useDispatch()
@@ -15,6 +18,9 @@ const useUnitActions = () => {
     }
 
     const createUnit = async (unit) => {
+        const [ errorMsg, errorParams ] = (controlObject(unitObjectDef, unit, {fullCheck:false}))
+        if (errorMsg)
+            throw new ComaintTranslatedError(errorMsg, errorParams)
         try {
             return await dispatch(createUnitThunk({unit})).unwrap()
         }
@@ -24,6 +30,9 @@ const useUnitActions = () => {
     }
 
     const editUnit = async (unit) => {
+        const [ errorMsg, errorParams ] = (controlObject(unitObjectDef, unit, {fullCheck:true}))
+        if (errorMsg)
+            throw new ComaintTranslatedError(errorMsg, errorParams)
         try {
             return await dispatch(editUnitThunk({unit})).unwrap()
         }
@@ -31,6 +40,19 @@ const useUnitActions = () => {
             throw new Error(errorMessage)
         }
     }
+
+    const deleteUnit = async (unit) => {
+        const [ errorMsg, errorParams ] = (controlObject(unitObjectDef, unit, {fullCheck:true}))
+        if (errorMsg)
+            throw new ComaintTranslatedError(errorMsg, errorParams)
+        try {
+            return await dispatch(deleteUnitThunk({unit})).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
+    }
+
 
     const updateUnitList = async () => {
         try {
@@ -54,9 +76,10 @@ const useUnitActions = () => {
         getSelectedUnit,
         createUnit,
         editUnit,
+        deleteUnit,
         updateUnitList,
         getUnitById,
-        getUnitList 
+        getUnitList
     }
 }
 

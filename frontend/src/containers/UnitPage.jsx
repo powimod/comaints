@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import UnitEditor from '../components/UnitEditor'
 import useUnitActions from '../actions/unitActions'
@@ -9,12 +10,15 @@ const UnitPage = () => {
     let { id } = useParams()
     if (id === undefined) // no unit ID specified in URL path
         id = null
+	const { t } = useTranslation()
     const navigate = useNavigate()
     const { comaintContext } = useComaintContext()
-    const { updateUnitList, getUnitList, getUnitById } = useUnitActions()
+    const { updateUnitList, getSelectedUnit, getUnitList, getUnitById } = useUnitActions()
     const unitList = getUnitList()
     const [ error, setError ] = useState(null)
     const componentInitializedRef = useRef(false)
+
+    const selectedUnit = getSelectedUnit()
 
     useEffect(() => {
         if (comaintContext === null || comaintContext.connected === false)
@@ -39,8 +43,6 @@ const UnitPage = () => {
     }, [])
 
     useEffect(() => {
-        if (id === null) // no unit ID specified in URL
-            return
         const getUnit = async () => {
             try {
                 await getUnitById(id)
@@ -49,8 +51,12 @@ const UnitPage = () => {
                 setError(error.message)
             }
         }
-        getUnit()
+        if (id === null) // no unit ID specified in URL
+            return
+        if (selectedUnit === null || selectedUnit.id != id)
+            getUnit()
     }, [id])
+
 
     return (<>
             <h1>Unit Page</h1>

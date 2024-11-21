@@ -5,8 +5,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useComaintContext } from '../ComaintContext'
 import useAuthActions from '../actions/authActions'
 import CustomDialog from './dialog/CustomDialog'
-import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
-import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
+import { controlObjectProperty } from '@common/objects/object-util.mjs'
+import userObjectDef from '@common/objects/user-object-def.mjs'
 
 import '../scss/login-dialog.scss'
 

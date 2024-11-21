@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import useCompanyActions from '../actions/companyActions'
 import { useComaintContext } from '../ComaintContext'
-import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
-import companyObjectDef from '../../../common/src/objects/company-object-def.mjs'
+import { controlObjectProperty } from '@common/objects/object-util.mjs'
+import companyObjectDef from '@common/objects/company-object-def.mjs'
 
 const CompanyInitialisation = () => {
     const { t } = useTranslation()

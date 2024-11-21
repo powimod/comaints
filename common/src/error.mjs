@@ -19,6 +19,7 @@ class ComaintTranslatedError extends Error {
         this.msgId = msgId
         this.msgParams = msgParams
         this.message = i18nFunction ? i18nFunction(msgId, msgParams) : `Error ${msgId}`
+        //Object.setPrototypeOf(this, new.target.prototype)
     }
 
     translate(i18nFunction) {

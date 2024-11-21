@@ -30,10 +30,10 @@ const getUnitByIdThunk = createAsyncThunk(
 
 const createUnitThunk = createAsyncThunk(
     'unit/create',
-    async ({ unitName }, { rejectWithValue }) => {
+    async ({ unit }, { rejectWithValue }) => {
         const comaintApi = ComaintBackendApiSingleton.getInstance()
         try {
-            return await comaintApi.unit.createUnit({unitName})
+            return await comaintApi.unit.createUnit(unit)
         }
         catch (error) {
             return rejectWithValue(error.message)
@@ -47,16 +47,27 @@ const editUnitThunk = createAsyncThunk(
         const comaintApi = ComaintBackendApiSingleton.getInstance()
         try {
             unit = await comaintApi.unit.editUnit(unit)
-            console.log("dOm success")
             return unit
         }
         catch (error) {
-            console.log("dOm erreur", error)
             return rejectWithValue(error.message)
         }
     }
 )
 
+const deleteUnitThunk = createAsyncThunk(
+    'unit/delete',
+    async ({ unit }, { rejectWithValue }) => {
+        const comaintApi = ComaintBackendApiSingleton.getInstance()
+        try {
+            await comaintApi.unit.deleteUnitById(unit.id)
+            return { unit }
+        }
+        catch (error) {
+            return rejectWithValue(error.message)
+        }
+    }
+)
 
 
 const unitSlice = createSlice({
@@ -77,17 +88,14 @@ const unitSlice = createSlice({
 
             // getUnitList 
             .addCase(listUnitThunk.pending, (state) => {
-                console.log("dOm list unit loading")
                 state.status = STATUS.LOADING
                 state.error = null
             })
             .addCase(listUnitThunk.fulfilled, (state, action) => {
-                console.log("dOm list unit succeeded")
                 state.status = STATUS.SUCCEEDED
                 state.unitList = action.payload
             })
             .addCase(listUnitThunk.rejected, (state, action) => {
-                console.error("thunk unit list failed", action.payload)
                 state.status = STATUS.FAILED
                 state.error = action.payload
             })
@@ -102,7 +110,6 @@ const unitSlice = createSlice({
                 state.selectedUnit = action.payload
             })
             .addCase(getUnitByIdThunk.rejected, (state, action) => {
-                console.error("thunk unit get failed", action.payload)
                 state.status = STATUS.FAILED
                 state.error = action.payload
             })
@@ -115,12 +122,11 @@ const unitSlice = createSlice({
             .addCase(createUnitThunk.fulfilled, (state, action) => {
                 state.status = STATUS.SUCCEEDED
                 const newUnit = action.payload
-                // update unit list to reflect unit change
-                state.unit = newUnit
+                // update unit list to reflect change
+                state.selectedUnit = newUnit
                 state.unitList.push(newUnit)
             })
             .addCase(createUnitThunk.rejected, (state, action) => {
-                console.error("thunk unit create failed", action.payload)
                 state.status = STATUS.FAILED
                 state.error = action.payload
             })
@@ -133,21 +139,36 @@ const unitSlice = createSlice({
             .addCase(editUnitThunk.fulfilled, (state, action) => {
                 state.status = STATUS.SUCCEEDED
                 const editedUnit = action.payload
-                state.unit = editedUnit
-                // update unit list to reflect unit change
+                state.selectedUnit = editedUnit
+                // update unit list to reflect change
                 state.unitList = state.unitList.map(unit => unit.id === editedUnit.id ? editedUnit : unit)
-                /* 
+                /* variante possible : 
                 const index = state.unitList.findIndex((unit) => unit.id === editedUnit.id)
                 if (index !== -1) state.unitList[index] = editedUnit
                 */
             })
             .addCase(editUnitThunk.rejected, (state, action) => {
-                console.error("thunk unit edit failed", action.payload)
                 state.status = STATUS.FAILED
                 state.error = action.payload
             })
 
- 
+
+             // deleteUnit
+            .addCase(deleteUnitThunk.pending, (state) => {
+                state.status = STATUS.LOADING
+                state.error = null
+            })
+            .addCase(deleteUnitThunk.fulfilled, (state, action) => {
+                state.status = STATUS.SUCCEEDED
+                const deletedUnit = action.payload.unit
+                state.selectedUnit = null
+                // update unit list to reflect change
+                state.unitList = state.unitList.filter(unit => unit.id !== deletedUnit.id)
+            })
+            .addCase(deleteUnitThunk.rejected, (state, action) => {
+                state.status = STATUS.FAILED
+                state.error = action.payload
+            })
     }
 })
 
@@ -155,6 +176,7 @@ export {
     listUnitThunk, 
     createUnitThunk,
     editUnitThunk,
+    deleteUnitThunk,
     getUnitByIdThunk
 }
 export default unitSlice.reducer

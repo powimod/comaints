@@ -37,7 +37,7 @@
  *      throw new ComaintTranslatedError(errorMsg, errorParams)
  *
  */
-const controlObject = (objDef, object, options) => {
+const controlObject = (objDef, object, options = {}) => {
     const fullCheck =  options.fullCheck === undefined ? true : options.fullCheck
     const checkId =  options.checkId === undefined ? true : options.checkId
     if (objDef === undefined)
@@ -68,7 +68,7 @@ const controlObject = (objDef, object, options) => {
         }
         else {
             const controlResult = controlObjectProperty(objDef, propName, object[propName])
-            if (controlResult[0] !== false) 
+            if (controlResult[0] !== false)
                 return controlResult
         }
     }
@@ -120,7 +120,7 @@ const controlObjectProperty = (objDef, propName, propValue) => {
         if (propDef.mandatory)
             return ['common:error.prop.is_null', {property: propName}]
         else
-            return null // FIXME 
+            return null // FIXME
     }
 
 
@@ -170,7 +170,7 @@ const controlObjectProperty = (objDef, propName, propValue) => {
         case 'image':
             if (typeof(propValue) !== 'string' )
                 return ['common:error.prop.is_not_a_string', {property: propName}]
-            if (propDef.minimum && propValue.length < propDef.minimum ) 
+            if (propDef.minimum && propValue.length < propDef.minimum )
                 return ['common:error.prop.is_too_short', {property: propName, size: propDef.minimum}]
             if (propDef.maximum && propValue.length > propDef.maximum )
                 return ['common:error.prop.is_too_long',  {property: propName, size: propDef.maximum}]
@@ -269,7 +269,7 @@ const convertObjectFromDb = (objDef, dbRecord) => {
         if (fieldValue === undefined)
             continue // record should not have all properties
         if (fieldValue !== null) {
-            if (propDef.type === 'boolean') 
+            if (propDef.type === 'boolean')
                 fieldValue = (fieldValue === 1) ? true : false
             // FIXME remove this if no error is thrown
             if (propDef.type === 'date' || propDef.type === 'datetime') {
@@ -283,6 +283,123 @@ const convertObjectFromDb = (objDef, dbRecord) => {
     }
     return object
 }
+
+/**
+ * Create an object containing object properties according to the object definition passed as argument.
+ *
+ * @function
+ * @param {Object} objDef - object containing definition of each properties of the object.
+ * @returns {Object} - the created object
+ *
+ */
+const createObjectInstance = (objDef) => {
+    if (objDef === undefined)
+        throw new Error('objDef argument is missing')
+    if (typeof(objDef) != 'object')
+        throw new Error('objDef argument is not an object')
+    const object = {}
+    for (const [propName, propDef] of Object.entries(objDef)) {
+        switch (propDef.type) {
+            case 'id':
+                object[propName] = null
+                break;
+            case 'integer':
+            case 'price':
+                if (object.defaultValue)
+                    object[propName] = parseInt(object.defaultValue)
+                else if (propDef.mandatory)
+                    object[propName] = 0
+                else
+                    object[propName] = null
+                break;
+            case 'string':
+            case 'text':
+            case 'email':
+                if (object.defaultValue)
+                    object[propName] = object.defaultValue
+                else if (propDef.mandatory)
+                    object[propName] = ""
+                else
+                    object[propName] = null
+                break;
+            case 'date':
+            case 'datetime':
+                if (propDef.mandatory)
+                    object[propName] = new Date()
+                else
+                    object[propName] = null
+                break;
+            case 'boolean':
+                if (object.defaultValue)
+                    object[propName] = object.defaultValue
+                else if (propDef.mandatory)
+                    object[propName] = false
+                else
+                    object[propName] = null
+                break;
+            case 'link':
+                object[propName] = null
+                break;
+            default:
+                throw new Error(`Property type [${propDef.type}] not supported`)
+        }
+    }
+    return object
+}
+
+
+/**
+ * Compare two object instances passed as parameters according to an object definition and
+ * returns an array containing all properties for which value has changed.
+ * Used to detect if an object has been changed in a dialog editor and to send the minimum field set
+ * to the backend to be save in database.
+ * 
+ * @function
+ * @param {Object} objDef - object containing definition of each properties of the object.
+ * @param {Object} objectA - first instance of the object to compare (before edition)
+ * @param {Object} objectB - second instance of the object (after edition)
+ * @param {boolean} ignoreID - indicates if object ID should be controlled or not.
+ *    If true, an error is thrown if objectA and objectB do not match.
+ * @returns {Object} - the diff object with changed properties (name and value after edition)
+ * 
+ */
+const diffObjectInstances = (objDef, objectA, objectB, ignoreID = false) => {
+    if (objDef === undefined)
+        throw new Error('objDef argument is missing')
+    if (typeof(objDef) != 'object')
+        throw new Error('objDef argument is not an object')
+
+    if (objectA === undefined)
+        throw new Error('objectA argument is missing')
+    if (typeof(objectA) != 'object')
+        throw new Error('objectA argument is not an object')
+
+    if (objectB === undefined)
+        throw new Error('objectB argument is missing')
+    if (typeof(objectA) != 'object')
+        throw new Error('objectB argument is not an object')
+
+    const delta = {}
+    for (const [propName, propDef] of Object.entries(objDef)) {
+        if (propDef.type === 'id') {
+            if (ignoreID)
+                continue
+            if (objectA.id === undefined)
+                throw new Error('Object A has no ID')
+            if (objectB.id === undefined)
+                throw new Error('Object B has no ID')
+            if (objectA.id !== objectB.id)
+                throw new Error('Objects ID are different')
+            delta[propName] = objectB[propName]
+            continue
+        }
+        if (objectA[propName] == objectB[propName])
+            continue
+        delta[propName] = objectB[propName]
+    }
+    return delta
+}
+
 
 /**
  * Cette fonction attend en argument une définition d'objet et une liste (sous forme d'objet) associant des
@@ -410,7 +527,9 @@ export {
     controlObjectProperty,
     convertObjectToDb,
     convertObjectFromDb,
+    createObjectInstance,
+    diffObjectInstances,
     buildFieldArrays,
     buildFieldNameArray,
-    buildPublicObjectVersion 
+    buildPublicObjectVersion
 }

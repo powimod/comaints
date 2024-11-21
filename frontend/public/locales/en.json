@@ -69,7 +69,12 @@
     "code-has-been-send": "Validation code has been sent by email",
 	"validation-code": "Validation code",
 	"invalid-validation-code-error": "Validation code must be a six digits number",
-
+    "editor": {
+        "delete-done": "Deletion completed successfully",
+        "confirm-delete-question": "Are you sure you want to delete this item ?",
+        "no-element-selected": "No element selected",
+        "display-mode": "Click on edit or create button"
+    },
     "error": {
         "invalid-email": "Invalid Email",
         "invalid-password": "Invalid Password",
