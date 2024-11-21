@@ -1,0 +1,26 @@
+@use './variables';
+
+div.editor-toolbar{
+	display: grid;
+	grid-template-columns: 1fr auto auto auto; /* caption + 3 buttons */
+	background-color: var(--global-color-1);
+    color: var(--global-color-0);
+	justify-items: start;
+    
+    & > span {
+        align-self: center;
+        flex-grow: 1;
+        font-size: 1.9rem;
+        margin-left: 1rem;
+        grid-column: 1 / -1;
+    }
+    & > button {
+	    color: var(--global-color-0);
+    }
+}
+@media (min-width: variables.$screen-size-small)  {
+	div.editor-toolbar > span {
+		grid-column: 1 / 2;
+	}
+}
+

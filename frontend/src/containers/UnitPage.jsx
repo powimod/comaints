@@ -6,6 +6,8 @@ import UnitEditor from '../components/UnitEditor'
 import useUnitActions from '../actions/unitActions'
 import { useComaintContext } from '../ComaintContext'
 
+import '../scss/list-page.scss'
+
 const UnitPage = () => {
     let { id } = useParams()
     if (id === undefined) // no unit ID specified in URL path
@@ -26,7 +28,7 @@ const UnitPage = () => {
     }, [comaintContext])
 
     useEffect(() => {
-        // detect react strict mode 
+        // detect react strict mode
         if ( componentInitializedRef.current  === true)
             return
         componentInitializedRef.current = true
@@ -58,28 +60,32 @@ const UnitPage = () => {
     }, [id])
 
 
-    return (<>
-            <h1>Unit Page</h1>
-            { error !== null && <div className='error-message'>{error}</div>}
-            { unitList === null || unitList.length === 0 ? 
-                    <div>Unit list is empty</div>
-                    :
-                    <>
-                        <div>Unit list (x{unitList.length}): </div>
-                        <ul>
-                        { unitList.map (unit => 
-                                <li key={unit.id}>
-                                    <Link to={`/unit/${unit.id}`}>
-                                        {unit.name}
-                                    </Link>
-                                </li>
-                            )
-                        }
-                        </ul>
-                    </>
-            }
+    return (<div className='list-page'>
+
+            <div className='list-container'>
+                <h1>Unit Page</h1>
+                <div>
+                    { error !== null && <div className='error-message'>{error}</div>}
+                    { unitList === null || unitList.length === 0 ?
+                            <div>{t('list-is-empty')}</div>
+                            :
+                            <>
+                                <ul>
+                                { unitList.map (unit =>
+                                        <li key={unit.id}>
+                                            <Link to={`/unit/${unit.id}`}>
+                                                {unit.name}
+                                            </Link>
+                                        </li>
+                                    )
+                                }
+                                </ul>
+                            </>
+                    }
+                </div>
+            </div>
             <UnitEditor/>
-        </>)
+        </div>)
 }
 
 export default UnitPage

@@ -1,0 +1,10 @@
+div.editor {
+    margin: var(--marge-size-large);
+    border: solid 1px var(--global-color-4);
+    border-radius: 5px;
+
+    div.input-container {
+        margin: var(--marge-size-large);
+    }
+}
+

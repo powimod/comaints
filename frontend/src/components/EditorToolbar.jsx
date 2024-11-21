@@ -4,6 +4,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 
+import '../scss/editor-toolbar.scss'
 import StockButton from './StockButton'
 
 const MODE_NONE = 0

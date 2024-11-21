@@ -1,0 +1,40 @@
+@use './variables';
+
+div.list-page {
+    display: grid;
+    gap:var(--marge-size-medium);
+    grid-template-areas:
+        "list"
+        "editor";
+    grid-template-columns: auto auto;
+
+    margin: var(--marge-size-large);
+
+    div.list-container {
+        grid-area: list;
+        margin: var(--marge-size-large);
+        border-radius: 5px;
+        border: solid 1px var(--global-color-4);
+
+        h1 {
+	        background-color: var(--global-color-1);
+            color: var(--global-color-0);
+            font-size: 1.9rem;
+            padding-left: 1rem;
+        }
+        ul {
+            list-style: none;
+            margin: var(--marge-size-large);
+            overflow: auto;
+        }
+    }
+
+    div.editor {
+        grid-area: editor;
+    }
+}
+@media (min-width: variables.$screen-size-small)  {
+    div.list-page {
+        grid-template-areas: "list  editor";
+    }
+}

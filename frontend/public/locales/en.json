@@ -1,19 +1,19 @@
 {
     "loading": "Loading...",
-	"header_title" : "Comaint CMMS",
-	"header_subtitle": "Computerized Maintenance Management System",
+    "header_title" : "Comaint CMMS",
+    "header_subtitle": "Computerized Maintenance Management System",
     "action": {
         "logout": "Logout",
         "close": "Close"
     },
-	"button": {
-		"yes" : "Yes",
-		"no" : "No",
-		"ok" : "OK",
-		"cancel": "Cancel",
-		"validate": "Validate",
+    "button": {
+        "yes" : "Yes",
+        "no" : "No",
+        "ok" : "OK",
+        "cancel": "Cancel",
+        "validate": "Validate",
         "home": "Home"
-	},
+    },
     "accessibility": {
         "theme" : "Theme",
         "light-theme" : "Light",
@@ -37,19 +37,19 @@
         "contact_us": "Contact us",
         "privacy_policy": "Privacy policy",
         "terms_of_use": "Terms of use",
-	    "about_link": "About",
+        "about_link": "About",
         "all_right_reserved": "© All right reserved {{name}} - {{years}}", 
         "product_conception": "{{name}} conception"
     },
-	"login-message": "Identify",
-	"already-customer-question": "Already a customer",
-	"email-field": "EMail",
-	"password-field": "Password",
-	"forget-password-button" : "Forgotten password",
-	"login-button": "Login",
-	"new-customer-question" : "New customer",
-	"create-account-button" : "Create account",
-	"close": "Close",
+    "login-message": "Identify",
+    "already-customer-question": "Already a customer",
+    "email-field": "EMail",
+    "password-field": "Password",
+    "forget-password-button" : "Forgotten password",
+    "login-button": "Login",
+    "new-customer-question" : "New customer",
+    "create-account-button" : "Create account",
+    "close": "Close",
     "field" : {
         "name": "Nom"
     },
@@ -57,18 +57,20 @@
         "title": "Company initialisation",
         "message": "You must create your company"
     },
-	"create-account-message" : "Create an account",
-	"create-account-instruction": "Please provide a valid email address and a password in order to create an account",
-	"password-rules": "Minimum 8 characters with at least one uppercase, one lowercase, one number, and one special character",
-	"firstname-field": "Firstname",
-	"lastname-field": "Lastname",
+    "create-account-message" : "Create an account",
+    "create-account-instruction": "Please provide a valid email address and a password in order to create an account",
+    "password-rules": "Minimum 8 characters with at least one uppercase, one lowercase, one number, and one special character",
+    "firstname-field": "Firstname",
+    "lastname-field": "Lastname",
     "different-password-error": "Passwords are different",
 
-	"ask-code-message": "Please enter the confirmation code that was sent to you by email",
-	"resend-validation-code": "Resend validation code",
+    "ask-code-message": "Please enter the confirmation code that was sent to you by email",
+    "resend-validation-code": "Resend validation code",
     "code-has-been-send": "Validation code has been sent by email",
-	"validation-code": "Validation code",
-	"invalid-validation-code-error": "Validation code must be a six digits number",
+    "validation-code": "Validation code",
+    "invalid-validation-code-error": "Validation code must be a six digits number",
+    "list-is-empty": "List is empty",
+
     "editor": {
         "delete-done": "Deletion completed successfully",
         "confirm-delete-question": "Are you sure you want to delete this item ?",
@@ -76,25 +78,27 @@
         "display-mode": "Click on edit or create button"
     },
     "error": {
+        "title": "Properties",
         "invalid-email": "Invalid Email",
         "invalid-password": "Invalid Password",
         "different-password": "Passwords does not match",
         "invalid-code": "Invalid code",
-	    "invalid-validation-code": "Le code de validation doit être un nombre à six chiffres",
+        "invalid-validation-code": "Le code de validation doit être un nombre à six chiffres",
         "empty-firstname": "Firstname can not be empty",
         "empty-lastname": "Lastname can not be empty"
     },
 
-	"forgotten_password" : {
-		"title": "Forgotten password",
+
+    "forgotten_password" : {
+        "title": "Forgotten password",
         "step_1": "First step",
         "step_2": "Step two",
-		"email_field": "Email address",
-		"send_code_button": "Send code",
-		"code": "code",
-		"new_password_field": "New password",
-		"confirm_password_field": "Confirm password",
-		"send_code_message": "Please enter the validation code that was sent to your email address",
-		"password_changed_message": "Your password has been changed"
-	}
+        "email_field": "Email address",
+        "send_code_button": "Send code",
+        "code": "code",
+        "new_password_field": "New password",
+        "confirm_password_field": "Confirm password",
+        "send_code_message": "Please enter the validation code that was sent to your email address",
+        "password_changed_message": "Your password has been changed"
+    }
 }

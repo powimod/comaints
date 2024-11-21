@@ -10,6 +10,8 @@ import { controlObjectProperty, createObjectInstance,  diffObjectInstances } fro
 import unitObjectDef from '@common/objects/unit-object-def.mjs'
 import { ComaintTranslatedError } from '@common/error.mjs'
 
+import '../scss/editor.scss'
+
 const UnitEditor = ({ onClose = null }) => {
     const { t } = useTranslation()
     const bubbleMessage = useBubbleMessage()
@@ -125,10 +127,9 @@ const UnitEditor = ({ onClose = null }) => {
     }
 
 
-    return (<>
-            <h1>{t('unit-editor')}</h1>
+    return (<div className='editor'>
             <EditorToolbar
-                title="TODO change title"
+                title={t('editor.title')}
                 mode={editorMode}
                 setMode={setEditorMode}
                 setAction={setEditorAction}
@@ -136,7 +137,7 @@ const UnitEditor = ({ onClose = null }) => {
                 canClose={(onClose !== null)}
             />
             { (editedUnit === null) ?  <>
-                    <div>{t('editor.no-element-selected')}</div>
+                    <div className='input-container'>{t('editor.no-element-selected')}</div>
                 </> : <>
                     {error !== null && <div className='error-message'>{error}</div>}
                     <div className='input-container'>
@@ -154,6 +155,6 @@ const UnitEditor = ({ onClose = null }) => {
 
                 </>
             }
-        </>)
+        </div>)
 }
 export default UnitEditor
