@@ -14,20 +14,40 @@ const useUnitActions = () => {
         return unitListState
     }
 
-    const createUnit = async ({unitName}) => {
-        return await dispatch(createUnitThunk({unitName})).unwrap()
+    const createUnit = async (unit) => {
+        try {
+            return await dispatch(createUnitThunk({unit})).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
 
     const editUnit = async (unit) => {
-        return await dispatch(editUnitThunk({unit})).unwrap()
+        try {
+            return await dispatch(editUnitThunk({unit})).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
 
     const updateUnitList = async () => {
-        return await dispatch(listUnitThunk()).unwrap()
+        try {
+            return await dispatch(listUnitThunk()).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
 
     const getUnitById = async (unitId) => {
-        return await dispatch(getUnitByIdThunk({unitId})).unwrap()
+        try {
+            return await dispatch(getUnitByIdThunk({unitId})).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
 
     return {
