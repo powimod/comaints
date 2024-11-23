@@ -1,26 +1,26 @@
-'use strict'
-const BACKEND_VERSION = '0.0.1'
+'use strict';
+const BACKEND_VERSION = '0.0.1';
 
-import express from 'express'
-import i18next from 'i18next'
-import Backend from 'i18next-fs-backend'
-import middleware from 'i18next-http-middleware'
-import dotenv from 'dotenv'
-import path from 'path'
+import express from 'express';
+import i18next from 'i18next';
+import Backend from 'i18next-fs-backend';
+import middleware from 'i18next-http-middleware';
+import dotenv from 'dotenv';
+import path from 'path';
 import { fileURLToPath } from 'url';
 
-import MailManagerModel from './MailManager.js'
-import ModelSingleton from './model.js'
-import ControllerSingleton from './controller.js'
-import View from './view.js'
+import MailManagerModel from './MailManager.js';
+import ModelSingleton from './model.js';
+import ControllerSingleton from './controller.js';
+import View from './view.js';
 
-dotenv.config()
+dotenv.config();
 
 const main = async () => {
 
-    const app = express()
-    app.use(express.json())
-    app.use(express.urlencoded({extended: true}))
+    const app = express();
+    app.use(express.json());
+    app.use(express.urlencoded({extended: true}));
 
     // i18n support
     i18next.use(Backend).use(middleware.LanguageDetector).init({
@@ -31,35 +31,35 @@ const main = async () => {
         backend: {
             loadPath: (lng, ns) => {
                 if (ns === 'common')
-                    return `../${ns}/locales/${lng}.json`
-                return `./locales/${lng}.json`
+                    return `../${ns}/locales/${lng}.json`;
+                return `./locales/${lng}.json`;
             }
         }
-    })
-    app.use(middleware.handle(i18next))
+    });
+    app.use(middleware.handle(i18next));
 
     // serve common locale files
-    const __dirname = path.dirname(fileURLToPath(import.meta.url))
-    app.use('/locales/common', express.static(path.join(__dirname, '../../common/locales/')))
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    app.use('/locales/common', express.static(path.join(__dirname, '../../common/locales/')));
 
     // configuration is defined in «.env» file
-    const env = process.env
-    const dbPassword = env.DB_PASSWORD
+    const env = process.env;
+    const dbPassword = env.DB_PASSWORD;
     if (! dbPassword)
-        throw new Error('DB_PASSWORD not defined')
-    const tokenSecret = env.TOKEN_SECRET
+        throw new Error('DB_PASSWORD not defined');
+    const tokenSecret = env.TOKEN_SECRET;
     if (! tokenSecret)
-        throw new Error('TOKEN_SECRET not defined')
+        throw new Error('TOKEN_SECRET not defined');
 
-    const mailServerPassword = env.MAIL_SERVER_PASSWORD 
+    const mailServerPassword = env.MAIL_SERVER_PASSWORD; 
     if (! mailServerPassword)
-        throw new Error('MAIL_SERVER_PASSWORD not defined')
-    const mailServerFrom = env.MAIL_SERVER_FROM
+        throw new Error('MAIL_SERVER_PASSWORD not defined');
+    const mailServerFrom = env.MAIL_SERVER_FROM;
     if (! mailServerFrom)
-        throw new Error('MAIL_SERVER_FROM not defined')
+        throw new Error('MAIL_SERVER_FROM not defined');
 
-    const adminEmail = env.ADMIN_EMAIL || null
-    const adminPassword = env.ADMIN_PASSWORD || null
+    const adminEmail = env.ADMIN_EMAIL || null;
+    const adminPassword = env.ADMIN_PASSWORD || null;
 
 
     // FIXME env variable values are not checked
@@ -91,56 +91,56 @@ const main = async () => {
             email: adminEmail,
             password: adminPassword
         }
-    }
+    };
     const mailConfig = {
         host: env.MAIL_SERVER_HOST || 'localhost',
         port: env.MAIL_SERVER_PORT || 25,
         user: env.MAIL_SERVER_USER || 'comaint',
         password: mailServerPassword,
         from: mailServerFrom,
-    }
+    };
 
-    const mailManager = MailManagerModel.getInstance()
-    mailManager.initialize(mailConfig)
+    const mailManager = MailManagerModel.getInstance();
+    mailManager.initialize(mailConfig);
 
-	const model = ModelSingleton.getInstance()
-	await model.initialize(config)
+	const model = ModelSingleton.getInstance();
+	await model.initialize(config);
 
-	const controller = ControllerSingleton.getInstance()
-	await controller.initialize(config, app)
+	const controller = ControllerSingleton.getInstance();
+	await controller.initialize(config, app);
 
 
     // catch signals to stop daemon
     const stopService = async () => {
-        console.log('Stopping Comaint backend...')
-	    await model.terminate()
-        process.exit(0)
-    }
-    process.on('SIGINT' , stopService) // catch CTRL+C signal 
-    process.on('SIGTERM', stopService) // catch CTRL+D signal (sent by SystemD)
+        console.log('Stopping Comaint backend...');
+	    await model.terminate();
+        process.exit(0);
+    };
+    process.on('SIGINT' , stopService); // catch CTRL+C signal 
+    process.on('SIGTERM', stopService); // catch CTRL+D signal (sent by SystemD)
 
-    const port = config.server.port
+    const port = config.server.port;
     
     // use a Promise to transmit connection error to the main caller
     const expressServer = await new Promise( (resolve, reject) => {
         const server = app.listen(
             port, 
             () => { // success
-                console.log(`Comaint backend listening on ${port}...`)
-                resolve(server)
+                console.log(`Comaint backend listening on ${port}...`);
+                resolve(server);
             }
-        )
+        );
         server.on('error', (error) => {
-            reject(error)
-        })
-    })
+            reject(error);
+        });
+    });
 
-}
+};
 
 
 main()
 . catch (error => {
-	const message = error.message ? error.message : error
-    console.error(`ERROR : Can not start Comaint backend : ${message}`)
-	process.exit(1)
-})
+	const message = error.message ? error.message : error;
+    console.error(`ERROR : Can not start Comaint backend : ${message}`);
+	process.exit(1);
+});
