@@ -23,10 +23,8 @@ const StandardDialog = () => {
 
     useEffect(() => {
         const modalDialog = dialogRef.current
-        if (modalDialog  === null) {
-            console.error('Dialog is null')
+        if (modalDialog  === null) 
             return
-        }
         dialogDataRef.current = dialogData
         dialogRef.current.showModal()
         modalDialog.addEventListener('close', evDialogClose)

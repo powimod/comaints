@@ -12,7 +12,7 @@ const PrivateHomeContent = () => {
     return (<>
             <h1>Private home page</h1>
             <ul>
-                <li><Link to='/unit'>Units</Link></li>
+                <li><Link to='/units'>Units</Link></li>
             </ul>
         </>)
 }
