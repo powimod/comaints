@@ -22,9 +22,10 @@ class UnitRoutes {
             const pagination = request.requestPagination;
             assert(pagination !== undefined);
 
-            // filter units own by user company
-            assert(request.companyId);
-            const filters = { companyId: request.companyId };
+            // for non admin users, add a filter on user company
+            const filters = {}
+            if (request.companyId !== null)
+                filters.companyId = request.companyId;
 
             try {
                 const result = await unitModel.findUnitList(properties, filters, pagination);
@@ -44,15 +45,11 @@ class UnitRoutes {
             const pagination = request.requestPagination;
             assert(pagination !== undefined);
 
-            // filter units own by user company
-            assert(request.companyId);
-            filters.companyId = request.companyId;
-
-            try {
-                // return only units of user company !
-                assert(request.companyId);
+            // for non admin users, add a filter on user company
+            if (request.companyId !== null)
                 filters.companyId = request.companyId;
 
+            try {
                 const result = await unitModel.findUnitList(properties, filters, pagination);
                 view.json(result);
             }
@@ -65,13 +62,16 @@ class UnitRoutes {
             const view = request.view;
             try {
                 assert(request.userId);
-                assert(request.companyId);
+
                 let unit = request.body.unit;
                 if (unit === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'unit'});
                 if (typeof(unit) !== 'object')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'unit'});
-                unit.companyId = request.companyId;
+
+                // for non admin users, force user company ID
+                if (request.companyId !== null)
+                    unit.companyId = request.companyId
 
                 const [ errorMsg, errorParam ] = controlObject(unitObjectDef, unit, { fullCheck:true, checkId:false });
                 if (errorMsg)
@@ -90,10 +90,10 @@ class UnitRoutes {
             const view = request.view;
             try {
                 assert(request.userId);
-                assert(request.companyId);
                 let unit = await unitModel.getUnitById(unitId);
+
                 // silently ignore tentative to access not owned unit
-                if (unit !== null && unit.companyId !== request.companyId)
+                if (unit !== null && request.isAdministrator === false && unit.companyId !== request.companyId)
                     unit = null;
                 view.json({unit});
             }
@@ -150,6 +150,7 @@ class UnitRoutes {
                 let unit = await unitModel.getUnitById(unitId);
                 if (unit === null)
                     throw new ComaintApiErrorUnauthorized('error.not_found');
+
                 if (unit.companyId !== request.companyId)
                     throw new ComaintApiErrorUnauthorized('error.not_owner');
                 unit = null;
