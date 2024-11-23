@@ -163,7 +163,7 @@ const unitSlice = createSlice({
                 const deletedUnit = action.payload.unit
                 state.selectedUnit = null
                 // update unit list to reflect change
-                state.unitList = state.unitList.list.filter(unit => unit.id !== deletedUnit.id)
+                state.unitList.list = state.unitList.list.filter(unit => unit.id !== deletedUnit.id)
             })
             .addCase(deleteUnitThunk.rejected, (state, action) => {
                 state.status = STATUS.FAILED
