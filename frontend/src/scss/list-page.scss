@@ -1,6 +1,6 @@
 @use './variables';
 
-div.list-page {
+main.list-page {
     display: grid;
     gap:var(--marge-size-medium);
     grid-template-areas:
@@ -35,7 +35,7 @@ div.list-page {
 }
 
 @media (min-width: variables.$screen-size-medium)  {
-    div.list-page {
+    main.list-page {
         grid-template-areas: "list editor";
     }
     .inactive-element {

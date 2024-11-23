@@ -51,7 +51,12 @@
     "create-account-button" : "Create account",
     "close": "Close",
     "field" : {
-        "name": "Nom"
+        "name": "Name",
+        "description": "Description",
+        "address": "Address",
+        "city": "City",
+        "zipCode": "Zip Code",
+        "country": "Country"
     },
     "company-initialisation" : {
         "title": "Company initialisation",

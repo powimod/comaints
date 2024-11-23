@@ -31,7 +31,6 @@ const UnitEditor = ({ id=null,  className='', onClose = null }) => {
 
 
     useEffect( () => {
-        // FIXME pourquoi au chargement on reçoit une action «none»
         const { action } = editorAction
         if (action === EditorToolbarActions.none)
             return
@@ -140,17 +139,48 @@ const UnitEditor = ({ id=null,  className='', onClose = null }) => {
                     {error !== null && <div className='error-message'>{error}</div>}
                     <div className='input-container'>
                         <label htmlFor='name'>{t('field.name')}</label>
-                        <input type='text' name='name' value={editedUnit?.name||''} onChange={onFieldValueChange}/>
+                        <input type='text' name='name' 
+                            value={editedUnit?.name||''}
+                            onChange={onFieldValueChange}
+                        />
+                    </div>
+                    <div className='input-container'>
+                        <label htmlFor='description'>{t('field.description')}</label>
+                        <input type='text' name='description' 
+                            value={editedUnit?.description||''} 
+                            onChange={onFieldValueChange}
+                        />
                     </div>
                     <div className='input-container'>
                         <label htmlFor='address'>{t('field.address')}</label>
-                        <input type='text' name='address' value={editedUnit?.address||''} onChange={onFieldValueChange}/>
+                        <input type='text' name='address' 
+                            value={editedUnit?.address||''} 
+                            onChange={onFieldValueChange}
+                        />
                     </div>
                     <div className='input-container'>
                         <label htmlFor='city'>{t('field.city')}</label>
-                        <input type='text' name='city' value={editedUnit?.city||''} onChange={onFieldValueChange}/>
+                        <textarea name='city' 
+                            rows="3"
+                            value={editedUnit?.city||''}
+                            onChange={onFieldValueChange}
+                        />
                     </div>
-
+                    <div className='input-container'>
+                        <label htmlFor='zipCode'>{t('field.zipCode')}</label>
+                        <input type='text' name='zipCode' 
+                            value={editedUnit?.zipCode||''} 
+                            onChange={onFieldValueChange}
+                        />
+                    </div>
+                     <div className='input-container'>
+                        <label htmlFor='country'>{t('field.country')}</label>
+                        <input type='text' name='country'
+                            value={editedUnit?.country||''} 
+                            onChange={onFieldValueChange}
+                        />
+                    </div>
+ 
                 </>
             }
         </div>)
