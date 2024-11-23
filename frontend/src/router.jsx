@@ -20,8 +20,8 @@ const createRouter = () => {
             errorElement: <ErrorPage />,
             children: [
                 { index:true                 , element:<Home/> },
-                { path: '/unit'              , element:<UnitPage/> },
-                { path: '/unit/:id'          , element:<UnitPage/> },
+                { path: '/units'             , element:<UnitPage/> },
+                { path: '/units/:id'          , element:<UnitPage/> },
                 { path: '/forgotten-password', element:<ForgottenPasswordPage/> },
                 { path: '/about'             , element:<About/> },
                 { path: '/contact-us'        , element:<ContactUs/> },

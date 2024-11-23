@@ -63,6 +63,13 @@ const UnitPage = () => {
 
 
     useEffect( () => {
+        // enlever l'ID de l'URL après une suppression
+        if (selectedUnit === null && id !== null)
+            navigate('/units')
+
+    }, [selectedUnit ])
+
+    useEffect( () => {
         const elElementList = document.getElementById('element-list')
         const elElementEditor = document.getElementById('element-editor')
         if ( elElementList === null || elElementEditor  === null)
@@ -95,9 +102,9 @@ const UnitPage = () => {
     }
 
     if ( unitList === null || unitList === undefined || unitList.list === null)
-        return <>Unit list not initialized</>
+        return <></>
 
-    return (<div className='list-page'>
+    return (<main className='list-page'>
                 <div id='element-list' className='list-container'>
                     <h1>{t('page-title.unit')} (x{unitList.count})</h1>
                     <div>
@@ -109,7 +116,7 @@ const UnitPage = () => {
                                 <ul>
                                 { unitList.list.map (unit =>
                                         <li key={unit.id}>
-                                            <Link to={`/unit/${unit.id}`} onClick={onUnitLinkClick }>
+                                            <Link to={`/units/${unit.id}`} onClick={onUnitLinkClick }>
                                                 {unit.name}
                                             </Link>
                                         </li>
@@ -124,7 +131,7 @@ const UnitPage = () => {
                 <div id='element-editor'>
                     <UnitEditor onClose={onEditorClose}/>
                 </div>
-            </div>)
+            </main>)
 }
 
 

@@ -16,6 +16,7 @@ class Context{
         this.#backendUrl = backendUrl
         this.#contextInfoCallback = contextInfoCallback 
         this.#accountSerializeCallback = accountSerializeCallback
+        // TODO erreur non captée en amont
         this.#loadAccount()
         this.#transmitContext()
     }
@@ -242,6 +243,7 @@ class Context{
                 count++
             if (count != 0 && count != 3) {
                 console.error('Incoherent context data detected')
+                //TODO erreur non captée en amont !
                 throw new Error('Incoherent context data detected')
             }
             this.#refreshToken = refreshToken
