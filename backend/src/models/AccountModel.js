@@ -1,17 +1,12 @@
 'use strict'
 
-import assert from 'assert'
 import ModelSingleton from '../model.js'
-import { ComaintApiError, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken } from '../../../common/src/error.mjs'
-import jwt from 'jsonwebtoken'
 
 class AccountModel {
-    #db = null
     #userModel = null
     #authModel = null
 
-    initialize (db) {
-        this.#db = db
+    initialize (_) {
         const model  = ModelSingleton.getInstance()
         this.#userModel = model.getUserModel()
         this.#authModel = model.getAuthModel()

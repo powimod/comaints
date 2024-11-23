@@ -6,9 +6,9 @@
     "error": {
         "unauthorized_access": "Accès non autorisé",
         "access_token_error": "Jeton d'accès invalide({{error}})",
-        "request_param_not_found": "Paramètre «{{parameter}}» non trouvé dans le corps de la requête",
-        "request_param_invalid": "Paramètre «{{parameter}}» invalide dans le corps de la requête", 
-        "not_found_error": "TODO change message",
+        "request_param_not_found": "Paramètre «{{parameter}}» non trouvé dans la requête",
+        "request_param_invalid": "Paramètre «{{parameter}}» invalide dans la requête", 
+        "invalid_object_id": "Identifiant «{{id}}» invalide pour l'objet «{{object}}»",
         "invalid_request_error": "TODO change message",
         "internal_error": "TODO change message",
         "confict_error" : "Doublon sur le champ «{{field}»} pour l'ojet «{{object}}»",
@@ -32,7 +32,10 @@
         "same_email": "L'adresse mail est identique",
         "already_used_email": "L'adresse mail est déjà utilisée",
         "no_auth_in_progress": "Pas d'opératon d'authentification en cours",
-        "company_already_initialized": "Compagnie déjà initialisée"
+        "company_already_initialized": "Compagnie déjà initialisée",
+        "not_owner": "Votre compagnie n'est pas propriétaire de cette ressource",
+        "not_found": "Ressource introuvable",
+        "can_not_delete_company_with_managers": "Impossible de supprimer une compagnie qui a toujours des gestionnaires"
     },
     "register": {
         "mail_body": "Bonjour,\nVotre code pour la création d'un compte est {{code}}.\nSi vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message.",

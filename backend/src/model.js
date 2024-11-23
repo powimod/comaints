@@ -8,11 +8,10 @@ import UserModelSingleton     from './models/UserModel.js'
 import AccountModelSingleton  from './models/AccountModel.js'
 import TokenModelSingleton    from './models/TokenModel.js'
 import AuthModelSingleton     from './models/AuthModel.js'
-import AdminModelSingleton    from './models/AdminModel.js'
+import UnitModelSingleton     from './models/UnitModel.js'
 import { AccountState } from '../../common/src/global.mjs'
 
 class Model {
-    #config = null
     #dbPool = null
     #authModel = null
     #accountModel = null
@@ -20,9 +19,9 @@ class Model {
     #companyModel = null
     #userModel = null
     #tokenModel = null
+    #unitModel = null
 
     async initialize(config) {
-        this.#config = config
 
         // check «database» configuration section 
         const dbConfig = config.database
@@ -98,28 +97,24 @@ class Model {
 			}
 		}, pingInterval * 1000)
 
+        // company model is used by user model
+        this.#companyModel = CompanyModelSingleton.getInstance()
+        this.#userModel = UserModelSingleton.getInstance()
+        this.#tokenModel = TokenModelSingleton.getInstance()
+        this.#authModel = AuthModelSingleton.getInstance()
+        this.#accountModel = AccountModelSingleton.getInstance()
+        this.#adminModel = AccountModelSingleton.getInstance()
+        this.#unitModel = UnitModelSingleton.getInstance()
 
         // IMPORTANT : do not change modele declaration order because of module dependencies
-        this.#userModel = UserModelSingleton.getInstance()
         this.#userModel.initialize(dbPool, config.security.hashSalt)
-
-        this.#tokenModel = TokenModelSingleton.getInstance()
         this.#tokenModel.initialize(dbPool)
-
-        // authModel depends on userModel and tokenModel
-        this.#authModel = AuthModelSingleton.getInstance()
-        this.#authModel.initialize(dbPool, config.security)
-
-        // authModel depends on authModel
-        this.#accountModel = AccountModelSingleton.getInstance()
-        this.#accountModel.initialize(dbPool)
-
-        this.#adminModel = AccountModelSingleton.getInstance()
+        this.#authModel.initialize(dbPool, config.security) // authModel depends on userModel and tokenModel
+        this.#accountModel.initialize(dbPool) // authModel depends on authModel
         this.#adminModel.initialize(dbPool)
-
-        this.#companyModel = CompanyModelSingleton.getInstance()
         this.#companyModel.initialize(dbPool)
-
+        this.#unitModel.initialize(dbPool)
+        
         const adminEmail = config.admin.email
         const adminPassword = config.admin.password
         if (adminEmail !== null && adminPassword !== null) {
@@ -178,6 +173,11 @@ class Model {
     getAuthModel() {
         return this.#authModel
     }
+
+    getUnitModel() {
+        return this.#unitModel
+    }
+
 }
 
 class ModelSingleton {

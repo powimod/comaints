@@ -1,19 +1,19 @@
 {
     "loading": "Chargement...",
-	"header_title" : "GMAO Comaint",
-	"header_subtitle": "Gestion de maintenance assistée par ordinateur",
+    "header_title" : "GMAO Comaint",
+    "header_subtitle": "Gestion de maintenance assistée par ordinateur",
     "action": {
         "logout": "Se déconnecter",
         "close": "Fermer"
     },
-	"button": {
-		"yes" : "Oui",
-		"no" : "Non",
-		"ok" : "OK",
-		"cancel": "Annuler",
-		"validate": "Valider",
+    "button": {
+        "yes" : "Oui",
+        "no" : "Non",
+        "ok" : "OK",
+        "cancel": "Annuler",
+        "validate": "Valider",
         "home": "Accueil"
-	},
+    },
     "accessibility": {
         "theme" : "Thème",
         "light-theme" : "Clair",
@@ -38,59 +38,76 @@
         "privacy_policy": "Politique de confidentialité",
         "terms_of_use": "Conditions d'utilisation",
         "all_right_reserved": "© Tous droits réservés {{name}} - {{years}}", 
-	    "about_link": "À propos de",
+        "about_link": "À propos de",
         "product_conception": "Conçu par {{name}}"
     },
-	"login-message": "Identifiez-vous",
-	"already-customer-question": "Déjà client ?",
-	"email-field": "EMail",
-	"password-field": "Mot de passe",
-	"forget-password-button" : "Mot de passe oublié",
-	"login-button": "Connexion",
-	"new-customer-question" : "Nouveau client",
-	"create-account-button" : "Créer un compte",
-	"close": "Fermer",
+    "login-message": "Identifiez-vous",
+    "already-customer-question": "Déjà client ?",
+    "email-field": "EMail",
+    "password-field": "Mot de passe",
+    "forget-password-button" : "Mot de passe oublié",
+    "login-button": "Connexion",
+    "new-customer-question" : "Nouveau client",
+    "create-account-button" : "Créer un compte",
+    "close": "Fermer",
     "field" : {
-        "name": "Nom"
+        "name": "Nom",
+        "description": "Description",
+        "address": "Adresse",
+        "city": "Ville",
+        "zipCode": "Code postal",
+        "country": "Pays"
     },
     "company-initialisation" : {
         "title": "Initialisation de la compagnie",
         "message": "Vous devez créer votre compagnie"
     },
-	"create-account-message" : "Créez un compte",
-	"create-account-instruction": "Veuillez fournir une adresse mail valide et un mot de passe pour pouvoir vous créer un compte",
-	"password-rules": "(8 caractères minimum avec au moins une majuscule, une minuscule, un chiffre et un caractère spécial)",
-	"firstname-field": "Prénom",
-	"lastname-field": "Nom",
+    "create-account-message" : "Créez un compte",
+    "create-account-instruction": "Veuillez fournir une adresse mail valide et un mot de passe pour pouvoir vous créer un compte",
+    "password-rules": "(8 caractères minimum avec au moins une majuscule, une minuscule, un chiffre et un caractère spécial)",
+    "firstname-field": "Prénom",
+    "lastname-field": "Nom",
     "different-password-error": "Les mots de passe sont différents",
 
-	"ask-code-message": "Veuillez entrer le code de confirmation qui vous a été envoyé par mail",
-	"resend-validation-code": "Renvoyer le code de validation",
+    "ask-code-message": "Veuillez entrer le code de confirmation qui vous a été envoyé par mail",
+    "resend-validation-code": "Renvoyer le code de validation",
     "code-has-been-send": "Le code de validation a été envoyé par mail",
-	"validation-code": "Code de validation",
-	"invalid-validation-code-error": "Le code de validation doit être un nombre de six chiffres",
+    "validation-code": "Code de validation",
+    "invalid-validation-code-error": "Le code de validation doit être un nombre de six chiffres",
+    "list-is-empty": "La liste est vide",
+
+    "page-title": {
+        "unit": "Unités"
+    },
+    "editor": {
+        "title": "Propriétés",
+        "delete-done": "La suppression a été effectuée avec succès",
+        "confirm-delete-question": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+        "no-element-selected": "Aucun élément sélectionné",
+        "display-mode": "Cliquer sur le bouton de création ou d'édition"
+    },
 
     "error": {
         "invalid-email": "Adresse mail invalide",
         "invalid-password": "Mot de passe invalide",
         "different-password": "Les mots de passe ne correpondent pas",
         "invalid-code": "Code invalide",
-	    "invalid-validation-code-error": "Validation code must be a six digits number",
+        "invalid-validation-code-error": "Validation code must be a six digits number",
         "empty-firstname": "Le prénom ne peut pas être vide",
         "empty-lastname": "Le nom ne peut pas être vide"
     },
 
-	"forgotten_password" : {
-		"title": "Mot de passe oublié",
+    "forgotten_password" : {
+        "title": "Mot de passe oublié",
         "step_1": "Première étape",
         "step_2": "Deuxième étape",
-		"email_field": "Adresse mail",
-		"send_code_button": "Envoyer le code",
-		"validate_code_message": "Ensuite entrez le code reçu...",
-		"code": "code",
-		"new_password_field": "Nouveau mot de passe",
-		"confirm_password_field": "Confirmation du mot de passe",
-		"send_code_message": "Veuillez saisir le code validation qui vous a été envoyé à votre adresse mail",
-		"password_changed_message": "Le mot de passe a été modifié"
-	}
+        "email_field": "Adresse mail",
+        "send_code_button": "Envoyer le code",
+        "validate_code_message": "Ensuite entrez le code reçu...",
+        "code": "code",
+        "new_password_field": "Nouveau mot de passe",
+        "confirm_password_field": "Confirmation du mot de passe",
+        "send_code_message": "Veuillez saisir le code validation qui vous a été envoyé à votre adresse mail",
+        "password_changed_message": "Le mot de passe a été modifié"
+    }
 }

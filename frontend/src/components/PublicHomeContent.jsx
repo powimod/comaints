@@ -1,6 +1,8 @@
+import MarkDownLoader from '../components/MarkDownLoader';
+
 const PublicHomeContent = () => {
     return <>
-            <h1>Public home page</h1>
+		 	<MarkDownLoader source="home.md"/> 
         </>
 }
 export default PublicHomeContent 

@@ -74,6 +74,27 @@ CREATE INDEX idx_idx_user ON tokens(
 	id_user
 	);
 
+--
+-- Table units
+--
+CREATE TABLE units(
+	id INTEGER NOT NULL auto_increment,
+	id_company INTEGER NOT NULL,
+	name VARCHAR(32) NOT NULL,
+	description VARCHAR(255),
+	address TEXT DEFAULT '',
+	city TEXT DEFAULT '',
+	zip_code TEXT DEFAULT '',
+	country TEXT DEFAULT '',
+	PRIMARY KEY (id)
+);
+
+
+CREATE UNIQUE INDEX idx_idx_company_name ON units(
+	id_company,
+	name
+	);
+
 
 --------------------------------------------------------------------------------
 --     Foreign keys                                                           --
@@ -87,6 +108,10 @@ ALTER TABLE users ADD CONSTRAINT fk_users_company
 ALTER TABLE tokens ADD CONSTRAINT fk_tokens_user
 	FOREIGN KEY (id_user)
 	REFERENCES users(id)
+	ON DELETE CASCADE;
+ALTER TABLE units ADD CONSTRAINT fk_units_company
+	FOREIGN KEY (id_company)
+	REFERENCES companies(id)
 	ON DELETE CASCADE;
 
 --- end of sql script

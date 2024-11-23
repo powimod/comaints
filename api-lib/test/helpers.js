@@ -10,7 +10,8 @@ const createUserAccount = async (options = {}) => {
     let {
         email = null,
         password = DEFAULT_PASSWORD,
-        logout = false
+        logout = false,
+        withCompany = false
     } = options
 
     if (email === null) {
@@ -33,15 +34,20 @@ const createUserAccount = async (options = {}) => {
     expect(json).to.have.property('validated')
     expect(json.validated).to.be.a('boolean').and.to.equal(true)
 
+    if (withCompany) {
+        const companyName = 'My company'
+        let company = await api.company.initializeCompany(companyName)
+        expect(company).to.be.instanceOf(Object).and.to.have.keys('id', 'name')
+        expect(company.id).to.be.a('number')
+        expect(company.name).to.be.a('string').and.to.equal(companyName)
+    }
+
     if (logout) {
         json = await api.auth.logout()
         expect(json).to.be.instanceOf(Object)
     }
 
-    return {
-        id: user.id,
-        email: user.email
-    }
+    return user 
 }
 
 const deleteUserAccountById = async (userId) => {

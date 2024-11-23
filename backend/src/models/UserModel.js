@@ -78,7 +78,6 @@ class UserModel {
             return user
         }
         catch (error) {
-            // TODO duplicated code
             if (error.code === 'ER_DUP_ENTRY') {
                 const match = error.message.match(/Duplicate entry '.*' for key '(\w+)'/)
                 if (match) {

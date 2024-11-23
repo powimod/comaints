@@ -19,6 +19,7 @@ class ComaintTranslatedError extends Error {
         this.msgId = msgId
         this.msgParams = msgParams
         this.message = i18nFunction ? i18nFunction(msgId, msgParams) : `Error ${msgId}`
+        //Object.setPrototypeOf(this, new.target.prototype)
     }
 
     translate(i18nFunction) {
@@ -110,6 +111,23 @@ const buildComaintError = (comaintErrorCode, params = {}) => {
     }
 }
 
+const convertError = (error) => {
+    if (error === undefined)
+        throw Error('Argument «error» is missing')
+    if (! (error instanceof Error))
+        throw Error('Argument «error» is not an error')
+    if (error.code === 'ER_DUP_ENTRY') {
+        const match = error.message.match(/Duplicate entry '.*' for key '(\w+)'/)
+        if (match) {
+            let field = match[1]
+            if (field.startsWith("idx_"))
+                field = field.slice(4)
+            error = buildComaintError(comaintErrors.CONFLICT_ERROR, {field, object: 'user'})
+        }
+    }
+    return error
+}
+
 export {
     comaintErrors,
     ComaintTranslatedError,
@@ -122,5 +140,6 @@ export {
     ComaintApiErrorInvalidToken,
     ComaintApiErrorExpiredToken,
     ComaintApiErrorInvalidResponse,
-    buildComaintError
+    buildComaintError,
+    convertError
 }

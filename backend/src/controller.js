@@ -10,17 +10,19 @@ import CompanyRoutesSingleton from './routes/CompanyRoutes.js'
 import AdminRoutesSingleton   from './routes/AdminRoutes.js'
 import UserRoutesSingleton    from './routes/UserRoutes.js'
 import TokenRoutesSingleton   from './routes/TokenRoutes.js'
+import UnitRoutesSingleton    from './routes/UnitRoutes.js'
 
 const API_VERSION = 'v1'
 
 class Controller {
 
-	#authRoutes = null;
-	#accountRoutes = null;
-	#adminRoutes = null;
-	#companyRoutes = null;
-	#userRoutes = null;
-	#tokenRoutes = null;
+	#authRoutes = null
+	#accountRoutes = null
+	#adminRoutes = null
+	#companyRoutes = null
+	#userRoutes = null
+	#tokenRoutes = null
+	#unitRoutes = null
 
     async initialize(config, expressApp) {
 
@@ -51,6 +53,9 @@ class Controller {
 
         this.#tokenRoutes = TokenRoutesSingleton.getInstance()
         this.#tokenRoutes.initialize(expressApp)
+
+        this.#unitRoutes = UnitRoutesSingleton.getInstance()
+        this.#unitRoutes.initialize(expressApp)
 
 
         // special API routes to check i18n support

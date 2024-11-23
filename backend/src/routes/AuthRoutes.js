@@ -2,11 +2,8 @@
 
 import assert from 'assert'
 
-import { requireUserAuth } from './auth.js'
-import View from '../view.js'
 import ModelSingleton from '../model.js'
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized,
-    ComaintApiErrorInvalidToken, ComaintApiError, comaintErrors } from '../../../common/src/error.mjs'
+import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken } from '../../../common/src/error.mjs'
 import { AccountState } from '../../../common/src/global.mjs'
 import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
@@ -19,7 +16,7 @@ class AuthRoutes {
 
         const authModel = model.getAuthModel()
 
-        const _renewTokens = async(refreshToken) => {
+        const _renewTokens = async(refreshToken, view) => {
             if (typeof(refreshToken) !== 'string')
                 throw new Error('Invalid refresh token')
             let tokenFoundInDatabase, tokenId, userId, connected, companyId, administrator
@@ -39,7 +36,6 @@ class AuthRoutes {
             console.log(`Delete token ${tokenId} in database`)
             await authModel.deleteRefreshToken(tokenId)
 
-            const isLocked = await authModel.isAccountLocked(userId)
             if (await authModel.isAccountLocked(userId)) {
                 console.log(`Token renew - account locked userId = ${userId}`)
                 throw new ComaintApiErrorUnauthorized(view.translation('error.account_locked'))
@@ -61,7 +57,7 @@ class AuthRoutes {
 
 
         // middleware to manage access and refresh tokens
-        expressApp.use( async (request, response, next) => {
+        expressApp.use( async (request, _, next) => {
             assert(request.view !== undefined) // view middleware must have been called first
             const view = request.view
             console.log(`Token middleware : token management for request ${request.url} ...`)
@@ -86,7 +82,7 @@ class AuthRoutes {
                 console.log(`Token middleware - refresh token found -> renew tokens`)
                 try {
                     let newAccessToken, newRefreshToken
-                    [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken, administrator ] = await _renewTokens(refreshToken)
+                    [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken, administrator ] = await _renewTokens(refreshToken, view)
                     view.storeRenewedTokens(newAccessToken, newRefreshToken)
                 }
                 catch (error) {
@@ -124,7 +120,7 @@ class AuthRoutes {
 
 
         // public route
-        expressApp.post('/api/v1/auth/register', async (request, response) => {
+        expressApp.post('/api/v1/auth/register', async (request, _) => {
             const view = request.view
             try {
                 let email = request.body.email
@@ -427,7 +423,7 @@ class AuthRoutes {
                 if (typeof(refreshToken) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'token'})
 
-                const [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken ] = await _renewTokens(refreshToken)
+                const [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken ] = await _renewTokens(refreshToken, view)
 
                 console.log(`auth/refresh - send new tokens userId ${userId}`)
                 view.storeRenewedTokens(newAccessToken, newRefreshToken)

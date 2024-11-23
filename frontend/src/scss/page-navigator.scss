@@ -1,0 +1,13 @@
+div.page-navigator {
+    display: flex;
+    justify-content: center;
+    border-top: solid black 1px;
+    button {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        min-width: 3rem;
+    }
+    span {
+        margin: 1rem;
+    }
+}

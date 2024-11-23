@@ -16,6 +16,7 @@ class Context{
         this.#backendUrl = backendUrl
         this.#contextInfoCallback = contextInfoCallback 
         this.#accountSerializeCallback = accountSerializeCallback
+        // TODO erreur non captée en amont
         this.#loadAccount()
         this.#transmitContext()
     }
@@ -226,15 +227,38 @@ class Context{
         if (! (result instanceof Object))
             throw new Error('Serialize function does not return an object')
         const {refreshToken, accessToken, contextData} = result
-        if (refreshToken !== null && typeof(refreshToken) !== 'string')
-            throw new Error('Invalid refresh token')
-        if (accessToken !== null && typeof(accessToken) !== 'string')
-            throw new Error('Invalid access token')
-        if (contextData !== null && typeof(contextData) !== 'object')
-            throw new Error('Invalid context')
-        this.#refreshToken = refreshToken
-        this.#accessToken = accessToken
-        this.#contextData = contextData
+        try {
+            if (refreshToken !== null && typeof(refreshToken) !== 'string')
+                throw new Error('Invalid refresh token')
+            if (accessToken !== null && typeof(accessToken) !== 'string')
+                throw new Error('Invalid access token')
+            if (contextData !== null && typeof(contextData) !== 'object')
+                throw new Error('Invalid context')
+            let count = 0
+            if (refreshToken !== null)
+                count++
+            if (accessToken !== null)
+                count++
+            if (contextData !== null)
+                count++
+            if (count != 0 && count != 3) {
+                console.error('Incoherent context data detected')
+                //TODO erreur non captée en amont !
+                throw new Error('Incoherent context data detected')
+            }
+            this.#refreshToken = refreshToken
+            this.#accessToken = accessToken
+            this.#contextData = contextData
+        }
+        catch (error) {
+            this.#refreshToken = null
+            this.#accessToken = null
+            this.#contextData = null
+            console.error('Context reset')
+            this.#saveAccount()
+            throw (error)
+        }
+
     }
 
     #saveAccount() {
@@ -248,6 +272,12 @@ class Context{
         if (this.#contextInfoCallback !== null) {
             this.#contextInfoCallback(this.#contextData)
         }
+    }
+
+    prepareRequestPath(path, params) {
+        for (const [paramName, paramValue] of Object.entries(params))
+            path = path.replace(`{{${paramName}}}`, paramValue)
+        return path
     }
 }
 

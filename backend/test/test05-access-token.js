@@ -89,7 +89,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Parameter «token» not found in request body')
+                expect(error.message).to.equal('Parameter «token» not found in request')
             }
         })
 
@@ -100,7 +100,7 @@ describe('Test user login', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Invalid value for «token» parameter in request body')
+                expect(error.message).to.equal('Invalid value for «token» parameter in request')
             }
         })
 

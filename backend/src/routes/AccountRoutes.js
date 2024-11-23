@@ -4,7 +4,7 @@ import assert from 'assert'
 
 import View from '../view.js'
 import ModelSingleton from '../model.js'
-import { requireUserAuth } from './auth.js'
+import { requireUserAuth } from './middleware.js'
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs'
 import { controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs'
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs'
@@ -128,7 +128,7 @@ class AccountRoutes {
             }
         })
 
-        expressApp.post('/api/v1/account/delete', requireUserAuth, async (request, response) => {
+        expressApp.post('/api/v1/account/delete', requireUserAuth, async (request, _) => {
             const view = request.view
             try {
                 const userId = request.userId
@@ -142,10 +142,6 @@ class AccountRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'confirmation'})
                 if (typeof(confirmation) !== 'boolean')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'confirmation'})
-
-                // TODO check if user can be deleted with administrator and companyId properties
-                // yes if companyId is null
-                // yes if campanyId is not null but he is not an administrator
 
                 const invalidateCodeImmediately = (request.body.invalidateCodeImmediately !== undefined) ?
                     request.body.invalidateCodeImmediately : false
@@ -170,7 +166,7 @@ class AccountRoutes {
             }
         })
 
-        expressApp.post('/api/v1/account/unlock', requireUserAuth, async (request, response) => {
+        expressApp.post('/api/v1/account/unlock', requireUserAuth, async (request, _) => {
             const view = request.view
             try {
                 const userId = request.userId

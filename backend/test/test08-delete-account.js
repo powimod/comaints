@@ -1,8 +1,8 @@
 'use strict'
 import { expect } from 'chai'
 
-import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
-import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserById } from './helpers.js'
+import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, refreshToken, accessToken } from './util.js'
+import { createUserAccount, deleteUserAccount, getDatabaseUserById } from './helpers.js'
 
 const ROUTE_DELETE_ACCOUNT = 'api/v1/account/delete'
 const ROUTE_VALIDATE = 'api/v1/auth/validate'
@@ -34,12 +34,12 @@ describe('Test delete account route', () => {
     describe('Call account delete route with invalid data', () => {
         it('Try to call account delete route without data', async () => {
             try {
-                const json = await jsonPost(ROUTE_DELETE_ACCOUNT, {})
+                await jsonPost(ROUTE_DELETE_ACCOUNT, {})
                 expect.fail('Call with no data not detected')
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Parameter «confirmation» not found in request body')
+                expect(error.message).to.equal('Parameter «confirmation» not found in request')
             }
         })
     })
@@ -89,7 +89,7 @@ describe('Test delete account route', () => {
 
         it('Try to access profile after account deletion', async () => {
             try {
-                const json = await jsonGet(ROUTE_PROFILE)
+                await jsonGet(ROUTE_PROFILE)
                 expect.fail('Profile access with deleted account not detected')
             }
             catch (error) {
@@ -100,7 +100,7 @@ describe('Test delete account route', () => {
 
         it(`Try to login after account deletion`, async () => {
             try {
-                let json = await jsonPost(ROUTE_LOGIN, {
+                await jsonPost(ROUTE_LOGIN, {
                         email: userEmail,
                         password: PASSWORD
                     })

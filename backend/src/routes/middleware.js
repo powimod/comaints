@@ -1,10 +1,9 @@
 import assert from 'assert'
 
 import ModelSingleton from '../model.js'
-import View from '../view.js'
-import { ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs'
+import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs'
 
-const requireUserAuth = (request, response, next) => {
+const requireUserAuth = (request, _ , next) => {
     const view = request.view
     assert(view !== undefined)
     const userId = request.userId
@@ -19,7 +18,8 @@ const requireUserAuth = (request, response, next) => {
     next()
 }
 
-const requireAdminAuth = (request, response, next) => {
+
+const requireAdminAuth = (request, _ , next) => {
     const view = request.view
     assert(view !== undefined)
     const userId = request.userId
@@ -33,6 +33,66 @@ const requireAdminAuth = (request, response, next) => {
         view.error(new ComaintApiErrorUnauthorized(view.translation('error.unauthorized_access')))
         return
     }
+    next()
+}
+
+
+const requestPagination = (request, _, next) => {
+    const DEFAULT_PAGE = 1
+    const DEFAULT_LIMIT = 10
+    const view = request.view
+    assert(view !== undefined)
+    let page, limit
+    if (request.method === 'GET') {
+        page = parseInt(request.query?.page || DEFAULT_PAGE)
+        limit = parseInt(request.query?.limit || DEFAULT_LIMIT)
+    }
+    else {
+        page = request.body?.page || DEFAULT_PAGE
+        limit = request.body?.limit || DEFAULT_LIMIT
+    }
+    if (isNaN(page) || page < 1) {
+        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'page'}))
+        return
+    }
+    if (isNaN(limit) || limit < 1) {
+        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'limit'}))
+        return
+    }
+    const offset = (page - 1) * limit
+    request.requestPagination = { page, limit, offset }
+    next()
+}
+
+const requestFilters = (request, _, next) => {
+    const view = request.view
+    assert(view !== undefined)
+    const filters = request.body.filters || {}
+    if (typeof(filters) !== 'object') {
+        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'filters'}))
+        return
+    }
+    request.requestFilters = filters  
+    next()
+}
+
+const requestProperties = (request, _, next) => {
+    const view = request.view
+    assert(view !== undefined)
+    let properties = null
+    if (request.method === 'GET') {
+        const stringValue = request.query?.properties || null
+        if (stringValue !== null) 
+            properties = stringValue.split(',')
+    }
+    else {
+        properties = request.body.properties || null
+    }
+    if (properties !== null && ! (properties instanceof Array)) {
+        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'properties'}))
+        return
+    }
+    request.requestProperties = properties
     next()
 }
 
@@ -57,7 +117,6 @@ const renewTokens = async (request) => {
     console.log(`Delete token ${refreshTokenId} in database`)
     await authModel.deleteRefreshToken(refreshTokenId)
 
-    const isLocked = await authModel.isAccountLocked(userId)
     if (await authModel.isAccountLocked(userId)) {
         console.log(`Token renew - account locked userId = ${userId}`)
         throw new ComaintApiErrorUnauthorized(view.translation('error.account_locked'))
@@ -68,14 +127,13 @@ const renewTokens = async (request) => {
         throw new Error('User account does not exist')
     if (companyId !== user.companyId)
         throw new Error('Invalid company ID in refresh token')
-    const administrator = user.administrator
-
 
     const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, connected)
     const newAccessToken  = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId, true)
 
     view.storeRenewedTokens(newAccessToken, newRefreshToken)
 }
+
 
 const renewContext = async (request, user) => {
     assert(request)
@@ -97,6 +155,14 @@ const renewContext = async (request, user) => {
         company
     })
 }
- 
-export { requireAdminAuth, requireUserAuth, renewTokens, renewContext }
 
+
+export { 
+    requireAdminAuth, 
+    requireUserAuth, 
+    renewTokens, 
+    renewContext, 
+    requestPagination,
+    requestFilters,
+    requestProperties
+}

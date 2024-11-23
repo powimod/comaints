@@ -10,45 +10,66 @@ const useAuthActions = () => {
     }
 
     const register = async (email, password) => {
-        const result = await dispatch(registerUser({email, password}))
-        if (registerUser.rejected.match(result)) 
-            throw new Error(result.payload)
+        try {
+            return await dispatch(registerUser({email, password})).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
 
     const login = async (email, password) => {
-        const result = await dispatch(loginUser({email, password}))
-        if (loginUser.rejected.match(result)) 
-            throw new Error(result.payload)
+        try {
+            return await dispatch(loginUser({email, password})).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
 
     const logout = async () => {
-        const result = await dispatch(logoutUser())
-        if (logoutUser.rejected.match(result))
-            throw new Error(result.payload)
+        try {
+            return await dispatch(logoutUser()).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
 
     const validateCode = async (code) => {
-        const result = await dispatch(validateAuthCode({code}))
-        if (validateAuthCode.rejected.match(result))
-            throw new Error(result.payload)
+        try {
+            return await dispatch(validateAuthCode({code})).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
 
     const validateCodeWithEmail = async (email, code) => {
-        const result = await dispatch(validateAuthCode({email, code}))
-        if (validateAuthCode.rejected.match(result))
-            throw new Error(result.payload)
+        try {
+            return await dispatch(validateAuthCode({email, code})).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
 
     const resendCodeWithEmail = async (email) => {
-        const result = await dispatch(resendAuthCode({email}))
-        if (resendAuthCode.rejected.match(result)) 
-            throw new Error(result.payload)
+        try {
+            return await dispatch(resendAuthCode({email})).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
  
     const resetPassword = async (email, password) => {
-        const result = await dispatch(authResetPassword({email, password}))
-        if (authResetPassword.rejected.match(result))
-            throw new Error(result.payload)
+        try {
+            await dispatch(authResetPassword({email, password})).unwrap()
+        }
+        catch (errorMessage) {
+            throw new Error(errorMessage)
+        }
     }
 
     return {

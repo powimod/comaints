@@ -22,6 +22,10 @@ DROP TABLE IF EXISTS users;
 -- Table tokens
 --
 DROP TABLE IF EXISTS tokens;
+--
+-- Table units
+--
+DROP TABLE IF EXISTS units;
 
 
 SET FOREIGN_KEY_CHECKS = 1;

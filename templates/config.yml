@@ -153,6 +153,50 @@ objects:
         keys:
           - link: "user"
 
+  - name: "Unit"
+    attributes:
+      table_name: "units"
+    properties:
+      - name: "id"
+        type: "id"
+      - name: "name"
+        type: "string"
+        minimum: 2
+        maximum: 32
+      - name: "description"
+        type: "string"
+        mandatory: false
+      - name: "address"
+        type: "text"
+        default: ""
+        mandatory: false
+        maximum: 128
+      - name: "city"
+        type: "text"
+        default: ""
+        mandatory: false
+        maximum: 64
+      - name: "zipCode"
+        type: "text"
+        default: ""
+        mandatory: false
+        maximum: 16
+      - name: "country"
+        type: "text"
+        default: ""
+        mandatory: false
+        maximum: 32
+    links:
+      - name: "company"
+        target: "Company"
+        mandatory: true
+    indexes:
+      - name: "idx_company_name"
+        unique: true
+        keys:
+          - link: "company"
+          - property : "name"
+
 
 files:
   - scope:  "project"

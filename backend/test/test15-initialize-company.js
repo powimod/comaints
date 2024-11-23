@@ -1,9 +1,8 @@
 'use strict'
 import { expect } from 'chai'
-import assert from 'assert'
 
-import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js'
-import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserByEmail } from './helpers.js'
+import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, refreshToken, accessToken } from './util.js'
+import { createUserAccount, deleteUserAccount } from './helpers.js'
 
 const ROUTE_INITIALIZE_COMPANY= 'api/v1/company/initialize'
 const ROUTE_PROFILE = 'api/v1/account/profile'
@@ -11,6 +10,7 @@ const ROUTE_LOGOUT = 'api/v1/auth/logout'
 
 describe('Test reset password', () => {
 
+    const companyName = 'abc'
     let user = null
     let company = null
     let initialRefreshToken = null
@@ -32,20 +32,20 @@ describe('Test reset password', () => {
 
     describe(`Call route /${ROUTE_INITIALIZE_COMPANY} with invalid data`, () => {
 
-        it(`Should detect missing company name in request body`, async () => {
+        it(`Should detect missing company name in request`, async () => {
             try {
-                let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {})
+                await jsonPost(ROUTE_INITIALIZE_COMPANY, {})
                 expect.fail("Missing parameter not detected")
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal(`Parameter «companyName» not found in request body`)
+                expect(error.message).to.equal(`Parameter «companyName» not found in request`)
             }
         })
 
-        it(`Should detect invalid company name in request body`, async () => {
+        it(`Should detect invalid company name in request`, async () => {
             try {
-                let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName: 123})
+                await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName: 123})
                 expect.fail("Invalid company name not detected")
             }
             catch (error) {
@@ -54,9 +54,9 @@ describe('Test reset password', () => {
             }
         })
 
-        it(`Should detect empty company name in request body`, async () => {
+        it(`Should detect empty company name in request`, async () => {
             try {
-                let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName: ''})
+                await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName: ''})
                 expect.fail("Empty company name not detected")
             }
             catch (error) {
@@ -76,18 +76,18 @@ describe('Test reset password', () => {
         })
 
         it(`Initialize company`, async () => {
-            const companyName = 'abc'
             let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName})
-            expect(json).to.be.instanceOf(Object).and.to.have.keys('id', 'name', 'access-token', 'refresh-token', 'context')
-            expect(json.id).to.be.a('number')
-            expect(json.name).to.be.a('string').and.to.equal(companyName)
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('company', 'access-token', 'refresh-token', 'context')
+            company = json.company
+            expect(company).to.be.instanceOf(Object).and.to.have.keys('id', 'name')
+            expect(company.id).to.be.a('number')
+            expect(company.name).to.be.a('string').and.to.equal(companyName)
             let context = json.context
             expect(context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company')
             expect(context.email).to.equal(user.email)
             expect(context.connected).to.equal(true)
             expect(context.administrator).to.equal(false)
             expect(context.company).to.equal(true)
-            company = json
         })
 
         it('Control user company', async () => {
@@ -95,6 +95,7 @@ describe('Test reset password', () => {
             expect(json).to.be.instanceOf(Object)
             expect(json).to.have.property('profile')
             const profile = json.profile
+            user = profile // to delete company when user account is deleted
             expect(profile).to.be.instanceOf(Object)
             expect(profile).to.have.property('companyId')
             expect(profile.companyId).to.equal(company.id)
@@ -107,7 +108,7 @@ describe('Test reset password', () => {
 
         it(`Try to initialize company twice`, async () => {
             try {
-                let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName: 'def'})
+                await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName: 'def'})
                 expect.fail("Second call not detected")
             }
             catch (error) {
@@ -127,7 +128,7 @@ describe('Test reset password', () => {
 
          it(`Try to initialize company without being connected`, async () => {
             try {
-                let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName: 'def'})
+                await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName: 'def'})
                 expect.fail("Unauthorized call not detected")
             }
             catch (error) {

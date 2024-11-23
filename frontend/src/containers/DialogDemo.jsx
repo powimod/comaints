@@ -1,15 +1,8 @@
-import { useState, useContext, useEffect, useRef } from 'react'
+import { useState } from 'react'
 
 import { useFlashPopupStack }  from '../components/dialog/FlashPopupStack'
 import { useBubbleMessage }  from '../components/dialog/BubbleMessage'
 import { useStandardDialog }  from '../components/dialog/StandardDialog'
-
-/*
-import { DialogContext} from '../components/dialog/DialogContext'
-import MessageDialog from '../components/dialog/MessageDialog'
-import QuestionDialog from '../components/dialog/QuestionDialog'
-import ConfirmationDialog from '../components/dialog/ConfirmationDialog'
-*/
 
 const DialogDemo = (props) => {
 
@@ -18,14 +11,6 @@ const DialogDemo = (props) => {
     const flashPopupStack = useFlashPopupStack()
     const bubbleMessage = useBubbleMessage()
     const standardDialog = useStandardDialog()
-
-    //const [ dialogRequestList, pushDialogRequest ] = useContext(DialogContext)
-    /*
-     const [isHealthQuestionDialogOpen, setHealthQuestionDialogOpen] = useState(false)
-     const [isHealthResponseDialogOpen, setHealthResponseDialogOpen] = useState(false)
-     const [isConfirmationDialogOpen, setConfirmationDialogOpen] = useState(false)
-    const [message, setMessage] = useState("")
-    */
 
     const showFlashMessage = () => {
         const duration = parseInt(500 + Math.random() * 3000)

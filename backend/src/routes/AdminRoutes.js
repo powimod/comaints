@@ -2,7 +2,7 @@
 
 import assert from 'assert'
 
-import { requireAdminAuth } from './auth.js'
+import { requireAdminAuth } from './middleware.js'
 import View from '../view.js'
 import ModelSingleton from '../model.js'
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs'

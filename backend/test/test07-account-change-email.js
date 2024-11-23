@@ -43,7 +43,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Parameter «email» not found in request body')
+                expect(error.message).to.equal('Parameter «email» not found in request')
             }
         })
 
@@ -54,7 +54,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Invalid value for «newEmail» parameter in request body')
+                expect(error.message).to.equal('Invalid value for «newEmail» parameter in request')
             }
         })
 
@@ -77,7 +77,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Parameter «password» not found in request body')
+                expect(error.message).to.equal('Parameter «password» not found in request')
             }
         })
 
@@ -88,7 +88,7 @@ describe('Test change password route', () => {
             }
             catch (error) {
                 expect(error).to.be.instanceOf(Error)
-                expect(error.message).to.equal('Invalid value for «password» parameter in request body')
+                expect(error.message).to.equal('Invalid value for «password» parameter in request')
             }
         })
 

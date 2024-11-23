@@ -18,10 +18,10 @@ const {{object.name|camelCase}}ObjectDef = {
         "default": "{{ property.defaultValue }}",
         {%- endif %}
         {%- if property.mandatory != nil %}
-        "mandatory": "{{ property.mandatory }}",
+        "mandatory": {{ property.mandatory }},
         {%- endif %}
         {%- if property.secret == true %}
-        "secret": "{{ property.secret }}",
+        "secret": {{ property.secret }},
         {%- endif %}
         "scope": "{{ property.scope }}"
     },
@@ -32,7 +32,7 @@ const {{object.name|camelCase}}ObjectDef = {
         "target" : "{{link.target.name}}",
         "field" : "id_{{link.name|snakeCase}}",
         "table" : "{{link.target.attributes.table_name}}",
-        "mandatory": "{{link.mandatory}}",
+        "mandatory": {{link.mandatory}},
         "scope": "{{ link.scope }}"
     },
 {%- endfor %}

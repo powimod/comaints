@@ -2,20 +2,25 @@
 
 import { expect } from 'chai'
 
-import { jsonGet, jsonPost, requestDb } from './util.js'
+import { jsonPost, requestDb, getTokens, setTokens } from './util.js'
 
 const ROUTE_REGISTER = 'api/v1/auth/register'
 const ROUTE_LOGIN = 'api/v1/auth/login'
 const ROUTE_LOGOUT = 'api/v1/auth/logout'
 const ROUTE_VALIDATE = 'api/v1/auth/validate'
+const ROUTE_INITIALIZE_COMPANY= 'api/v1/company/initialize'
 
 const DEFAULT_PASSWORD = 'abC.dEf.GH1.lMn!'
+
+const tokensCache = {}
+let currentUser = null
 
 const createUserAccount = async (options = {}) => {
     let {
         email = null,
         password = DEFAULT_PASSWORD,
-        logout = false
+        logout = false,
+        withCompany = false
     } = options
 
     if (email === null) {
@@ -37,19 +42,57 @@ const createUserAccount = async (options = {}) => {
     expect(json).to.have.property('validated')
     expect(json.validated).to.be.a('boolean').and.to.equal(true)
 
+    let companyId = null
+    if (withCompany) {
+        const companyName = 'My Company'
+        let json = await jsonPost(ROUTE_INITIALIZE_COMPANY, {companyName})
+        expect(json).to.be.instanceOf(Object).and.to.have.keys('company', 'access-token', 'refresh-token', 'context')
+        const company = json.company
+        expect(company).to.be.instanceOf(Object).and.to.have.keys('id', 'name')
+        expect(company.id).to.be.a('number')
+        expect(company.name).to.be.a('string').and.to.equal(companyName)
+        companyId = company.id
+    }
+
+    currentUser = user
+    tokensCache[currentUser.id] = getTokens()
+
     if (logout)
         await jsonPost(ROUTE_LOGOUT)
 
     return {
         id: user.id,
-        email: user.email
+        email: user.email,
+        companyId
     }
 }
 
 const deleteUserAccount = async (user) => {
     if (user === null || typeof(user) !== 'object')
         return
+    let companyId = null
+    if (user.companyId)
+        companyId = user.companyId
+    if (user.id_company)
+        companyId = user.id_company
+    if (companyId)
+        await requestDb('DELETE FROM companies WHERE id=?', companyId)
     await requestDb('DELETE FROM users WHERE id=?', user.id)
+}
+
+const changeUser = async (user) => {
+    if (user === null || typeof(user) !== 'object')
+        throw new Error('Invalid «user» argument')
+    if (currentUser.id === user.id)
+        return currentUser
+    if (currentUser !== null) 
+        tokensCache[currentUser.id] = getTokens()
+    const tokens = tokensCache[user.id]
+    if (tokens === undefined)
+        throw new Error('Tokens not found')
+    currentUser = user
+    setTokens(tokens)
+    return currentUser
 }
 
 const getDatabaseUserByEmail = async (email) => {
@@ -88,8 +131,10 @@ const userPublicProperties = [
 export {
     createUserAccount,
     deleteUserAccount,
+    changeUser,
     getDatabaseUserByEmail,
     getDatabaseUserById,
     userPublicProperties,
-    connectWithAdminAccount 
+    connectWithAdminAccount,
+    currentUser
 }
