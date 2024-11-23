@@ -33,6 +33,7 @@
         "already_used_email": "L'adresse mail est déjà utilisée",
         "no_auth_in_progress": "Pas d'opératon d'authentification en cours",
         "company_already_initialized": "Compagnie déjà initialisée",
+        "company_not_initialized": "Compagnie non initialisée",
         "not_owner": "Votre compagnie n'est pas propriétaire de cette ressource",
         "not_found": "Ressource introuvable",
         "can_not_delete_company_with_managers": "Impossible de supprimer une compagnie qui a toujours des gestionnaires"

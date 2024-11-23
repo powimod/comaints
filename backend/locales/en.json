@@ -33,6 +33,7 @@
         "already_used_email": "Email address is already used",
         "no_auth_in_progress": "No authentification operation in progress",
         "company_already_initialized": "Company already initialized",
+        "company_not_initialized": "Company is not initialized",
         "not_owner": "Your company is not owner of this ressource",
         "not_found": "Ressource not found",
         "can_not_delete_company_with_managers": "Can not delete a company that always has managers" 

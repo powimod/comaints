@@ -2,7 +2,7 @@
 import assert from 'assert';
 
 import ModelSingleton from '../model.js';
-import { requireUserAuth, requestPagination, requestFilters, requestProperties } from './middleware.js';
+import { requireUserWithCompanyAuth, requestPagination, requestFilters, requestProperties } from './middleware.js';
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
 import { controlObject } from '../../../common/src/objects/object-util.mjs';
 import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs';
@@ -15,7 +15,7 @@ class UnitRoutes {
 
         const unitModel = model.getUnitModel();
 
-        expressApp.get('/api/v1/unit/list', requireUserAuth, requestProperties, requestPagination, async (request) => {
+        expressApp.get('/api/v1/unit/list', requireUserWithCompanyAuth, requestProperties, requestPagination, async (request) => {
             const view = request.view;
             const properties = request.requestProperties;
             assert(properties !== undefined);
@@ -36,7 +36,7 @@ class UnitRoutes {
             }
         });
 
-        expressApp.post('/api/v1/unit/search', requireUserAuth, requestProperties, requestFilters, requestPagination,  async (request) => {
+        expressApp.post('/api/v1/unit/search', requireUserWithCompanyAuth, requestProperties, requestFilters, requestPagination,  async (request) => {
             const view = request.view;
             const properties = request.requestProperties;
             assert(properties !== undefined);
@@ -58,10 +58,11 @@ class UnitRoutes {
             }
         });
 
-        expressApp.post('/api/v1/unit', requireUserAuth, async (request) => {
+        expressApp.post('/api/v1/unit', requireUserWithCompanyAuth, async (request) => {
             const view = request.view;
             try {
-                assert(request.userId);
+                if (request.isAdministrator === false && request.companyId === null)
+                    throw new ComaintApiErrorUnauthorized('error.user_not_logged_in');
 
                 let unit = request.body.unit;
                 if (unit === undefined)
@@ -85,7 +86,7 @@ class UnitRoutes {
             }
         });
 
-        expressApp.get('/api/v1/unit/:id', requireUserAuth, async (request) => {
+        expressApp.get('/api/v1/unit/:id', requireUserWithCompanyAuth, async (request) => {
             const unitId = request.params.id;
             const view = request.view;
             try {
@@ -102,7 +103,7 @@ class UnitRoutes {
             }
         });
 
-        expressApp.post('/api/v1/unit/:id', requireUserAuth, async (request) => {
+        expressApp.post('/api/v1/unit/:id', requireUserWithCompanyAuth, async (request) => {
             assert(request.userId);
             assert(request.companyId);
             const view = request.view;
@@ -137,7 +138,7 @@ class UnitRoutes {
             }
         });
 
-        expressApp.delete('/api/v1/unit/:id/delete', requireUserAuth, async (request) => {
+        expressApp.delete('/api/v1/unit/:id/delete', requireUserWithCompanyAuth, async (request) => {
             assert(request.userId);
             assert(request.companyId);
             const view = request.view;

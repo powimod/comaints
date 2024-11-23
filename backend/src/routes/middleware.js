@@ -18,6 +18,24 @@ const requireUserAuth = (request, _ , next) => {
     next();
 };
 
+const requireUserWithCompanyAuth = (request, _ , next) => {
+    const view = request.view;
+    assert(view !== undefined);
+    const userId = request.userId;
+    const connected = request.userConnected;
+    assert(userId !== undefined);
+    assert(connected !== undefined);
+    console.log(`require user auth, userId:${userId}, connected:${connected}`);
+    if (userId === null || connected !== true) {
+        view.error(new ComaintApiErrorUnauthorized(view.translation('error.unauthorized_access')));
+        return;
+    }
+    if (userId.companyId === null) {
+        view.error(new ComaintApiErrorUnauthorized(view.translation('error.company_not_initialized')));
+        return;
+    }
+    next();
+};
 
 const requireAdminAuth = (request, _ , next) => {
     const view = request.view;
@@ -160,6 +178,7 @@ const renewContext = async (request, user) => {
 export { 
     requireAdminAuth, 
     requireUserAuth, 
+    requireUserWithCompanyAuth, 
     renewTokens, 
     renewContext, 
     requestPagination,
