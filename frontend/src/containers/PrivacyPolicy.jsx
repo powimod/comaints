@@ -22,7 +22,7 @@ const PrivacyPolicy = (props) => {
 			<h1>Privacy Policy</h1>
 			<p>bla bla bla</p>
 		</main>
-	)
-}
+	);
+};
 
-export default PrivacyPolicy
+export default PrivacyPolicy;

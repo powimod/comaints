@@ -1,8 +1,8 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit';
 
-import authReducer from './authSlice'
-import companyReducer from './companySlice'
-import unitReducer from './unitSlice'
+import authReducer from './authSlice';
+import companyReducer from './companySlice';
+import unitReducer from './unitSlice';
 
 const initializeStore = () => {
     const store = configureStore({
@@ -11,8 +11,8 @@ const initializeStore = () => {
             company: companyReducer,
             unit: unitReducer
         }
-    })
-    return store
-}
+    });
+    return store;
+};
 
-export default initializeStore 
+export default initializeStore; 

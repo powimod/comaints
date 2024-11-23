@@ -2,11 +2,11 @@
  * @module CustomDialog
  */
 
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react';
 
-import '../../scss/custom-dialog.scss'
+import '../../scss/custom-dialog.scss';
 
 /**
  * Display a custom dialog box (with no buttons). Content must be passed as React children.
@@ -46,43 +46,43 @@ import '../../scss/custom-dialog.scss'
 
 const CustomDialog = ({isOpen, onClose, className = '',  children}) => {
 
-	const [ dialogId, setDialogId ] = useState(parseInt(Math.random() * 1000))
-	const [ isDialogOpen, setDialogOpen ] = useState(false)
-	const dialogRef = useRef(null)
+	const [ dialogId, setDialogId ] = useState(parseInt(Math.random() * 1000));
+	const [ isDialogOpen, setDialogOpen ] = useState(false);
+	const dialogRef = useRef(null);
 
-    className = `custom-dialog ${className}`.trim()
+    className = `custom-dialog ${className}`.trim();
 
 	useEffect(() => {
-		const modalDialog = dialogRef.current
+		const modalDialog = dialogRef.current;
 		if (modalDialog === null)
-			return
-		modalDialog.addEventListener('close', onDialogClose)
+			return;
+		modalDialog.addEventListener('close', onDialogClose);
 		return () => {
-			modalDialog.removeEventListener('close', onDialogClose)
-		}
-	}, [])
+			modalDialog.removeEventListener('close', onDialogClose);
+		};
+	}, []);
 
 
 	useEffect(() => {
-		setDialogOpen(isOpen)
-	}, [isOpen])
+		setDialogOpen(isOpen);
+	}, [isOpen]);
 
 
 	useEffect(() => {
-		const modalDialog = dialogRef.current
+		const modalDialog = dialogRef.current;
 		if (modalDialog === null)
-			return
+			return;
 		if (isDialogOpen)
-			modalDialog.showModal()
+			modalDialog.showModal();
 		else
-			modalDialog.close()
-	}, [isDialogOpen])
+			modalDialog.close();
+	}, [isDialogOpen]);
 
 
 	// onDialogClose is closed when Escape key is pressed or when dialog.close is called
 	const onDialogClose = (ev) => {
-		onClose()
-	}
+		onClose();
+	};
 
 	return (<>
         { isOpen &&
@@ -90,14 +90,14 @@ const CustomDialog = ({isOpen, onClose, className = '',  children}) => {
                 {children}
             </dialog>
         }
-		</>)
-}
+		</>);
+};
 
 CustomDialog.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     className: PropTypes.string,
     children: PropTypes.node,
-}
+};
 
-export default CustomDialog
+export default CustomDialog;

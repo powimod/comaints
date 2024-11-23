@@ -1,43 +1,43 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link, useLoaderData } from 'react-router-dom'
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link, useLoaderData } from 'react-router-dom';
 
-import Logo from '../components/Logo'
-import Config from '../Config'
-import ComaintBackendApiSingleton from '../ComaintApi'
+import Logo from '../components/Logo';
+import Config from '../Config';
+import ComaintBackendApiSingleton from '../ComaintApi';
 
-import '../scss/about.scss'
+import '../scss/about.scss';
 
 const About = (props) => {
-	const { t } = useTranslation()
-    const comaintApi = ComaintBackendApiSingleton.getInstance()
-    const [ backendVersion, setBackendVersion ] = useState('-')
+	const { t } = useTranslation();
+    const comaintApi = ComaintBackendApiSingleton.getInstance();
+    const [ backendVersion, setBackendVersion ] = useState('-');
 
     useEffect( () => {
         if (comaintApi === null)
-            return
+            return;
         const getApiVersion = async () => {
             try {
-                const result = await comaintApi.getBackendVersion()
-                setBackendVersion(result)
+                const result = await comaintApi.getBackendVersion();
+                setBackendVersion(result);
             }
             catch (error) {
-                console.error(error)
-                setBackendVersion('?')
+                console.error(error);
+                setBackendVersion('?');
             }
-        }
-        getApiVersion()
-    }, [comaintApi])
+        };
+        getApiVersion();
+    }, [comaintApi]);
 
 	const sendMail = (ev) => {
-		ev.preventDefault()
-		window.location.href = `mailto:${Config.contact}`
-	}
+		ev.preventDefault();
+		window.location.href = `mailto:${Config.contact}`;
+	};
 
 	const navigateWebsite = (ev) => {
-		ev.preventDefault()
-		window.location.replace(Config.website)
-	}
+		ev.preventDefault();
+		window.location.replace(Config.website);
+	};
 
 	return (
 		<main className="about">
@@ -53,7 +53,7 @@ const About = (props) => {
 			</ul>
 			<div> <Link to="/">{t('button.home')}</Link> </div>
 		</main>
-	)
-}
+	);
+};
 
-export default About
+export default About;

@@ -1,14 +1,14 @@
-import PublicHomeContent from '../components/PublicHomeContent'
-import PrivateHomeContent from '../components/PrivateHomeContent'
-import AdminHomeContent from '../components/AdminHomeContent'
-import { useComaintContext } from '../ComaintContext'
+import PublicHomeContent from '../components/PublicHomeContent';
+import PrivateHomeContent from '../components/PrivateHomeContent';
+import AdminHomeContent from '../components/AdminHomeContent';
+import { useComaintContext } from '../ComaintContext';
 
-import '../scss/home.scss'
+import '../scss/home.scss';
 
 const Home = (props) => {
-    const { comaintContext } = useComaintContext()
+    const { comaintContext } = useComaintContext();
     if (comaintContext === null)
-        return <></>
+        return <></>;
 	return (
 		<main className='page_home'>
             { ! comaintContext.connected ? 
@@ -20,7 +20,7 @@ const Home = (props) => {
                 )
             }
 		</main>
-	)
-}
+	);
+};
 
-export default Home
+export default Home;

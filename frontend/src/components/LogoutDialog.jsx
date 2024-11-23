@@ -1,41 +1,41 @@
-import { useState, useContext, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { useState, useContext, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
-import useAuthActions from '../actions/authActions'
-import QuestionDialog from './dialog/QuestionDialog'
+import useAuthActions from '../actions/authActions';
+import QuestionDialog from './dialog/QuestionDialog';
 
 const LogoutDialog = ({isOpen, onResponse}) => {
-	const { t } = useTranslation()
-    const { logout } = useAuthActions()
+	const { t } = useTranslation();
+    const { logout } = useAuthActions();
 
-	const [ error, setError ] = useState(null)
+	const [ error, setError ] = useState(null);
 
     useEffect( () => {
-        setError(null)
-    }, [isOpen])
+        setError(null);
+    }, [isOpen]);
 
 	const onDialogResponse = async (confirmation) => {
 		if (confirmation)  {
 			try {
-                setError(null)
-                await logout()
+                setError(null);
+                await logout();
 			}
 			catch (error) {
-				console.error(error)
-				setError(error.message !== undefined ? error.message : error)
-				return
+				console.error(error);
+				setError(error.message !== undefined ? error.message : error);
+				return;
 			}
 		}
-		onResponse(confirmation)
-	}
+		onResponse(confirmation);
+	};
 
 	return (<>
 		<QuestionDialog isOpen={isOpen} onResponse={onDialogResponse}>
 			{error !== null && <div className='error-message'>{error}</div>}
 			<div>{t('logout-question')}</div>
 		</QuestionDialog>
-	</>)
-}
+	</>);
+};
 
-export default LogoutDialog
+export default LogoutDialog;

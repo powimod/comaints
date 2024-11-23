@@ -1,76 +1,76 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
-import i18n from 'i18next'
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import i18n from 'i18next';
 
-import StockIcon from './StockIcon'
-import CustomDialog from './dialog/CustomDialog'
+import StockIcon from './StockIcon';
+import CustomDialog from './dialog/CustomDialog';
 
-import '../scss/accessibility-dialog.scss'
+import '../scss/accessibility-dialog.scss';
 
 const AccessibilityDialog = ({isOpen, onClose}) => {
-	const { t } = useTranslation()
+	const { t } = useTranslation();
 
 	const [theme, setTheme] = useState(() => {
-		let value = localStorage.getItem('theme')
-		return (value === 'dark' ? 'dark' : 'light')
-	})
+		let value = localStorage.getItem('theme');
+		return (value === 'dark' ? 'dark' : 'light');
+	});
 
 	const [lineSpacing, setLineSpacing] = useState(() => {
-		let value = localStorage.getItem('line-spacing')
-		return (value === 'simple' ? 'simple' : 'double')
-	})
+		let value = localStorage.getItem('line-spacing');
+		return (value === 'simple' ? 'simple' : 'double');
+	});
 
 	const [lang, setLang] = useState(() => {
-		let value = localStorage.getItem('i18nextLng')
-		return (value === 'en' ? 'en' : 'fr')
-	})
+		let value = localStorage.getItem('i18nextLng');
+		return (value === 'en' ? 'en' : 'fr');
+	});
 
 	useEffect( () => {
-		activateTheme()
-		activateLineSpacing()
-	}, [])
+		activateTheme();
+		activateLineSpacing();
+	}, []);
 
 	useEffect( () => {
-		localStorage.setItem('theme', theme)
-		activateTheme()
-	}, [ theme ])
+		localStorage.setItem('theme', theme);
+		activateTheme();
+	}, [ theme ]);
 
 	useEffect( () => {
-		localStorage.setItem('line-spacing', lineSpacing)
-		activateLineSpacing()
-	}, [ lineSpacing ])
+		localStorage.setItem('line-spacing', lineSpacing);
+		activateLineSpacing();
+	}, [ lineSpacing ]);
 
 	useEffect( () => {
-		localStorage.setItem('i18nextLng', lang)
-		i18n.changeLanguage(lang)
-	}, [ lang])
+		localStorage.setItem('i18nextLng', lang);
+		i18n.changeLanguage(lang);
+	}, [ lang]);
 
 	const activateTheme = () => {
 		if (theme === 'dark')
-			document.body.classList.add('dark-theme')
+			document.body.classList.add('dark-theme');
 		else
-			document.body.classList.remove('dark-theme')
-	}
+			document.body.classList.remove('dark-theme');
+	};
 
 	const activateLineSpacing= () => {
 		if (lineSpacing === 'simple')
-			document.body.classList.remove('line-spacing-theme')
+			document.body.classList.remove('line-spacing-theme');
 		else
-			document.body.classList.add('line-spacing-theme')
-	}
+			document.body.classList.add('line-spacing-theme');
+	};
 	
 	const onThemeChange = (ev) => {
-		setTheme(ev.target.value)
-	}
+		setTheme(ev.target.value);
+	};
 
 	const onLineSpacingChange = (ev) => {
-		setLineSpacing(ev.target.value)
-	}
+		setLineSpacing(ev.target.value);
+	};
 
 	const onLangChange = (ev) => {
-		setLang(ev.target.value)
-	}
+		setLang(ev.target.value);
+	};
 
 	return (<>
 		<CustomDialog isOpen={isOpen} onClose={onClose} className='accessibility-dialog'>
@@ -113,7 +113,7 @@ const AccessibilityDialog = ({isOpen, onClose}) => {
 				<button onClick={onClose}>{t('action.close')}</button>
 			</div>
 		</CustomDialog>
-	</>)
-}
+	</>);
+};
 
-export default AccessibilityDialog
+export default AccessibilityDialog;

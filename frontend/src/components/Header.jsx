@@ -1,72 +1,72 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import i18n from "i18next"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faWheelchair } from '@fortawesome/free-solid-svg-icons'
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import i18n from "i18next";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWheelchair } from '@fortawesome/free-solid-svg-icons';
 
-import Logo from './Logo'
-import StockButton from './StockButton'
-import PopupMenu from './PopupMenu'
-import AccessibilityDialog from './AccessibilityDialog'
-import { useComaintContext } from '../ComaintContext'
-import LoginDialog from './LoginDialog'
-import LogoutDialog from './LogoutDialog'
-import RegisterAccountDialog from './RegisterAccountDialog'
+import Logo from './Logo';
+import StockButton from './StockButton';
+import PopupMenu from './PopupMenu';
+import AccessibilityDialog from './AccessibilityDialog';
+import { useComaintContext } from '../ComaintContext';
+import LoginDialog from './LoginDialog';
+import LogoutDialog from './LogoutDialog';
+import RegisterAccountDialog from './RegisterAccountDialog';
 
-import '../scss/header.scss'
+import '../scss/header.scss';
 
 const Header = () => {
-    const { t } = useTranslation()
-    const [connected, setConnected] = useState(false)
-    const [isAccountMenuVisible, setAccountMenuVisible] = useState(false)
-    const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
-    const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
-    const [isAccessibilityDialogOpen, setIsAccessibilityDialogOpen] = useState(false)
+    const { t } = useTranslation();
+    const [connected, setConnected] = useState(false);
+    const [isAccountMenuVisible, setAccountMenuVisible] = useState(false);
+    const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+    const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+    const [isAccessibilityDialogOpen, setIsAccessibilityDialogOpen] = useState(false);
     const [isRegisterAccountDialogOpen, setIsRegisterAccountDialogOpen] = useState(false);
-    const { comaintContext } = useComaintContext()
-    const [ accountLabel, setAccountLabel ] = useState('')
+    const { comaintContext } = useComaintContext();
+    const [ accountLabel, setAccountLabel ] = useState('');
 
     useEffect( ()=> {
-        setAccountLabel( comaintContext ? comaintContext.email : '')
-        setConnected( comaintContext ? comaintContext.connected : false)
-    }, [comaintContext])
+        setAccountLabel( comaintContext ? comaintContext.email : '');
+        setConnected( comaintContext ? comaintContext.connected : false);
+    }, [comaintContext]);
 
 
     const onAccountButtonClick = () => {
         if (connected)
-            setAccountMenuVisible(true)
+            setAccountMenuVisible(true);
         else
-            setIsLoginDialogOpen(true)
-    }
+            setIsLoginDialogOpen(true);
+    };
 
     const onLogoutMenuClick = () => {
-        setIsLogoutDialogOpen(true)
-    }
+        setIsLogoutDialogOpen(true);
+    };
 
     const onLoginDialogClose = () => {
-        setIsLoginDialogOpen(false)
-    }
+        setIsLoginDialogOpen(false);
+    };
 
     const onLogoutDialogResponse = () => {
-        setIsLogoutDialogOpen(false)
-    }
+        setIsLogoutDialogOpen(false);
+    };
 
     const onRegisterAccount = () => {
-        setIsRegisterAccountDialogOpen(true)
-    }
+        setIsRegisterAccountDialogOpen(true);
+    };
 
     const onAccessibilityDialogClose = () => {
-        setIsAccessibilityDialogOpen(false)
-    }
+        setIsAccessibilityDialogOpen(false);
+    };
 
     const onAccessibilityButtonClick = () => {
-        setIsAccessibilityDialogOpen(true)
-    }
+        setIsAccessibilityDialogOpen(true);
+    };
 
     const onRegisterAccountDialogClose = () => {
         setIsRegisterAccountDialogOpen(false);
-    }
+    };
 
     return (
         <>
@@ -92,7 +92,7 @@ const Header = () => {
             <LogoutDialog isOpen={isLogoutDialogOpen} onResponse={onLogoutDialogResponse}/>
             <RegisterAccountDialog isOpen={isRegisterAccountDialogOpen} onClose={onRegisterAccountDialogClose} /> 
         </>
-    )
-}
+    );
+};
 
-export default Header
+export default Header;

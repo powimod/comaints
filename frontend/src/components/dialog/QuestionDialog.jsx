@@ -1,6 +1,6 @@
-import { useTranslation } from 'react-i18next'
-import { useState, useRef, useEffect } from 'react'
-import CustomDialog from './CustomDialog'
+import { useTranslation } from 'react-i18next';
+import { useState, useRef, useEffect } from 'react';
+import CustomDialog from './CustomDialog';
 
 /**
  * Display a confirmation dialog box with Yes/No buttons
@@ -46,42 +46,42 @@ import CustomDialog from './CustomDialog'
  */
 const QuestionDialog = ({isOpen, onResponse, className = '', children}) => {
 	if (isOpen === undefined)
-		throw new Error('Argument [isOpen] is missing')
+		throw new Error('Argument [isOpen] is missing');
 	if (typeof(isOpen) !== 'boolean')
-		throw new Error('Argument [isOpen] is not a boolean')
+		throw new Error('Argument [isOpen] is not a boolean');
 	if (onResponse === undefined)
-		throw new Error('Argument [onResponse] is missing')
+		throw new Error('Argument [onResponse] is missing');
 	if (typeof(onResponse) !== 'function')
-		throw new Error('Argument [onResponse] is not a function')
+		throw new Error('Argument [onResponse] is not a function');
 	if (children === undefined)
-		throw new Error('Argument [children] is missing')
+		throw new Error('Argument [children] is missing');
 
-	const { t } = useTranslation()
+	const { t } = useTranslation();
 
-	const dialogResponseRef = useRef(null) // null is returned when escape key is pressed
+	const dialogResponseRef = useRef(null); // null is returned when escape key is pressed
 
 	useEffect( () => {
 		if (isOpen)
-			dialogResponseRef.current = null
-	}, [isOpen])
+			dialogResponseRef.current = null;
+	}, [isOpen]);
 
 	const onYesResponse = () => {
-		dialogResponseRef.current = true
-		onDialogClosed()
-	}
+		dialogResponseRef.current = true;
+		onDialogClosed();
+	};
 
 	const onNoResponse = () => {
-		dialogResponseRef.current = false 
-		onDialogClosed()
-	}
+		dialogResponseRef.current = false; 
+		onDialogClosed();
+	};
 
 	const onDialogClosed = () => {
 		// called by Dialog when Escape key is pressed or when dialog.close is called
-		onResponse(dialogResponseRef.current)
-		dialogResponseRef.current = null
-	}
+		onResponse(dialogResponseRef.current);
+		dialogResponseRef.current = null;
+	};
 
-	className = [ 'standard-dialog', className ].join(' ').trim()
+	className = [ 'standard-dialog', className ].join(' ').trim();
 
 	return (<CustomDialog isOpen={isOpen} onClose={onDialogClosed} className={className}>
 			<div>{children}</div>
@@ -89,7 +89,7 @@ const QuestionDialog = ({isOpen, onResponse, className = '', children}) => {
 				<button onClick={onYesResponse}>{t('button.yes')}</button>
 				<button onClick={onNoResponse}>{t('button.no')}</button>
 			</div>
-		</CustomDialog>)
-}
+		</CustomDialog>);
+};
 
-export default QuestionDialog
+export default QuestionDialog;

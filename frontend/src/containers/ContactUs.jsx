@@ -4,7 +4,7 @@ const ContactUs = () => {
 			<h1>Contact Us</h1>
 			<p>Contact us by email</p>
 		</main>
-	)
-}
+	);
+};
 
-export default ContactUs
+export default ContactUs;

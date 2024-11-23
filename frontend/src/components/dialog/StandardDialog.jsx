@@ -1,65 +1,65 @@
-import { useState, useRef, useEffect, useContext } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useState, useRef, useEffect, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import { DialogContext } from './DialogContext'
+import { DialogContext } from './DialogContext';
 
-import '../../scss/dialog.scss'
+import '../../scss/dialog.scss';
 
 const StandardDialog = () => {
-	const { t } = useTranslation()
+	const { t } = useTranslation();
 
-    const [ dialogState, dialogDispatch ] = useContext(DialogContext)
+    const [ dialogState, dialogDispatch ] = useContext(DialogContext);
 
-    const [ dialogData, setDialogData] = useState(null)
-    const dialogDataRef = useRef(dialogData) // used by close dialog callback function
+    const [ dialogData, setDialogData] = useState(null);
+    const dialogDataRef = useRef(dialogData); // used by close dialog callback function
 
-    const dialogRef = useRef(null)
-    const validationRef = useRef(false)
+    const dialogRef = useRef(null);
+    const validationRef = useRef(false);
 
     const _showDialog = (dialogType, message, resolve)  => {
-        validationRef.current = false
-        setDialogData({ type:dialogType, message, resolve })
-    }
+        validationRef.current = false;
+        setDialogData({ type:dialogType, message, resolve });
+    };
 
     useEffect(() => {
-        const modalDialog = dialogRef.current
+        const modalDialog = dialogRef.current;
         if (modalDialog  === null) 
-            return
-        dialogDataRef.current = dialogData
-        dialogRef.current.showModal()
-        modalDialog.addEventListener('close', evDialogClose)
+            return;
+        dialogDataRef.current = dialogData;
+        dialogRef.current.showModal();
+        modalDialog.addEventListener('close', evDialogClose);
         return () => {
-            modalDialog.removeEventListener('close', evDialogClose)
-        }
-    }, [dialogData])
+            modalDialog.removeEventListener('close', evDialogClose);
+        };
+    }, [dialogData]);
 
 
 	useEffect( () => {
 		for (const request of dialogState) {
-            const requestType = request.type
+            const requestType = request.type;
             if (requestType === 'standard-dialog') {
-                _showDialog(request.dialog, request.message, request.resolve) 
-                dialogDispatch({type:'acquit', id: request.id})
+                _showDialog(request.dialog, request.message, request.resolve); 
+                dialogDispatch({type:'acquit', id: request.id});
 			}
 		}
-	}, [dialogState])
+	}, [dialogState]);
 
 
     const evDialogClose = () => {
         if (dialogDataRef.current !== null) {
-            dialogDataRef.current.resolve(validationRef.current)
-            setDialogData(null)
+            dialogDataRef.current.resolve(validationRef.current);
+            setDialogData(null);
         }
-    }
+    };
 
     const evValidateButtonClick = () => {
-        validationRef.current = true
-        dialogRef.current.close()
-    }
+        validationRef.current = true;
+        dialogRef.current.close();
+    };
 
     const evInvalidateButtonClick = () => {
-        dialogRef.current.close()
-    }
+        dialogRef.current.close();
+    };
 
 	return ( <>
         { dialogData !== null && (
@@ -84,24 +84,24 @@ const StandardDialog = () => {
                 </div>
             </dialog>
         ) }
-    </>)
-}
+    </>);
+};
 
 const useStandardDialog = () => {
-    const [ _, dialogDispatch ] = useContext(DialogContext)
+    const [ _, dialogDispatch ] = useContext(DialogContext);
 
     const postDialogRequest = (dialog, message) => {
         return new Promise( (resolve) => {
-            dialogDispatch({ type:'standard-dialog', dialog, message, resolve })
-        })
-    }
+            dialogDispatch({ type:'standard-dialog', dialog, message, resolve });
+        });
+    };
 
-    const messageDialog      = (message) => postDialogRequest('message', message) 
-    const questionDialog     = (message) => postDialogRequest('question', message) 
-    const confirmationDialog = (message) => postDialogRequest('confirmation', message) 
+    const messageDialog      = (message) => postDialogRequest('message', message); 
+    const questionDialog     = (message) => postDialogRequest('question', message); 
+    const confirmationDialog = (message) => postDialogRequest('confirmation', message); 
 
-    return { messageDialog, questionDialog, confirmationDialog }
-}
+    return { messageDialog, questionDialog, confirmationDialog };
+};
 
-export { useStandardDialog }
-export default StandardDialog
+export { useStandardDialog };
+export default StandardDialog;

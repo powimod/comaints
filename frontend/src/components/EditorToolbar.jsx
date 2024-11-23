@@ -2,15 +2,15 @@
  * @module EditorToolbar
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react';
 
-import '../scss/editor-toolbar.scss'
-import StockButton from './StockButton'
+import '../scss/editor-toolbar.scss';
+import StockButton from './StockButton';
 
-const MODE_NONE = 0
-const MODE_DISPLAY = 1
-const MODE_EDIT = 2
-const MODE_CREATE = 3
+const MODE_NONE = 0;
+const MODE_DISPLAY = 1;
+const MODE_EDIT = 2;
+const MODE_CREATE = 3;
 
 /**
  * Enumeration of display modes
@@ -24,13 +24,13 @@ const EditorToolbarModes = {
 	display : MODE_DISPLAY,
 	edit    : MODE_EDIT,
 	create  : MODE_CREATE
-}
+};
 
-const ACTION_NONE = 0
-const ACTION_CLOSE = 1
-const ACTION_DELETE = 2
-const ACTION_VALIDATE = 3
-const ACTION_CANCEL = 4
+const ACTION_NONE = 0;
+const ACTION_CLOSE = 1;
+const ACTION_DELETE = 2;
+const ACTION_VALIDATE = 3;
+const ACTION_CANCEL = 4;
 
 /**
  * Enumeration of editor actions
@@ -46,7 +46,7 @@ const EditorToolbarActions = {
 	delete   : ACTION_DELETE,
 	validate : ACTION_VALIDATE,
 	cancel   : ACTION_CANCEL
-}
+};
 
 
 /**
@@ -102,69 +102,69 @@ const EditorToolbarActions = {
 
 const EditorToolbar = ({title=null, mode, setMode, setAction, canCreate=true, canDelete=false, canClose=true}) => {
 	if (mode === undefined)
-		throw new Error('Mode argument is not defined')
+		throw new Error('Mode argument is not defined');
 	if (setMode === undefined)
-		throw new Error('setMode argument is not defined')
+		throw new Error('setMode argument is not defined');
 	if (typeof(setMode) !== 'function')
-		throw new Error('setMode argument is not a function')
+		throw new Error('setMode argument is not a function');
 	if (setAction === undefined)
-		throw new Error('setAction argument is not defined')
+		throw new Error('setAction argument is not defined');
 	if (typeof(setAction) !== 'function')
-		throw new Error('setAction argument is not a function')
+		throw new Error('setAction argument is not a function');
 
-	const [ internalAction, setInternalAction ] = useState(ACTION_NONE)
-    const actionNumberRef = useRef(0)
+	const [ internalAction, setInternalAction ] = useState(ACTION_NONE);
+    const actionNumberRef = useRef(0);
 
 	useEffect( () => {
-		setMode(mode)
-	}, [mode])
+		setMode(mode);
+	}, [mode]);
 
 	useEffect( () => {
         if (internalAction === ACTION_NONE)
-            return
+            return;
         setAction(() => {
             // passer un compteur qui change pour empêcher React de vouloir le supprimer pour optimiser
-            actionNumberRef.current++ 
+            actionNumberRef.current++; 
             return {
                 action: internalAction,
                 actionNumber: actionNumberRef.current
-            }
-        })
+            };
+        });
         // FIXME peut-on renvoyer directement la valeur ?
-        setInternalAction(() => ACTION_NONE)
-	}, [internalAction])
+        setInternalAction(() => ACTION_NONE);
+	}, [internalAction]);
 
 	useEffect( () => {
-		setMode(() => MODE_DISPLAY)
-		setInternalAction(() => ACTION_NONE)
-	}, [])
+		setMode(() => MODE_DISPLAY);
+		setInternalAction(() => ACTION_NONE);
+	}, []);
 
 	const onCreateButtonClick = () => {
-		setMode(MODE_CREATE)
-	}
+		setMode(MODE_CREATE);
+	};
 
 	const onEditButtonClick = () => {
-		setMode(MODE_EDIT)
-	}
+		setMode(MODE_EDIT);
+	};
 
 	const onDeleteButtonClick = () => {
-		setInternalAction(ACTION_DELETE)
-	}
+		setInternalAction(ACTION_DELETE);
+	};
 
 	const onValidateButtonClick = () => {
-		setInternalAction(ACTION_VALIDATE)
-		setMode(MODE_DISPLAY)
-	}
+		setInternalAction(ACTION_VALIDATE);
+		setMode(MODE_DISPLAY);
+	};
 
 	const onCancelButtonClick = () => {
-		setInternalAction(ACTION_CANCEL)
-		setMode(MODE_DISPLAY)
-	}
+		setInternalAction(ACTION_CANCEL);
+		setMode(MODE_DISPLAY);
+	};
 
 	const onCloseButtonClick = () => {
-		setMode(MODE_DISPLAY)
-		setInternalAction(ACTION_CLOSE)
-	}
+		setMode(MODE_DISPLAY);
+		setInternalAction(ACTION_CLOSE);
+	};
 
 	return ( <div className='editor-toolbar'>
 			{ title && <span>{title}</span> }
@@ -182,8 +182,8 @@ const EditorToolbar = ({title=null, mode, setMode, setAction, canCreate=true, ca
 				<StockButton icon='validate' button='true' onClick={onValidateButtonClick}/>
 				<StockButton icon='cancel' button='true' onClick={onCancelButtonClick}/>
 			</>}
-		</div>)
-}
+		</div>);
+};
 
-export { EditorToolbarModes, EditorToolbarActions}
-export default EditorToolbar
+export { EditorToolbarModes, EditorToolbarActions};
+export default EditorToolbar;

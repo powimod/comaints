@@ -3,5 +3,5 @@ const STATUS = {
     LOADING:   'loading',
     SUCCEEDED: 'succeeded',
     FAILED:    'failed'
-}
-export default STATUS
+};
+export default STATUS;

@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { existsSync } from 'fs'
-import { join } from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { existsSync } from 'fs';
+import { join } from 'path';
 import path from 'path'; // Import du module path
 
 
@@ -19,17 +19,17 @@ export default defineConfig({
             configureServer(server) {
                 server.middlewares.use((req, res, next) => {
                     if (! req.url.endsWith('.md')) {
-                        next()
-                        return
+                        next();
+                        return;
                     }
-                    const filePath = join(process.cwd(), 'public', req.url)
+                    const filePath = join(process.cwd(), 'public', req.url);
                     if (existsSync(filePath)) {
-                        next()
-                        return
+                        next();
+                        return;
                     }
-                    res.statusCode = 404
-                    res.end('Not Found')
-                })
+                    res.statusCode = 404;
+                    res.end('Not Found');
+                });
             }
         }
     ],
@@ -46,4 +46,4 @@ export default defineConfig({
             }
         }
     }
-})
+});

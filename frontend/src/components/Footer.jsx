@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-import '../scss/footer.scss'
+import '../scss/footer.scss';
 
 const Footer = () => {
-	const { t } = useTranslation()
+	const { t } = useTranslation();
 
     return (
         <footer className="root_footer">
@@ -15,7 +15,7 @@ const Footer = () => {
 				<li> <Link to="/about">{t('footer.about_link')}</Link>              </li>
             </ul>
         </footer>
-    )
-}
+    );
+};
 
-export default Footer
+export default Footer;

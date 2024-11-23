@@ -1,25 +1,25 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react';
 
-import '../scss/popup-menu.scss'
+import '../scss/popup-menu.scss';
 
 const PopupMenu = ({isVisible, setVisible, children}) => {
 
-    const popupMenuBoxRef = useRef(null)
+    const popupMenuBoxRef = useRef(null);
 
 	useEffect( () => {
 		if (! isVisible)
-			return
+			return;
 		setTimeout(()=> {
-			popupMenuBoxRef.current.classList.add('menu-box-shown')
-		}, 0)
-	}, [isVisible])
+			popupMenuBoxRef.current.classList.add('menu-box-shown');
+		}, 0);
+	}, [isVisible]);
 
 	const hidePopupMenu = () => {
 		popupMenuBoxRef.current.addEventListener('transitionend', () => {
-			setVisible(false)
-		}, { once: true})
-		popupMenuBoxRef.current.classList.remove('menu-box-shown')
-	}
+			setVisible(false);
+		}, { once: true});
+		popupMenuBoxRef.current.classList.remove('menu-box-shown');
+	};
 
 	return <>
 		{isVisible && (
@@ -30,6 +30,6 @@ const PopupMenu = ({isVisible, setVisible, children}) => {
                 </div>
 		    </div>
         )}
-	</>
-}
-export default PopupMenu
+	</>;
+};
+export default PopupMenu;

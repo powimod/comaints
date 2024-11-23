@@ -1,115 +1,115 @@
-import { useState, useEffect, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
-import { useComaintContext } from '../ComaintContext'
-import useAuthActions from '../actions/authActions'
-import CustomDialog from './dialog/CustomDialog'
-import { controlObjectProperty } from '@common/objects/object-util.mjs'
-import userObjectDef from '@common/objects/user-object-def.mjs'
+import { useComaintContext } from '../ComaintContext';
+import useAuthActions from '../actions/authActions';
+import CustomDialog from './dialog/CustomDialog';
+import { controlObjectProperty } from '@common/objects/object-util.mjs';
+import userObjectDef from '@common/objects/user-object-def.mjs';
 
-import '../scss/login-dialog.scss'
+import '../scss/login-dialog.scss';
 
 const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
-	const { t } = useTranslation()
-    const { login } = useAuthActions()
-    const { comaintContext } = useComaintContext()
+	const { t } = useTranslation();
+    const { login } = useAuthActions();
+    const { comaintContext } = useComaintContext();
 
-	const [ error, setError ] = useState(null)
-	const [ email, setEmail] = useState('')
-	const [ password, setPassword] = useState('')
-	const emailRef = useRef()
-	const passwordRef = useRef()
-	const navigate = useNavigate()
+	const [ error, setError ] = useState(null);
+	const [ email, setEmail] = useState('');
+	const [ password, setPassword] = useState('');
+	const emailRef = useRef();
+	const passwordRef = useRef();
+	const navigate = useNavigate();
 
-	const EMAIL_STORAGE_KEY = 'login-email'
+	const EMAIL_STORAGE_KEY = 'login-email';
 
 	useEffect( () => {
         if (! isOpen)
-            return
-		setError(null)
-		const email = localStorage.getItem(EMAIL_STORAGE_KEY)
+            return;
+		setError(null);
+		const email = localStorage.getItem(EMAIL_STORAGE_KEY);
 		if (email !== null)
-			setEmail(email)
-        setPassword('')
-	}, [isOpen])
+			setEmail(email);
+        setPassword('');
+	}, [isOpen]);
    
 
 	useEffect( () => {
         if (comaintContext == null)
-            return
+            return;
         if (comaintContext.connected)
-            onClose()
-	}, [comaintContext])
+            onClose();
+	}, [comaintContext]);
 
 
 	useEffect( () => {
 		if (email.length === 0)
-			localStorage.removeItem(EMAIL_STORAGE_KEY)
+			localStorage.removeItem(EMAIL_STORAGE_KEY);
 		else
-			localStorage.setItem(EMAIL_STORAGE_KEY, email)
-	}, [email])
+			localStorage.setItem(EMAIL_STORAGE_KEY, email);
+	}, [email]);
 
 
 	useEffect( () => {
-		setError(null)
+		setError(null);
 		if (! isOpen)
-			return
-		setFocus( (emailRef.current.value.length > 0) ?  passwordRef : emailRef )
-	}, [isOpen])
+			return;
+		setFocus( (emailRef.current.value.length > 0) ?  passwordRef : emailRef );
+	}, [isOpen]);
 
 
     const setFocus = (fieldRef) => {
 		setTimeout( () => {
-			fieldRef.current.focus()
-		}, 100) // FIXME why does not work with zero ?
-    }
+			fieldRef.current.focus();
+		}, 100); // FIXME why does not work with zero ?
+    };
 
 	const onLoginButtonClick = async () => {
-        setError(null)
-        let errorMsg, errorParams
+        setError(null);
+        let errorMsg, errorParams;
 
-        [ errorMsg, errorParams ] = controlObjectProperty(userObjectDef, 'email', email)
+        [ errorMsg, errorParams ] = controlObjectProperty(userObjectDef, 'email', email);
         if (errorMsg) {
-			setError(t(errorMsg, errorParams))
-            setFocus(emailRef)
-			return
+			setError(t(errorMsg, errorParams));
+            setFocus(emailRef);
+			return;
 		}
-        [ errorMsg, errorParams ] = controlObjectProperty(userObjectDef, 'password', password)
+        [ errorMsg, errorParams ] = controlObjectProperty(userObjectDef, 'password', password);
 		if (errorMsg) {
-			setError(t(errorMsg, errorParams))
-            setFocus(passwordRef)
-			return
+			setError(t(errorMsg, errorParams));
+            setFocus(passwordRef);
+			return;
 		}
 		try {
-            await login(email, password)
+            await login(email, password);
 		}
 		catch (error) {
-			setError(error.message)
-            setFocus(passwordRef)
+			setError(error.message);
+            setFocus(passwordRef);
 		}
-	}
+	};
 
 	const onForgetPasswordButtonClick = (ev) => {
-		ev.preventDefault()
-		navigate('/forgotten-password')
-		onClose() // close dialog
-	}
+		ev.preventDefault();
+		navigate('/forgotten-password');
+		onClose(); // close dialog
+	};
 
 	const onEmailChanged = (ev) => {
-        setError(null)
-		setEmail(ev.target.value.trim())
-	}
+        setError(null);
+		setEmail(ev.target.value.trim());
+	};
 
 	const onPasswordChanged = (ev) => {
-        setError(null)
-		setPassword(ev.target.value.trim())
-	}
+        setError(null);
+		setPassword(ev.target.value.trim());
+	};
 
 	const onDialogClosed = () => {
-        setError(null)
-		onClose()
-	}
+        setError(null);
+		onClose();
+	};
 
 	return (<>
 		<CustomDialog isOpen={isOpen} onClose={onDialogClosed} className='login-dialog'>
@@ -144,7 +144,7 @@ const LoginDialog = ({isOpen, onClose, onRegisterAccount}) => {
 			</div>
 
 		</CustomDialog>
-	</>)
-}
+	</>);
+};
 
-export default LoginDialog
+export default LoginDialog;

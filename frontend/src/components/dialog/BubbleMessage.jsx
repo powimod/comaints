@@ -1,13 +1,13 @@
-import { useState, useRef, useEffect, useContext } from 'react'
+import { useState, useRef, useEffect, useContext } from 'react';
 
-import { DialogContext } from './DialogContext'
+import { DialogContext } from './DialogContext';
 
-import '../../scss/dialog.scss'
+import '../../scss/dialog.scss';
 
 const BubbleMessage = () => {
 
-    const [ dialogState, dialogDispatch ] = useContext(DialogContext)
-    const [ message, setMessage ] = useState(null)
+    const [ dialogState, dialogDispatch ] = useContext(DialogContext);
+    const [ message, setMessage ] = useState(null);
 	const timeoutIdRef = useRef(null);
 
     const _showBubblePopup = (message, tempo = null) => {
@@ -24,49 +24,49 @@ const BubbleMessage = () => {
             }, tempo);
             timeoutIdRef.current = timeoutId;
         }
-    }
+    };
 
     const _hideBubblePopup = () => {
         _showBubblePopup(null);
-    }
+    };
 
 	useEffect( () => {
 		for (const request of dialogState) {
-            const requestType = request.type
+            const requestType = request.type;
             switch (requestType) {
                 case 'bubble-show':
-                    _showBubblePopup(request.message, request.duration) 
-                    dialogDispatch({type:'acquit', id: request.id})
+                    _showBubblePopup(request.message, request.duration); 
+                    dialogDispatch({type:'acquit', id: request.id});
                     break;
                 case 'bubble-hide':
-				    _hideBubblePopup()
-				    dialogDispatch({type:'acquit', id: request.id})
+				    _hideBubblePopup();
+				    dialogDispatch({type:'acquit', id: request.id});
                     break;
                 default:
                     // simply ignore other requests (flash message)
-                    break
+                    break;
 			}
 		}
-	}, [dialogState])
+	}, [dialogState]);
 
 	return ( <>
 		    { message !== null && ( <div className='bubble-message'>{message}</div> ) }
-	    </>)
-}
+	    </>);
+};
 
 const useBubbleMessage = () => {
-    const [ dialogState, dialogDispatch ] = useContext(DialogContext)
+    const [ dialogState, dialogDispatch ] = useContext(DialogContext);
 
     const show = ({message, duration = null}) => {
-        dialogDispatch({type:'bubble-show', message, duration})
-    }
+        dialogDispatch({type:'bubble-show', message, duration});
+    };
 
     const hide= () => {
-        dialogDispatch({type:'bubble-hide'})
-    }
+        dialogDispatch({type:'bubble-hide'});
+    };
 
-    return { show, hide }
-}
+    return { show, hide };
+};
 
-export { useBubbleMessage }
-export default BubbleMessage
+export { useBubbleMessage };
+export default BubbleMessage;

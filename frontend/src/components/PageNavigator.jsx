@@ -1,53 +1,53 @@
-const NAVIGATE_FIRST = 'first'
-const NAVIGATE_PREVIOUS = 'previous'
-const NAVIGATE_NEXT = 'next'
-const NAVIGATE_LAST = 'last'
+const NAVIGATE_FIRST = 'first';
+const NAVIGATE_PREVIOUS = 'previous';
+const NAVIGATE_NEXT = 'next';
+const NAVIGATE_LAST = 'last';
 
-import '../scss/page-navigator.scss'
+import '../scss/page-navigator.scss';
 
 const PageNavigator = ({list = null, onPageNavigate = null}) => {
-    const currentPage = list.page
-    const pageCount = parseInt(list.count / list.limit +1)
+    const currentPage = list.page;
+    const pageCount = parseInt(list.count / list.limit +1);
 
     const callPageNavigate = (action) => {
         if (typeof(onPageNavigate) !== 'function') {
-            console.error('Callback pageNavigate is not defined')
-            return
+            console.error('Callback pageNavigate is not defined');
+            return;
         }
-        let page = currentPage
+        let page = currentPage;
         switch (action) {
             case NAVIGATE_FIRST:
-                page = 1
-                break
+                page = 1;
+                break;
             case NAVIGATE_PREVIOUS:
-                page--
-                break
+                page--;
+                break;
             case NAVIGATE_NEXT:
-                page++
-                break
+                page++;
+                break;
             case NAVIGATE_LAST:
-                page = pageCount
-                break
+                page = pageCount;
+                break;
         }
         if (page < 1)
-            page = 1
+            page = 1;
         if (page > pageCount)
-            page = pageCount
-        onPageNavigate({action, page})
-    }
+            page = pageCount;
+        onPageNavigate({action, page});
+    };
 
     const onFirstPageButtonClick = () => {
-        callPageNavigate(NAVIGATE_FIRST)
-    }
+        callPageNavigate(NAVIGATE_FIRST);
+    };
     const onPreviousPageButtonClick = () => {
-        callPageNavigate(NAVIGATE_PREVIOUS)
-    }
+        callPageNavigate(NAVIGATE_PREVIOUS);
+    };
     const onNextPageButtonClick = () => {
-        callPageNavigate(NAVIGATE_NEXT)
-    }
+        callPageNavigate(NAVIGATE_NEXT);
+    };
     const onLastPageButtonClick = () => {
-        callPageNavigate(NAVIGATE_LAST)
-    }
+        callPageNavigate(NAVIGATE_LAST);
+    };
 
     return (<div className='page-navigator'>
             <button onClick={onFirstPageButtonClick}>&lt;&lt;</button>
@@ -56,7 +56,7 @@ const PageNavigator = ({list = null, onPageNavigate = null}) => {
             <button onClick={onNextPageButtonClick}>&gt;</button>
             <button onClick={onLastPageButtonClick}>&gt;&gt;</button>
         </div>
-    )
-}
+    );
+};
 
-export default PageNavigator
+export default PageNavigator;

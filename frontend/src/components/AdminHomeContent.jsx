@@ -1,6 +1,6 @@
 const AdminHomeContent = () => {
     return <>
             <h1>Admin home page</h1>
-        </>
-}
-export default AdminHomeContent 
+        </>;
+};
+export default AdminHomeContent; 

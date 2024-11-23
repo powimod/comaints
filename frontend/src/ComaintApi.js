@@ -1,29 +1,29 @@
-import { ComaintBackendApi } from 'comaint-api-lib'
+import { ComaintBackendApi } from 'comaint-api-lib';
 
 class ComaintBackendApiSingleton {
-    static #instance = null
+    static #instance = null;
 
     static getInstance() {
 
         const accountSerializeCallback = (data) => {
-            const accountStorageKey = 'account'
+            const accountStorageKey = 'account';
             if (data === undefined) {
-                const accountData = localStorage.getItem(accountStorageKey)
-                data = JSON.parse(accountData)
+                const accountData = localStorage.getItem(accountStorageKey);
+                data = JSON.parse(accountData);
             } else {
-                const accountData = JSON.stringify(data)
-                localStorage.setItem(accountStorageKey, accountData)
+                const accountData = JSON.stringify(data);
+                localStorage.setItem(accountStorageKey, accountData);
             }
-            return data
-        }
+            return data;
+        };
 
         if (ComaintBackendApiSingleton.#instance === null) {
-            const apiUrl = window.location.origin
-            ComaintBackendApiSingleton.#instance = new ComaintBackendApi(apiUrl, accountSerializeCallback)
+            const apiUrl = window.location.origin;
+            ComaintBackendApiSingleton.#instance = new ComaintBackendApi(apiUrl, accountSerializeCallback);
         }
 
-        return ComaintBackendApiSingleton.#instance
+        return ComaintBackendApiSingleton.#instance;
     }
 }
 
-export default ComaintBackendApiSingleton 
+export default ComaintBackendApiSingleton; 

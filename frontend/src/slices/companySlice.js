@@ -1,19 +1,19 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import STATUS from './status'
-import ComaintBackendApiSingleton from '../ComaintApi.js'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import STATUS from './status';
+import ComaintBackendApiSingleton from '../ComaintApi.js';
 
 
 export const initializeCompanyThunk = createAsyncThunk(
     'company/initializeCompany',
     async ({ companyName }, { rejectWithValue }) => {
-        const comaintApi = ComaintBackendApiSingleton.getInstance()
+        const comaintApi = ComaintBackendApiSingleton.getInstance();
         try {
-            return await comaintApi.company.initializeCompany(companyName)
+            return await comaintApi.company.initializeCompany(companyName);
         } catch (error) {
-            return rejectWithValue(error.message)
+            return rejectWithValue(error.message);
         }
     }
-)
+);
 
 
 const companySlice = createSlice({
@@ -29,19 +29,19 @@ const companySlice = createSlice({
 
             // initializeCompanyThunk
             .addCase(initializeCompanyThunk.pending, (state) => {
-                state.companyStatus = STATUS.LOADING
-                state.companyError = null
+                state.companyStatus = STATUS.LOADING;
+                state.companyError = null;
             })
             .addCase(initializeCompanyThunk.fulfilled, (state, action) => {
-                state.companyStatus = STATUS.SUCCEEDED
-                state.company = action.payload
+                state.companyStatus = STATUS.SUCCEEDED;
+                state.company = action.payload;
             })
             .addCase(initializeCompanyThunk.rejected, (state, action) => {
-                state.companyStatus = STATUS.FAILED
-                state.companyError = action.payload
-            })
+                state.companyStatus = STATUS.FAILED;
+                state.companyError = action.payload;
+            });
 
     }
-})
+});
 
-export default companySlice.reducer
+export default companySlice.reducer;

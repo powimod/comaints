@@ -1,14 +1,14 @@
 //import RegisterComponent from '../components/RegisterComponent'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
 
 const Development = () => {
-	const { t } = useTranslation()
+	const { t } = useTranslation();
 
     return (<div>
         <h1>Development</h1>
         <p>{t('common:common_message')}</p>
-        </div>)
+        </div>);
 
-}
+};
 
-export default Development
+export default Development;

@@ -1,114 +1,114 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import CustomDialog from './dialog/CustomDialog'
-import { useComaintContext } from '../ComaintContext'
-import useAuthActions from '../actions/authActions'
+import CustomDialog from './dialog/CustomDialog';
+import { useComaintContext } from '../ComaintContext';
+import useAuthActions from '../actions/authActions';
 
-import '../scss/register-account-dialog.scss'
+import '../scss/register-account-dialog.scss';
 
 const RegisterAccountDialog = ({isOpen, onClose }) => {
-	const { t } = useTranslation()
-    const { register, validateCode} = useAuthActions()
+	const { t } = useTranslation();
+    const { register, validateCode} = useAuthActions();
     const { comaintContext } = useComaintContext();
 
-	const [ error, setError ] = useState(null)
-	const [ step, setStep ] = useState(1)
-	const [ email, setEmail] = useState('')
-	const [ password, setPassword] = useState('')
-	const [ firstname, setFirstname] = useState('')
-	const [ lastname, setLastname] = useState('')
-	const [ validationCode, setValidationCode ] = useState('')
+	const [ error, setError ] = useState(null);
+	const [ step, setStep ] = useState(1);
+	const [ email, setEmail] = useState('');
+	const [ password, setPassword] = useState('');
+	const [ firstname, setFirstname] = useState('');
+	const [ lastname, setLastname] = useState('');
+	const [ validationCode, setValidationCode ] = useState('');
 
 	useEffect( () => {
         if (comaintContext == null)
-            return
+            return;
         if (comaintContext.connected)
-            onClose()
-	}, [comaintContext])
+            onClose();
+	}, [comaintContext]);
 
 
 	useEffect(() => {
-		setStep(1)
-		setValidationCode('')
-		setError(null)
-	}, [isOpen])
+		setStep(1);
+		setValidationCode('');
+		setError(null);
+	}, [isOpen]);
 
 
 	const onFirstStepValidateButtonClick = async () => {
-		setError(null)
+		setError(null);
 		if (email.length === 0) {
-			setError(t('error.invalid-email'))
-			return
+			setError(t('error.invalid-email'));
+			return;
 		}
 		if (password.length === 0) {
-			setError(t('error.invalid-password'))
-			return
+			setError(t('error.invalid-password'));
+			return;
 		}
 		if (firstname.length === 0) {
-			setError(t('error.empty-firstname'))
-			return
+			setError(t('error.empty-firstname'));
+			return;
 		}
 		if (lastname.length === 0) {
-			setError(t('error.empty-lastname'))
-			return
+			setError(t('error.empty-lastname'));
+			return;
 		}
 		try {
-			await register(email, password, firstname, lastname)
-			setStep(2)
+			await register(email, password, firstname, lastname);
+			setStep(2);
 		}
 		catch (error) {
-			setError(error)
+			setError(error);
 		}
-	}
+	};
 
 	const onSecondStepValidateButtonClick = async () => {
-		setError(null)
+		setError(null);
 		if (validationCode.length === 0 || isNaN(validationCode)) {
-			setError(t('error.invalid-validation-code'))
-			return
+			setError(t('error.invalid-validation-code'));
+			return;
 		}
 		try {
-			await validateCode(parseInt(validationCode))
+			await validateCode(parseInt(validationCode));
 		} catch (error) {
-			setError(error)
+			setError(error);
 		}
-	}
+	};
 
 
 	const onPreviousButtonClick = () => {
-		setStep(1)
-	}
+		setStep(1);
+	};
 
 	const onForgetPasswordButtonClick = (ev) => {
-		ev.preventDefault()
-		console.log('Forget password') // TODO
-	}
+		ev.preventDefault();
+		console.log('Forget password'); // TODO
+	};
 
 	const onResendCodedButtonClick = (ev) => {
-		ev.preventDefault()
-		console.log('Resend code') // TODO
-	}
+		ev.preventDefault();
+		console.log('Resend code'); // TODO
+	};
 
 	const onEmailChanged = (ev) => {
-		setEmail(ev.target.value.trim())
-	}
+		setEmail(ev.target.value.trim());
+	};
 
 	const onPasswordChanged = (ev) => {
-		setPassword(ev.target.value.trim())
-	}
+		setPassword(ev.target.value.trim());
+	};
 
 	const onFirstnameChanged = (ev) => {
-		setFirstname(ev.target.value.trim())
-	}
+		setFirstname(ev.target.value.trim());
+	};
 
 	const onLastnameChanged = (ev) => {
-		setLastname(ev.target.value.trim())
-	}
+		setLastname(ev.target.value.trim());
+	};
 
 	const onValidationCodeChanged = (ev) => {
-		setValidationCode(ev.target.value.trim())
-	}
+		setValidationCode(ev.target.value.trim());
+	};
 
 	return (<>
 		<CustomDialog isOpen={isOpen} onClose={onClose} className='register-account-dialog'>
@@ -164,7 +164,7 @@ const RegisterAccountDialog = ({isOpen, onClose }) => {
 			</>}
 
 		</CustomDialog>
-	</>)
-}
+	</>);
+};
 
-export default RegisterAccountDialog
+export default RegisterAccountDialog;
