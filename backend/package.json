@@ -10,7 +10,6 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon node src/server.js",
-    "dev": "nodemon node src/server.js",
     "test": "mocha --timeout 10000 --exit"
   },
   "repository": {
@@ -35,6 +34,7 @@
   },
   "devDependencies": {
     "chai": "^5.1.1",
+    "eslint": "^9.15.0",
     "mocha": "^10.7.3"
   }
 }
