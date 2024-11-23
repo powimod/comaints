@@ -10,8 +10,6 @@ describe('Check login', () => {
     const dte = new Date();
     const userEmail = `u${dte.getTime()}@x.y`;
     const password = 'aBcdef+ghijkl9';
-    let userId = null;
-
 
 	before( async () =>  {
         await connectDb();

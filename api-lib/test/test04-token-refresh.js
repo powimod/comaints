@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 
 import { api, initializeApi, terminateApi, connectDb, disconnectDb, accessToken, refreshToken } from './util.js';
-import { createUserAccount, deleteUserAccountById, getDatabaseUserById } from './helpers.js';
+import { createUserAccount, deleteUserAccountById } from './helpers.js';
 
 describe('Check token refresh', () => {
 

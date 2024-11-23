@@ -17,7 +17,7 @@ describe('Check login', () => {
     after( async () =>  {
         await deleteUserAccountById(user.id);
         await disconnectDb();
-        await terminateApi();
+        terminateApi();
     });
 
 

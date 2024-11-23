@@ -68,7 +68,7 @@ class ComaintBackendApi {
     async checkBackend() {
         const API_VERSION_ROUTE = '/api/welcome';
         try {
-            const ret = await this.#context.jsonGet(API_VERSION_ROUTE, null, {token:false});
+            await this.#context.jsonGet(API_VERSION_ROUTE, null, {token:false});
             return {success: true, message: 'Comaint backend communication is working !'};
         }
         catch (error) {

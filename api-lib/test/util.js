@@ -57,7 +57,7 @@ const connectDb = async () => {
     dbPassword = process.env.DB_PASSWORD;
 
     if (dbPassword === undefined)
-        throw new Error(`Parameter «DB_PASSWORD» not found in «${CONF_FILE}»`);
+        throw new Error(`Env variable «DB_PASSWORD» is not defined`);
 
     db = await promise_mysql.createConnection({
         host: dbHost,

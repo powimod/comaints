@@ -8,12 +8,14 @@ export default [
         languageOptions: { 
             globals: {
                 ...globals.browser, 
-                ...globals.node
+                ...globals.node,
+                ...globals.mocha
             } 
         },
+        ...pluginJs.configs.recommended,
         rules: {
-            semi: ["error", "always"]
+            "semi": ["error", "always"],
+            "no-unused-vars": ["warn", { "vars": "all", "args": "after-used", "ignoreRestSiblings": true }],
         }
     },
-    pluginJs.configs.recommended,
 ];

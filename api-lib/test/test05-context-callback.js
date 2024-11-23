@@ -10,8 +10,6 @@ describe('Check login', () => {
     const dte = new Date();
     const userEmail = `u${dte.getTime()}@x.y`;
     const password = 'aBcdef+ghijkl9';
-    let userId = null;
-
 
 	before( async () =>  {
         await connectDb();
@@ -66,7 +64,7 @@ describe('Check login', () => {
 
         it ('Logout', async () => {
             const json = await api.auth.logout();
-            // TODO json should be undefined
+            //assert(json).equal(undefined);
         });
 
         it ('Check context after logout', () => {

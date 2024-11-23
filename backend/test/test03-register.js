@@ -1,6 +1,5 @@
 'use strict';
 import { expect } from 'chai';
-import assert from 'assert';
 
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js';
 import { userPublicProperties, getDatabaseUserByEmail } from './helpers.js';
@@ -20,9 +19,8 @@ describe('Test user registration', () => {
     const userEmail3 = `u${dte.getTime()}3@x.y`;
     const userEmail4 = `u${dte.getTime()}3@x.y`;
     let userId = null;
-    let userId2 = null;
-    let userId3 = null;
-    let userId4 = null;
+    let userId2  = null;
+    let userId3  = null;
 
     before( async () =>  {
         loadConfig();
@@ -41,7 +39,7 @@ describe('Test user registration', () => {
 
         it(`Should detect missing email in request`, async () => {
             try {
-                const json = await jsonPost(ROUTE_REGISTER, {
+                await jsonPost(ROUTE_REGISTER, {
                         email_missing:'',
                         password:'',
                         sendCodeByEmail: false
@@ -57,7 +55,7 @@ describe('Test user registration', () => {
 
         it(`Should detect empty email in request`, async () => {
             try {
-                const json = await jsonPost(ROUTE_REGISTER, {
+                await jsonPost(ROUTE_REGISTER, {
                         email:'',
                         password:'',
                         sendCodeByEmail: false
@@ -72,7 +70,7 @@ describe('Test user registration', () => {
 
         it(`Should detect malformed email in request`, async () => {
             try {
-                const json = await jsonPost(ROUTE_REGISTER, {
+                await jsonPost(ROUTE_REGISTER, {
                         email:'abcdef',
                         password:'',
                         sendCodeByEmail: false
@@ -88,7 +86,7 @@ describe('Test user registration', () => {
 
         it('Should detect missing password in request', async () => {
             try {
-                const json = await jsonPost(ROUTE_REGISTER, {
+                await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
                         password_missing:'',
                         sendCodeByEmail: false
@@ -103,7 +101,7 @@ describe('Test user registration', () => {
 
         it('Should detect too small password in request', async () => {
             try {
-                const json = await jsonPost(ROUTE_REGISTER, {
+                await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
                         password:'abc',
                         sendCodeByEmail: false
@@ -118,7 +116,7 @@ describe('Test user registration', () => {
 
         it('Should detect password with no uppercase letter in request', async () => {
             try {
-                const json = await jsonPost(ROUTE_REGISTER, {
+                await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
                         password:'abcdefghijk9.',
                         sendCodeByEmail: false
@@ -133,7 +131,7 @@ describe('Test user registration', () => {
 
         it('Should detect password with no digit character in request', async () => {
             try {
-                const json = await jsonPost(ROUTE_REGISTER, {
+                await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
                         password:'aBcdefghijkl.',
                         sendCodeByEmail: false
@@ -148,7 +146,7 @@ describe('Test user registration', () => {
 
         it('Should detect password with no special character in request', async () => {
             try {
-                const json = await jsonPost(ROUTE_REGISTER, {
+                await jsonPost(ROUTE_REGISTER, {
                         email:'a@b.c',
                         password:'aBcdefghijkl9',
                         sendCodeByEmail: false
@@ -237,7 +235,7 @@ describe('Test user registration', () => {
 
         it('Try to access profile without being logged in', async () => {
             try {
-                const json = await jsonGet(ROUTE_PROFILE);
+                await jsonGet(ROUTE_PROFILE);
                 expect.fail('Profile access without being connected was not detected');
             }
             catch (error) {
@@ -248,7 +246,7 @@ describe('Test user registration', () => {
 
         it('Try to validate registration without code', async () => {
             try {
-                const json = await jsonPost(ROUTE_VALIDATE, {});
+                await jsonPost(ROUTE_VALIDATE, {});
                 expect.fail("Missing «code» parameter not detected");
             }
             catch (error) {
@@ -259,7 +257,7 @@ describe('Test user registration', () => {
 
         it('Try to validate registration with invalid code', async () => {
             try {
-                const json = await jsonPost(ROUTE_VALIDATE, { code: 'abcd' });
+                await jsonPost(ROUTE_VALIDATE, { code: 'abcd' });
                 expect.fail("Invalid «code» parameter not detected");
             }
             catch (error) {
@@ -270,7 +268,7 @@ describe('Test user registration', () => {
 
         it('Try to validate registration with too large code', async () => {
             try {
-                const json = await jsonPost(ROUTE_VALIDATE, { code: 1234567 });
+                await jsonPost(ROUTE_VALIDATE, { code: 1234567 });
                 expect.fail("Too large code not detected");
             }
             catch (error) {
@@ -577,7 +575,7 @@ describe('Test user registration', () => {
 
         it('Send validation code after code expiration', async () => {
             try {
-                const json = await jsonPost(ROUTE_VALIDATE, { code: authCode });
+                await jsonPost(ROUTE_VALIDATE, { code: authCode });
                 expect.fail("Code expiration was not detected");
             }
             catch (error) {
