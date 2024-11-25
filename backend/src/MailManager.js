@@ -48,17 +48,15 @@ class MailManager {
                 text: textBody, // plain text body
                 html: htmlBody
             }
-	console.log("dOm mail transport", transporter)
-	console.log("dOm mail options", mailOptions)
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error)  {
-			console.log("dOm erreur mail", error)
+			        console.log("Mail not sent: ", error)
                     resolve(`Mail not sent: ${error}`) // do not reject if an error occures
-		}
+		        }
                 else {
-			console.log("dOm mail succes")
+			        console.log("Mail sent")
                     resolve(`Message ${info.messageId} sent: ${info.response}`)
-		}
+		        }
             })
         })
     }
