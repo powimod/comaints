@@ -34,6 +34,9 @@ const main = async () => {
                     return `../${ns}/locales/${lng}.json`
                 return `./locales/${lng}.json`
             }
+        },
+        interpolation: {
+            escapeValue: false // disable conversion &lt;
         }
     })
     app.use(middleware.handle(i18next))
