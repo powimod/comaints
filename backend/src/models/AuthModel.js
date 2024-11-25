@@ -199,7 +199,7 @@ class AuthModel {
         assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
         const subject  = i18n_t('register.mail_title')
         const textBody = i18n_t('register.mail_body', { 'code' : code })
-        const htmlBody = i18n_t('register.mail_body', { 'code' : `<b>${code}</b>code` })
+        const htmlBody = i18n_t('register.mail_body', { 'code' : `<b>${code}</b>` })
         const mailManager = MailManagerSingleton.getInstance()
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
@@ -211,7 +211,7 @@ class AuthModel {
         assert(i18n_t    !== undefined && typeof(i18n_t)    === 'function')
         const subject  = i18n_t('change_email.mail_title')
         const textBody = i18n_t('change_email.mail_body', { 'code' : code })
-        const htmlBody = i18n_t('change_email.mail_body', { 'code' : `<b>${code}</b>code` })
+        const htmlBody = i18n_t('change_email.mail_body', { 'code' : `<b>${code}</b>` })
         const mailManager = MailManagerSingleton.getInstance()
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
@@ -222,7 +222,7 @@ class AuthModel {
         assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
         const subject  = i18n_t('account_deletion.mail_title')
         const textBody = i18n_t('account_deletion.mail_body', { 'code' : code })
-        const htmlBody = i18n_t('account_deletion.mail_body', { 'code' : `<b>${code}</b>code` })
+        const htmlBody = i18n_t('account_deletion.mail_body', { 'code' : `<b>${code}</b>` })
         const mailManager = MailManagerSingleton.getInstance()
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
@@ -233,7 +233,7 @@ class AuthModel {
         assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
         const subject  = i18n_t('unlock_account_email.mail_title')
         const textBody = i18n_t('unlock_account_email.mail_body', { 'code' : code })
-        const htmlBody = i18n_t('unlock_account_email.mail_body', { 'code' : `<b>${code}</b>code` })
+        const htmlBody = i18n_t('unlock_account_email.mail_body', { 'code' : `<b>${code}</b>` })
         const mailManager = MailManagerSingleton.getInstance()
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
@@ -244,7 +244,7 @@ class AuthModel {
         assert(i18n_t !== undefined && typeof(i18n_t) === 'function')
         const subject  = i18n_t('reset_password.mail_title')
         const textBody = i18n_t('reset_password.mail_body', { 'code' : code })
-        const htmlBody = i18n_t('reset_password.mail_body', { 'code' : `<b>${code}</b>code` })
+        const htmlBody = i18n_t('reset_password.mail_body', { 'code' : `<b>${code}</b>` })
         const mailManager = MailManagerSingleton.getInstance()
         return await mailManager.sendMail(email, subject, textBody, htmlBody)
     }
