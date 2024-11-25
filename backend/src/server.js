@@ -92,12 +92,14 @@ const main = async () => {
             password: adminPassword
         }
     }
+
     const mailConfig = {
         host: env.MAIL_SERVER_HOST || 'localhost',
         port: env.MAIL_SERVER_PORT || 25,
         user: env.MAIL_SERVER_USER || 'comaint',
         password: mailServerPassword,
         from: mailServerFrom,
+	    secure: env.MAIL_SECURE === 'true'
     }
 
     const mailManager = MailManagerModel.getInstance()

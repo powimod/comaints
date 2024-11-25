@@ -9,6 +9,7 @@ class MailManager {
     #user = null
     #password = null
     #from = null
+    #secure = null
 
     initialize(mailConfig) {
         const mailServerParameterNames = [ 'host', 'port', 'user', 'password', 'from']
@@ -21,6 +22,7 @@ class MailManager {
         this.#user = mailConfig.user
         this.#password = mailConfig.password
         this.#from = mailConfig.from
+        this.#secure = mailConfig.secure
     }
 
     sendMail(mailTo, subject, textBody, htmlBody) {
@@ -30,7 +32,7 @@ class MailManager {
             let transporter = nodeMailer.createTransport({
                 host: this.#host,
                 port: this.#port,
-                secure: false,
+                secure: this.#secure,
                 auth: {
                     user: this.#user,
                     pass: this.#password
@@ -46,11 +48,17 @@ class MailManager {
                 text: textBody, // plain text body
                 html: htmlBody
             }
+	console.log("dOm mail transport", transporter)
+	console.log("dOm mail options", mailOptions)
             transporter.sendMail(mailOptions, (error, info) => {
-                if (error) 
+                if (error)  {
+			console.log("dOm erreur mail", error)
                     resolve(`Mail not sent: ${error}`) // do not reject if an error occures
-                else
+		}
+                else {
+			console.log("dOm mail succes")
                     resolve(`Message ${info.messageId} sent: ${info.response}`)
+		}
             })
         })
     }
