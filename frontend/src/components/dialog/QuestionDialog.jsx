@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import CustomDialog from './CustomDialog';
 
 /**

@@ -1,8 +1,7 @@
 'use strict';
 import { expect } from 'chai';
-import assert from 'assert';
 
-import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb } from './util.js';
+import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb } from './util.js';
 import { createUserAccount, deleteUserAccount, connectWithAdminAccount } from './helpers.js';
 
 const ROUTE_CHECK_ADMIN = '/api/v1/admin/check-access';

@@ -46,7 +46,6 @@ import '../../scss/custom-dialog.scss';
 
 const CustomDialog = ({isOpen, onClose, className = '',  children}) => {
 
-	const [ dialogId, setDialogId ] = useState(parseInt(Math.random() * 1000));
 	const [ isDialogOpen, setDialogOpen ] = useState(false);
 	const dialogRef = useRef(null);
 
@@ -80,7 +79,7 @@ const CustomDialog = ({isOpen, onClose, className = '',  children}) => {
 
 
 	// onDialogClose is closed when Escape key is pressed or when dialog.close is called
-	const onDialogClose = (ev) => {
+	const onDialogClose = () => {
 		onClose();
 	};
 

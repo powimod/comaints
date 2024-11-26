@@ -58,6 +58,12 @@
         "zipCode": "Code postal",
         "country": "Pays"
     },
+    "title": {
+        "admin-home-page": "Administration",
+        "private-home-page": "Bienvenue",
+        "unit-page": "Unités",
+        "user-admin-page": "Administration des utilisateurs"
+    },
     "company-initialisation" : {
         "title": "Initialisation de la compagnie",
         "message": "Vous devez créer votre compagnie"

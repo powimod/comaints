@@ -3,10 +3,13 @@
 import assert from 'assert';
 import bcrypt from 'bcrypt';
 
-import { buildFieldArrays, controlObject, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs';
+import { buildFieldNameArray, buildFieldArrays, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs';
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs';
 import { AccountState } from '../../../common/src/global.mjs';
+
+const defaultResultPropertyList = [ 'id', 'email', 'firstname', 'lastname' ];
+const defaultOrderPropertyList = [ 'email' ];
 
 class UserModel {
     #db = null;
@@ -19,17 +22,57 @@ class UserModel {
         this.#hashSalt = parseInt(hashSalt);
     }
 
-    async findUserList() {
-        let sql = `SELECT * FROM users`;
-        const result = await this.#db.query(sql);
-        const userList = [];
-        for (let userRecord of result) {
-            const user = convertObjectFromDb(userObjectDef, userRecord);
-            userList.push(user);
-        }
-        return userList;
-    }
 
+    async findUserList(properties = null, filters = null, pagination = null) {
+        assert(this.#db !== null);
+        if (properties === null)
+            properties = defaultResultPropertyList;
+        if (!(properties instanceof Array))
+            throw new Error("Parameter «properties» is not an array");
+        if (typeof(filters) !== 'object')
+            throw new Error("Parameter «filters» is not an object");
+
+        const sqlFields = buildFieldNameArray(userObjectDef, properties);
+        if (sqlFields.length === 0)
+            throw new Error("No request properties found");
+
+        const [ fieldNames, fieldValues ] = buildFieldArrays(userObjectDef, filters);
+        const sqlWhere = fieldNames.length === 0 ? '' :
+            'WHERE ' + fieldNames.map(f => `${f} = ?`).join(' AND ');
+
+        const sortProperties = defaultOrderPropertyList;
+        const sortFieldNames = buildFieldNameArray(userObjectDef, sortProperties);
+        const sqlSort = sortFieldNames.map === 0 ? '' :
+            'ORDER BY ' + sortFieldNames.map(f => `${f}`).join(', ');
+
+        // get record counts
+        let sql = `SELECT COUNT(*) as count FROM users ${sqlWhere}`;
+        const result = await this.#db.query(sql, fieldValues);
+        let recordCount = result[0]['count'];
+
+        const userList = [];
+
+        // get record of selected page
+        if ( recordCount > 0 ) {
+            sql = `SELECT ${sqlFields} FROM users ${sqlWhere} ${sqlSort} LIMIT ? OFFSET ?`;
+            console.log("dOm sql", sql);
+            console.log("dOm params", fieldValues);
+            fieldValues.push(pagination.limit, pagination.offset);
+            const result = await this.#db.query(sql, fieldValues);
+
+            for (let userRecord of result) {
+                const user = convertObjectFromDb(userObjectDef, userRecord);
+                userList.push(user);
+            }
+        }
+
+        return {
+            userList,
+            page: pagination.page,
+            limit: pagination.limit,
+            count: recordCount
+        };
+    }
 
     async getUserById(userId) {
         if (userId === undefined)

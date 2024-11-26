@@ -58,6 +58,12 @@
         "zipCode": "Zip Code",
         "country": "Country"
     },
+    "title": {
+        "admin-home-page": "Administration",
+        "private-home-page": "Welcome",
+        "unit-page": "Units",
+        "user-admin-page": "Users administration"
+    },
     "company-initialisation" : {
         "title": "Company initialisation",
         "message": "You must create your company"

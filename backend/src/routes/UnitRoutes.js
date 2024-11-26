@@ -12,10 +12,9 @@ class UnitRoutes {
 
     initialize(expressApp) {
         const model  = ModelSingleton.getInstance();
-
         const unitModel = model.getUnitModel();
 
-        expressApp.get('/api/v1/unit/list', requireUserWithCompanyAuth, requestProperties, requestPagination, async (request) => {
+        expressApp.get('/api/v1/unit/list', requireUserWithCompanyAuth, requestProperties, requestPagination, async (request, _) => {
             const view = request.view;
             const properties = request.requestProperties;
             assert(properties !== undefined);
@@ -79,6 +78,9 @@ class UnitRoutes {
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam);
 
                 unit = await unitModel.createUnit(unit);
+
+                // TODO filter protected properties
+
                 view.json({unit});
             }
             catch(error) {

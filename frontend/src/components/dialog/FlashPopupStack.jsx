@@ -23,7 +23,7 @@ const FlashPopupStack = () => {
     };
 
     const _flashPopupStackClear = () => {
-        setMessageStack( (stack) =>  []);
+        setMessageStack( (_) =>  []);
     };
 
     useEffect( () => {
@@ -66,7 +66,7 @@ const FlashPopupStack = () => {
 };
 
 const useFlashPopupStack = () => {
-    const [ dialogState, dialogDispatch ] = useContext(DialogContext);
+    const [ _, dialogDispatch ] = useContext(DialogContext);
     const _keyRef = useRef(1);
 
     const add = ({message, duration = null, dismissible = false}) => {
@@ -79,7 +79,7 @@ const useFlashPopupStack = () => {
         dialogDispatch({type:'flash-remove', id});
     };
 
-    const clear = (id) => {
+    const clear = () => {
         dialogDispatch({type:'flash-clear'});
     };
 

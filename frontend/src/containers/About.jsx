@@ -8,7 +8,7 @@ import ComaintBackendApiSingleton from '../ComaintApi';
 
 import '../scss/about.scss';
 
-const About = (props) => {
+const About = () => {
 	const { t } = useTranslation();
     const comaintApi = ComaintBackendApiSingleton.getInstance();
     const [ backendVersion, setBackendVersion ] = useState('-');
