@@ -17,13 +17,11 @@ const UnitEditor = ({ id=null,  className='', onClose = null }) => {
     const bubbleMessage = useBubbleMessage();
     const standardDialog = useStandardDialog();
 
-    const [ error, setError ] = useState(null);
-    const [ editorMode, setEditorMode ] = useState(EditorToolbarModes.none);
-    const [ editorAction, setEditorAction ] = useState(EditorToolbarActions.none);
-    const { getSelectedUnit, editUnit, createUnit, deleteUnit } = useUnitActions();
-    const [ editedUnit, setEditedUnit ] = useState(null);
-
-    const selectedUnit = getSelectedUnit();
+    const [ error, setError ] = useState(null)
+    const [ editorMode, setEditorMode ] = useState(EditorToolbarModes.none)
+    const [ editorAction, setEditorAction ] = useState(EditorToolbarActions.none)
+    const { selectedUnit, editUnit, createUnit, deleteUnit } = useUnitActions()
+    const [ editedUnit, setEditedUnit ] = useState(null)
 
     useEffect( () => {
         setEditedUnit(selectedUnit);

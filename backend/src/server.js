@@ -34,6 +34,9 @@ const main = async () => {
                     return `../${ns}/locales/${lng}.json`;
                 return `./locales/${lng}.json`;
             }
+        },
+        interpolation: {
+            escapeValue: false // disable conversion &lt;
         }
     });
     app.use(middleware.handle(i18next));
@@ -91,14 +94,16 @@ const main = async () => {
             email: adminEmail,
             password: adminPassword
         }
-    };
+    }
+
     const mailConfig = {
         host: env.MAIL_SERVER_HOST || 'localhost',
         port: env.MAIL_SERVER_PORT || 25,
         user: env.MAIL_SERVER_USER || 'comaint',
         password: mailServerPassword,
         from: mailServerFrom,
-    };
+	    secure: env.MAIL_SECURE === 'true'
+    }
 
     const mailManager = MailManagerModel.getInstance();
     mailManager.initialize(mailConfig);
@@ -122,7 +127,7 @@ const main = async () => {
     const port = config.server.port;
     
     // use a Promise to transmit connection error to the main caller
-    const expressServer = await new Promise( (resolve, reject) => {
+    await new Promise( (resolve, reject) => {
         const server = app.listen(
             port, 
             () => { // success

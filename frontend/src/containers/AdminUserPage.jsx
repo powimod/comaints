@@ -2,25 +2,27 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import UnitEditor from '../components/UnitEditor';
+//import UserEditor from '../components/UserEditor';
 import PageNavigator from '../components/PageNavigator';
-import useUnitActions from '../actions/unitActions';
+import useUserActions from '../actions/userActions';
 import { useComaintContext } from '../ComaintContext';
 
 import '../scss/list-page.scss';
 
-const UnitPage = () => {
+const UserPage = () => {
     let { id } = useParams();
-    if (id === undefined) // no unit ID specified in URL path
-        id = null
-    const { t } = useTranslation()
-    const navigate = useNavigate()
-    const { comaintContext } = useComaintContext()
-    const { updateUnitList, selectedUnit, unitList, getUnitById } = useUnitActions()
-    const [ error, setError ] = useState(null)
-    const [ activeElement, setActiveElement ] = useState('list')
-    const componentInitializedRef = useRef(false)
+    if (id === undefined) // no user ID specified in URL path
+        id = null;
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const { comaintContext } = useComaintContext();
+    const { updateUserList, getSelectedUser, getUserList, getUserById } = useUserActions();
+    const userList = getUserList();
+    const [ error, setError ] = useState(null);
+    const [ activeElement, setActiveElement ] = useState('list');
+    const componentInitializedRef = useRef(false);
 
+    const selectedUser = getSelectedUser();
 
     useEffect(() => {
         if (comaintContext === null || comaintContext.connected === false)
@@ -32,12 +34,12 @@ const UnitPage = () => {
         if ( componentInitializedRef.current  === true)
             return;
         componentInitializedRef.current = true;
-        refreshUnitList();
+        refreshUserList();
     }, []);
 
-    const refreshUnitList = async (page = 1) => {
+    const refreshUserList = async (page = 1) => {
         try {
-            await updateUnitList(page);
+            await updateUserList(page);
         }
         catch (error) {
             setError(error.message);
@@ -45,27 +47,27 @@ const UnitPage = () => {
     };
 
     useEffect(() => {
-        const getUnit = async () => {
+        const getUser = async () => {
             try {
-                await getUnitById(id);
+                await getUserById(id);
             }
             catch (error) {
                 setError(error.message);
             }
         };
-        if (id === null) // no unit ID specified in URL
+        if (id === null) // no user ID specified in URL
             return;
-        if (selectedUnit === null || selectedUnit.id != id)
-            getUnit();
+        if (selectedUser === null || selectedUser.id != id)
+            getUser();
     }, [id]);
 
 
     useEffect( () => {
         // enlever l'ID de l'URL après une suppression
-        if (selectedUnit === null && id !== null)
-            navigate('/units');
+        if (selectedUser === null && id !== null)
+            navigate('/users');
 
-    }, [selectedUnit ]);
+    }, [selectedUser ]);
 
     useEffect( () => {
         const elElementList = document.getElementById('element-list');
@@ -88,48 +90,51 @@ const UnitPage = () => {
 
 
     const onPageNavigate = (action) => {
-        refreshUnitList(action.page);
+        refreshUserList(action.page);
     };
 
-    const onUnitLinkClick = () => {
+    const onUserLinkClick = () => {
         setActiveElement('editor');
     };
 
+    /*
     const onEditorClose = () => {
         setActiveElement(() => 'list');
     };
+    */
 
-    if ( unitList === null || unitList === undefined || unitList.list === null)
+    if ( userList === null || userList === undefined || userList.list === null)
         return <></>;
 
     return (<main className='list-page'>
                 <div id='element-list' className='list-container'>
-                    <h1>{t('page-title.unit')} (x{unitList.count})</h1>
+                    <h1>{t('page-title.user')} (x{userList.count})</h1>
                     <div>
                         { error !== null && <div className='error-message'>{error}</div>}
-                        {  unitList.list === undefined || unitList.list.length === 0 ?
+                        {  userList.list === undefined || userList.list.length === 0 ?
                             <div>{t('list-is-empty')}</div>
                             :
                             <>
                                 <ul>
-                                { unitList.list.map (unit =>
-                                        <li key={unit.id}>
-                                            <Link to={`/units/${unit.id}`} onClick={onUnitLinkClick }>
-                                                {unit.name}
+                                { userList.list.map (user =>
+                                        <li key={user.id}>
+                                            <Link to={`/users/${user.id}`} onClick={onUserLinkClick }>
+                                                {user.name}
                                             </Link>
                                         </li>
                                     )
                                 }
                                 </ul>
-                                <PageNavigator list={unitList} onPageNavigate={onPageNavigate}/>
+                                <PageNavigator list={userList} onPageNavigate={onPageNavigate}/>
                             </>
                         }
                     </div>
                 </div>
                 <div id='element-editor'>
-                    <UnitEditor onClose={onEditorClose}/>
+        {/*<UserEditor onClose={onEditorClose}/>*/}
                 </div>
             </main>);
 };
 
-export default UnitPage;
+
+export default UserPage;

@@ -4,11 +4,12 @@ import nodeMailer from 'nodemailer';
 
 class MailManager {
 
-    #host = null;
-    #port = null;
-    #user = null;
-    #password = null;
-    #from = null;
+    #host = null
+    #port = null
+    #user = null
+    #password = null
+    #from = null
+    #secure = null
 
     initialize(mailConfig) {
         const mailServerParameterNames = [ 'host', 'port', 'user', 'password', 'from'];
@@ -16,21 +17,22 @@ class MailManager {
             if (mailConfig[parameterName] === undefined)
                 throw new Error(`Parameter «${parameterName}» not defined in mail server configuration`);
         }
-        this.#host = mailConfig.host;
-        this.#port = mailConfig.port;
-        this.#user = mailConfig.user;
-        this.#password = mailConfig.password;
-        this.#from = mailConfig.from;
+        this.#host = mailConfig.host
+        this.#port = mailConfig.port
+        this.#user = mailConfig.user
+        this.#password = mailConfig.password
+        this.#from = mailConfig.from
+        this.#secure = mailConfig.secure
     }
 
     sendMail(mailTo, subject, textBody, htmlBody) {
         assert(this.#host !== null);
 
-        return new Promise( (resolve, reject) => {
+        return new Promise( (resolve) => {
             let transporter = nodeMailer.createTransport({
                 host: this.#host,
                 port: this.#port,
-                secure: false,
+                secure: this.#secure,
                 auth: {
                     user: this.#user,
                     pass: this.#password
@@ -47,12 +49,16 @@ class MailManager {
                 html: htmlBody
             };
             transporter.sendMail(mailOptions, (error, info) => {
-                if (error) 
-                    resolve(`Mail not sent: ${error}`); // do not reject if an error occures
-                else
-                    resolve(`Message ${info.messageId} sent: ${info.response}`);
-            });
-        });
+                if (error)  {
+			        console.log("Mail not sent: ", error)
+                    resolve(`Mail not sent: ${error}`) // do not reject if an error occures
+		        }
+                else {
+			        console.log("Mail sent")
+                    resolve(`Message ${info.messageId} sent: ${info.response}`)
+		        }
+            })
+        })
     }
 
 
