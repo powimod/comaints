@@ -149,18 +149,18 @@ const UnitEditor = ({ id=null,  className='', onClose = null }) => {
                             onChange={onFieldValueChange}
                         />
                     </div>
-                    <div className='input-container'>
+                   <div className='input-container'>
                         <label htmlFor='address'>{t('field.address')}</label>
-                        <input type='text' name='address' 
-                            value={editedUnit?.address||''} 
+                        <textarea name='address' 
+                            rows="3"
+                            value={editedUnit?.address||''}
                             onChange={onFieldValueChange}
                         />
                     </div>
                     <div className='input-container'>
                         <label htmlFor='city'>{t('field.city')}</label>
-                        <textarea name='city' 
-                            rows="3"
-                            value={editedUnit?.city||''}
+                        <input type='text' name='city' 
+                            value={editedUnit?.city||''} 
                             onChange={onFieldValueChange}
                         />
                     </div>
