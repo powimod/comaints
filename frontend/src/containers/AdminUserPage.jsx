@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-//import UserEditor from '../components/UserEditor';
+import AdminUserEditor from '../components/AdminUserEditor';
 import PageNavigator from '../components/PageNavigator';
 import useUserActions from '../actions/userActions';
 import { useComaintContext } from '../ComaintContext';
@@ -16,13 +16,11 @@ const UserPage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { comaintContext } = useComaintContext();
-    const { updateUserList, getSelectedUser, getUserList, getUserById } = useUserActions();
-    const userList = getUserList();
+    const { updateUserList, selectedUser, userList, getUserById } = useUserActions();
     const [ error, setError ] = useState(null);
     const [ activeElement, setActiveElement ] = useState('list');
     const componentInitializedRef = useRef(false);
 
-    const selectedUser = getSelectedUser();
 
     useEffect(() => {
         if (comaintContext === null || comaintContext.connected === false)
@@ -65,7 +63,7 @@ const UserPage = () => {
     useEffect( () => {
         // enlever l'ID de l'URL après une suppression
         if (selectedUser === null && id !== null)
-            navigate('/users');
+            navigate('/admin/users');
 
     }, [selectedUser ]);
 
@@ -97,11 +95,9 @@ const UserPage = () => {
         setActiveElement('editor');
     };
 
-    /*
     const onEditorClose = () => {
         setActiveElement(() => 'list');
     };
-    */
 
     if ( userList === null || userList === undefined || userList.list === null)
         return <></>;
@@ -118,8 +114,8 @@ const UserPage = () => {
                                 <ul>
                                 { userList.list.map (user =>
                                         <li key={user.id}>
-                                            <Link to={`/users/${user.id}`} onClick={onUserLinkClick }>
-                                                {user.name}
+                                            <Link to={`/admin/users/${user.id}`} onClick={onUserLinkClick}>
+                                                {user.email}
                                             </Link>
                                         </li>
                                     )
@@ -131,7 +127,7 @@ const UserPage = () => {
                     </div>
                 </div>
                 <div id='element-editor'>
-        {/*<UserEditor onClose={onEditorClose}/>*/}
+                    <AdminUserEditor onClose={onEditorClose}/>
                 </div>
             </main>);
 };

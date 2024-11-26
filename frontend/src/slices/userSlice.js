@@ -21,9 +21,10 @@ const getUserByIdThunk = createAsyncThunk(
     async ({ userId }, { rejectWithValue }) => {
         const comaintApi = ComaintBackendApiSingleton.getInstance();
         try {
-            return await comaintApi.user.getUserById(userId);
+            return  await comaintApi.user.getUserById(userId);
         }
         catch (error) {
+            console.log("error", error.message);
             return rejectWithValue(error.message);
         }
     }

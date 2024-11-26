@@ -21,10 +21,10 @@ const createRouter = () => {
             errorElement: <ErrorPage />,
             children: [
                 { index:true                 , element:<Home/> },
-                { path: '/units'             , element:<UnitPage/> },
                 { path: '/admin/users'       , element:<AdminUserPage/> },
                 { path: '/admin/users/:id'   , element:<AdminUserPage/> },
                 { path: '/units/:id'         , element:<UnitPage/> },
+                { path: '/units'             , element:<UnitPage/> },
                 { path: '/forgotten-password', element:<ForgottenPasswordPage/> },
                 { path: '/about'             , element:<About/> },
                 { path: '/contact-us'        , element:<ContactUs/> },

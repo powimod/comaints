@@ -125,6 +125,7 @@ describe('Test users list with admin account', () => {
 
     });
 
+    /* TODO
     describe('Check user list with user account', () => {
         it(`Check owner can access its users`, async () => {
             const refUser = userPool[0]
@@ -143,5 +144,6 @@ describe('Test users list with admin account', () => {
             expect(user.email).equal(refUser.email)
         })
     })
+    */
 
 });

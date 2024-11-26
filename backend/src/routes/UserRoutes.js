@@ -2,7 +2,7 @@
 import assert from 'assert'
 
 import ModelSingleton from '../model.js';
-import { requireUserWithCompanyAuth, requestPagination, requestFilters, requestProperties } from './middleware.js';
+import { requireAdminAuth, requestPagination, requestFilters, requestProperties } from './middleware.js';
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 
 import { controlObject } from '../../../common/src/objects/object-util.mjs';
@@ -15,7 +15,7 @@ class UserRoutes {
         
         const userModel = model.getUserModel();
 
-        expressApp.get('/api/v1/user/list', requireUserWithCompanyAuth, requestProperties, requestPagination, async (request, _) => {
+        expressApp.get('/api/v1/user/list', requireAdminAuth, requestProperties, requestPagination, async (request, _) => {
             const view = request.view;
             const properties = request.requestProperties;
             assert(properties !== undefined);
@@ -38,7 +38,7 @@ class UserRoutes {
 
 
         // TODO ajouter withAuth
-        expressApp.post('/api/v1/user', requireUserWithCompanyAuth, async (request, _) => {
+        expressApp.post('/api/v1/user', requireAdminAuth, async (request, _) => {
             const view = request.view;
             try {
                 if (request.isAdministrator === false && request.companyId === null)
@@ -76,7 +76,7 @@ class UserRoutes {
             }
         });
 
-        expressApp.get('/api/v1/user/:id', requireUserWithCompanyAuth, async (request) => {
+        expressApp.get('/api/v1/user/:id', requireAdminAuth, async (request) => {
             const userId = request.params.id;
             const view = request.view;
             try {
@@ -93,7 +93,7 @@ class UserRoutes {
             }
         });
 
-        expressApp.post('/api/v1/user/:id', requireUserWithCompanyAuth, async (request) => {
+        expressApp.post('/api/v1/user/:id', requireAdminAuth, async (request) => {
             assert(request.userId);
             assert(request.companyId);
             const view = request.view;
@@ -128,7 +128,7 @@ class UserRoutes {
             }
         });
 
-        expressApp.delete('/api/v1/user/:id/delete', requireUserWithCompanyAuth, async (request) => {
+        expressApp.delete('/api/v1/user/:id/delete', requireAdminAuth, async (request) => {
             assert(request.userId);
             assert(request.companyId);
             const view = request.view;

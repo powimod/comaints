@@ -6,16 +6,8 @@ import { ComaintTranslatedError } from '@common/error.mjs';
 
 const useUserActions = () => {
     const dispatch = useDispatch();
-    const selectedUserState = useSelector((state) => state.user.selectedUser);
-    const userListState = useSelector((state) => state.user.userList);
-
-    const getSelectedUser = () => {
-        return selectedUserState;
-    };
-
-    const getUserList = () => {
-        return userListState;
-    };
+    const selectedUser = useSelector((state) => state.user.selectedUser);
+    const userList = useSelector((state) => state.user.userList);
 
     const createUser = async (user) => {
         const [ errorMsg, errorParams ] = (controlObject(userObjectDef, user, {fullCheck:false}));
@@ -65,7 +57,8 @@ const useUserActions = () => {
 
     const getUserById = async (userId) => {
         try {
-            return await dispatch(getUserByIdThunk({userId})).unwrap();
+            const user = await dispatch(getUserByIdThunk({userId})).unwrap();
+            return user;
         }
         catch (errorMessage) {
             throw new Error(errorMessage);
@@ -73,13 +66,13 @@ const useUserActions = () => {
     };
 
     return {
-        getSelectedUser,
+        selectedUser,
+        userList,
         createUser,
         editUser,
         deleteUser,
         updateUserList,
         getUserById,
-        getUserList
     };
 };
 
