@@ -16,13 +16,11 @@ const UnitPage = () => {
     const { t } = useTranslation()
     const navigate = useNavigate()
     const { comaintContext } = useComaintContext()
-    const { updateUnitList, getSelectedUnit, getUnitList, getUnitById } = useUnitActions()
-    const unitList = getUnitList()
+    const { updateUnitList, selectedUnit, unitList, getUnitById } = useUnitActions()
     const [ error, setError ] = useState(null)
     const [ activeElement, setActiveElement ] = useState('list')
     const componentInitializedRef = useRef(false)
 
-    const selectedUnit = getSelectedUnit()
 
     useEffect(() => {
         if (comaintContext === null || comaintContext.connected === false)

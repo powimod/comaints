@@ -6,16 +6,8 @@ import { ComaintTranslatedError } from '@common/error.mjs'
 
 const useUnitActions = () => {
     const dispatch = useDispatch()
-    const selectedUnitState = useSelector((state) => state.unit.selectedUnit)
-    const unitListState = useSelector((state) => state.unit.unitList)
-
-    const getSelectedUnit = () => {
-        return selectedUnitState
-    }
-
-    const getUnitList = () => {
-        return unitListState
-    }
+    const unitList = useSelector((state) => state.unit.unitList);
+    const selectedUnit = useSelector((state) => state.unit.selectedUnit);
 
     const createUnit = async (unit) => {
         const [ errorMsg, errorParams ] = (controlObject(unitObjectDef, unit, {fullCheck:false}))
@@ -73,15 +65,16 @@ const useUnitActions = () => {
     }
 
     return {
-        getSelectedUnit,
+        selectedUnit,
+        unitList,
         createUnit,
         editUnit,
         deleteUnit,
         updateUnitList,
         getUnitById,
-        getUnitList
     }
 }
+
 
 export default useUnitActions
 
