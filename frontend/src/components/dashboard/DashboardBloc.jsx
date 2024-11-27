@@ -4,7 +4,6 @@ import StockIcon from '../StockIcon'
 
 import '../../scss/dashboard.scss'
 
-
 const DashboardBloc = ({label, data = null, icon = '', onClick = null, className}) => {
 	const { t } = useTranslation();
 
@@ -36,7 +35,7 @@ const DashboardBloc = ({label, data = null, icon = '', onClick = null, className
 			<StockIcon icon={icon} size="large"/>
 			<span>{t(label)}</span>
 			<div className={valueClass}>{value}</div>
-			<button>☰</button>
+            { onClick !== null && <button>☰</button> }
 		</span>)
 }
 
