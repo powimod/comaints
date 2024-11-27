@@ -101,8 +101,6 @@
         "empty-firstname": "Firstname can not be empty",
         "empty-lastname": "Lastname can not be empty"
     },
-
-
     "forgotten_password" : {
         "title": "Forgotten password",
         "step_1": "First step",
@@ -114,5 +112,23 @@
         "confirm_password_field": "Confirm password",
         "send_code_message": "Please enter the validation code that was sent to your email address",
         "password_changed_message": "Your password has been changed"
-    }
+    },
+	"dashboard": {
+		"label": {
+			"parc": "Parc",
+			"stock": "Stock"
+		},
+		"bloc": {
+			"company": "Company",
+			"family": "Family",
+			"type": "Type",
+			"unit": "Unit",
+			"section": "Section",
+			"category": "Category",
+			"subcategory": "Subcategory",
+			"equipment": "Equipment",
+			"nomenclature": "Nomenclature",
+			"article": "Article"
+		}
+	}
 }

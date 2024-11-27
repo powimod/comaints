@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+import ParcDashboard from './dashboard/ParcDashboard';
 import { useComaintContext } from '../ComaintContext';
 import CompanyInitialisation from './CompanyInitialisation';
 
@@ -16,6 +17,7 @@ const PrivateHomeContent = () => {
             <ul>
                 <li><Link to='/units'>{t('title.unit-page')}</Link></li>
             </ul>
+            <ParcDashboard/>
         </>);
 };
 export default PrivateHomeContent; 
