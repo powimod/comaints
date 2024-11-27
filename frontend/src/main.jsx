@@ -5,7 +5,6 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
 import './i18n.js';
 
-
 import DialogProvider from  './components/dialog/DialogContext.jsx';
 import ComaintContextProvider from './ComaintContext.jsx';
 
@@ -14,6 +13,7 @@ import createRouter from './router';
 
 const Main = () => {
     const store = initializeStore();
+
     return (
         <StrictMode>
             <ComaintContextProvider>

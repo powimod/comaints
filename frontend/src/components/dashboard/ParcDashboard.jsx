@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import ParcUnitBloc from './ParcUnitBloc'
 import ParcSectionBloc from './ParcSectionBloc'
 import ParcEquipmentBloc from './ParcEquipmentBloc'
@@ -5,8 +7,14 @@ import ParcFamilyBloc from './ParcFamilyBloc'
 import ParcTypeBloc from './ParcTypeBloc'
 
 import DashboardArrow from './DashboardArrow'
+import useUnitActions from '../../actions/unitActions';
 
 const MainDashboard = () => {
+
+    const { updateUnitList } = useUnitActions()
+    useEffect( () => {
+        updateUnitList()
+    }, [])
 
 	return (<>
 		<div className="dashboard parc-dashboard">
