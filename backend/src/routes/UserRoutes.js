@@ -1,7 +1,7 @@
 'use strict';
 import assert from 'assert'
 
-import ModelSingleton from '../models/model.js';
+import UserController from '../controllers/UserController.js';
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 
 import requireAdminAuthMiddleware from '../middlewares/requireAdminAuthMiddleware.js';
@@ -18,9 +18,7 @@ import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 class UserRoutes {
 
     initialize(expressApp) {
-        const model  = ModelSingleton.getInstance();
-        
-        const userModel = model.getUserModel();
+        const userController = UserController.getInstance();
 
         expressApp.get('/api/v1/user/list', requireAdminAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, _) => {
             const view = request.view;
@@ -34,17 +32,11 @@ class UserRoutes {
             if (request.companyId !== null)
                 filters.companyId = request.companyId;
 
-            try {
-                const result = await userModel.findUserList(properties, filters, pagination);
-                view.json(result);
-            }
-            catch(error) {
-                view.error(error);
-            }
+            await userController.findUserList(properties, filters, pagination, view);
         });
 
 
-        // TODO ajouter withAuth
+        // user create route
         expressApp.post('/api/v1/user', requireAdminAuthMiddleware, async (request, _) => {
             const view = request.view;
             try {
@@ -56,50 +48,23 @@ class UserRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'user'});
                 if (typeof(user) !== 'object')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'user'});
-                const [ errorMsg, errorParam ] = controlObject(userObjectDef, user, { fullCheck:true, checkId:false });
-                if (errorMsg)
-                    throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam);
 
-                // for non admin users, force user company ID
-                if (request.companyId !== null)
-                    unit.companyId = request.companyId
-
-                // delete protected properties
-                delete user.companyId;
-                delete user.password;
-                delete user.state;
-                delete user.lastUse;
-                delete user.authAction;
-                delete user.authData;
-                delete user.authCode;
-                delete user.authExpiration;
-                delete user.authAttempts;
-
-                user = await userModel.createUser(user);
-                view.json(user);
+                await userController.createUser(user, view);
             }
             catch(error) {
                 view.error(error);
             }
         });
 
+        // get user by ID route
         expressApp.get('/api/v1/user/:id', requireAdminAuthMiddleware, async (request) => {
             const userId = request.params.id;
+            assert(request.userId);
             const view = request.view;
-            try {
-                assert(request.userId);
-                let user = await userModel.getUserById(userId);
-
-                // silently ignore tentative to access not owned user
-                if (user !== null && request.isAdministrator === false && user.companyId !== request.companyId)
-                    user = null;
-                view.json({user});
-            }
-            catch(error) {
-                view.error(error);
-            }
+            userController.getUserById(userId, view);
         });
 
+        // edit user route
         expressApp.post('/api/v1/user/:id', requireAdminAuthMiddleware, async (request) => {
             assert(request.userId);
             assert(request.companyId);
@@ -123,18 +88,16 @@ class UserRoutes {
                 if (user.companyId !== request.companyId)
                     throw new ComaintApiErrorUnauthorized('error.not_owner');
 
-                const [ errorMsg, errorParam ] = controlObject(userObjectDef, user, { fullCheck:true, checkId:false });
-                if (errorMsg)
-                    throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam);
-
-                user = await userModel.editUser(user);
-                view.json({user});
+                await userController.editUser(user, view, unit => (
+                    request.isAdministrator === true || user.companyId === request.companyId
+                ));
             }
             catch(error) {
                 view.error(error);
             }
         });
 
+        // delete user route
         expressApp.delete('/api/v1/user/:id/delete', requireAdminAuthMiddleware, async (request) => {
             assert(request.userId);
             assert(request.companyId);
@@ -145,16 +108,9 @@ class UserRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'id'});
                 userId = parseInt(userId);
 
-                let user = await userModel.getUserById(userId);
-                if (user === null)
-                    throw new ComaintApiErrorUnauthorized('error.not_found');
-
-                if (user.companyId !== request.companyId)
-                    throw new ComaintApiErrorUnauthorized('error.not_owner');
-                user = null;
-
-                const deleted = await userModel.deleteUserById(userId);
-                view.json({deleted});
+                const deleted = await userController.deleteUserById(userId, view, user => (
+                    request.isAdministrator === true || user.companyId === request.companyId
+                ));
             }
             catch(error) {
                 view.error(error);

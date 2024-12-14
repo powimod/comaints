@@ -83,16 +83,11 @@ class UnitRoutes {
         // get unit by ID route
         expressApp.get('/api/v1/unit/:id', requireUserWithCompanyAuthMiddleware, async (request) => {
             const unitId = request.params.id;
+            assert(request.userId);
             const view = request.view;
-            try {
-                assert(request.userId);
-                unitController.getUnitById(unitId, view, unit => (
-                    request.isAdministrator === true || unit.companyId === request.companyId
-                ));
-            }
-            catch(error) {
-                view.error(error);
-            }
+            unitController.getUnitById(unitId, view, unit => (
+                request.isAdministrator === true || unit.companyId === request.companyId
+            ));
         });
 
         // edit unit route
