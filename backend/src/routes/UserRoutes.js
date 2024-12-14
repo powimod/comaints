@@ -1,7 +1,7 @@
 'use strict';
 import assert from 'assert'
 
-import ModelSingleton from '../model.js';
+import ModelSingleton from '../models/model.js';
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 
 import requireAdminAuthMiddleware from '../middlewares/requireAdminAuthMiddleware.js';

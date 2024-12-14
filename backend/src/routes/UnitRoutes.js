@@ -1,7 +1,7 @@
 'use strict';
 import assert from 'assert';
 
-import ModelSingleton from '../model.js';
+import ModelSingleton from '../models/model.js';
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
 import { controlObject } from '../../../common/src/objects/object-util.mjs';
 import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs';

@@ -1,7 +1,7 @@
 'use strict';
 
 import assert from 'assert';
-import ModelSingleton from '../model.js';
+import ModelSingleton from './model.js';
 
 import { ComaintApiError } from '../../../common/src/error.mjs';
 import { AccountState } from '../../../common/src/global.mjs';

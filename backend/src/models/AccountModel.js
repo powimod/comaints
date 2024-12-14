@@ -1,6 +1,6 @@
 'use strict';
 
-import ModelSingleton from '../model.js';
+import ModelSingleton from './model.js';
 
 class AccountModel {
     #userModel = null;

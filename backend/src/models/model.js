@@ -2,14 +2,14 @@
 
 import mysql from 'promise-mysql';
 
-import { sleep } from './util.js';
-import CompanyModelSingleton  from './models/CompanyModel.js';
-import UserModelSingleton     from './models/UserModel.js';
-import AccountModelSingleton  from './models/AccountModel.js';
-import TokenModelSingleton    from './models/TokenModel.js';
-import AuthModelSingleton     from './models/AuthModel.js';
-import UnitModelSingleton     from './models/UnitModel.js';
-import { AccountState } from '../../common/src/global.mjs';
+import { sleep } from '../util.js';
+import CompanyModelSingleton  from './CompanyModel.js';
+import UserModelSingleton     from './UserModel.js';
+import AccountModelSingleton  from './AccountModel.js';
+import TokenModelSingleton    from './TokenModel.js';
+import AuthModelSingleton     from './AuthModel.js';
+import UnitModelSingleton     from './UnitModel.js';
+import { AccountState } from '../../../common/src/global.mjs';
 
 class Model {
     #dbPool = null;

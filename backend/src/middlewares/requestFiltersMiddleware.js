@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import ModelSingleton from '../model.js';
+import ModelSingleton from '../models/model.js';
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
 
 const requestFiltersMiddleware = (request, _, next) => {

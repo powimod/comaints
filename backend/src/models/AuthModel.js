@@ -3,7 +3,7 @@
 import assert from 'assert';
 import jwt from 'jsonwebtoken';
 
-import ModelSingleton from '../model.js';
+import ModelSingleton from './model.js';
 
 import { ComaintApiError, ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized,
     ComaintApiErrorInvalidToken, ComaintApiErrorExpiredToken  } from '../../../common/src/error.mjs';

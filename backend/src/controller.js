@@ -1,6 +1,6 @@
 'use strict';
 
-import ModelSingleton from './model.js';
+import ModelSingleton from './models/model.js';
 import View from './view.js';
 import { ComaintApiErrorInvalidRequest } from '../../common/src/error.mjs';
 

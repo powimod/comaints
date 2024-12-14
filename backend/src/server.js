@@ -10,7 +10,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import MailManagerModel from './MailManager.js';
-import ModelSingleton from './model.js';
+import ModelSingleton from './models/model.js';
 import ControllerSingleton from './controller.js';
 import View from './view.js';
 
