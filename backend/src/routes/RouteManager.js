@@ -4,6 +4,7 @@ import ModelSingleton from '../models/model.js';
 import View from '../view.js';
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 
+import initializeViewMiddleware  from '../middlewares/initializeViewMiddleware.js';
 import GlobalRoutesSingleton  from '../routes/GlobalRoutes.js';
 import AuthRoutesSingleton    from '../routes/AuthRoutes.js';
 import AccountRoutesSingleton from '../routes/AccountRoutes.js';
@@ -42,11 +43,7 @@ class RouteManager {
     async initializeRoutes(config, expressApp) {
 
         // Express middleware to initialize a View instance associated with the request
-        expressApp.use( async (request, response, next) => {
-            const view = new View(request, response);
-            request.view = view;
-            next();
-        });
+        expressApp.use(initializeViewMiddleware);
 
 	    const model  = ModelSingleton.getInstance();
 
