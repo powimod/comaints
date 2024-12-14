@@ -16,7 +16,7 @@ class AuthRoutes {
 
         const authModel = model.getAuthModel();
 
-        const _renewTokens = async(refreshToken, view) => {
+        const _renewTokensMiddleware = async(refreshToken, view) => {
             if (typeof(refreshToken) !== 'string')
                 throw new Error('Invalid refresh token');
             let tokenFoundInDatabase, tokenId, userId, connected, companyId, administrator;
@@ -82,7 +82,7 @@ class AuthRoutes {
                 console.log(`Token middleware - refresh token found -> renew tokens`);
                 try {
                     let newAccessToken, newRefreshToken;
-                    [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken, administrator ] = await _renewTokens(refreshToken, view);
+                    [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken, administrator ] = await _renewTokensMiddleware(refreshToken, view);
                     view.storeRenewedTokens(newAccessToken, newRefreshToken);
                 }
                 catch (error) {
@@ -423,7 +423,7 @@ class AuthRoutes {
                 if (typeof(refreshToken) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'token'});
 
-                const [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken ] = await _renewTokens(refreshToken, view);
+                const [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken ] = await _renewTokensMiddleware(refreshToken, view);
 
                 console.log(`auth/refresh - send new tokens userId ${userId}`);
                 view.storeRenewedTokens(newAccessToken, newRefreshToken);

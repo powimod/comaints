@@ -2,7 +2,7 @@
 
 import assert from 'assert';
 
-import { requireAdminAuth } from './middleware.js';
+import requireAdminAuthMiddleware from '../middlewares/requireAdminAuthMiddleware.js';
 import View from '../view.js';
 import ModelSingleton from '../model.js';
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs';
@@ -16,7 +16,7 @@ class AdminRoutes {
 
         const userModel = model.getUserModel();
 
-        expressApp.get('/api/v1/admin/check-access', requireAdminAuth, async (request, response) => {
+        expressApp.get('/api/v1/admin/check-access', requireAdminAuthMiddleware, async (request, response) => {
             const view = request.view;
             try {
                 view.json({ message: "This is an administrator account"});

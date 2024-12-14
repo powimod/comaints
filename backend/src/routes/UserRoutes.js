@@ -2,8 +2,15 @@
 import assert from 'assert'
 
 import ModelSingleton from '../model.js';
-import { requireAdminAuth, requestPagination, requestFilters, requestProperties } from './middleware.js';
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
+
+import requireAdminAuthMiddleware from '../middlewares/requireAdminAuthMiddleware.js';
+import requireUserAuthMiddleware from '../middlewares/requireUserAuthMiddleware.js';
+import renewTokensMiddleware from '../middlewares/renewTokensMiddleware.js';
+import renewContextMiddleware from '../middlewares/renewContextMiddleware.js';
+import requestPaginationMiddleware from '../middlewares/requestPaginationMiddleware.js';
+import requestFiltersMiddleware from '../middlewares/requestFiltersMiddleware.js';
+import requestPropertiesMiddleware from '../middlewares/requestPropertiesMiddleware.js';
 
 import { controlObject } from '../../../common/src/objects/object-util.mjs';
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
@@ -15,7 +22,7 @@ class UserRoutes {
         
         const userModel = model.getUserModel();
 
-        expressApp.get('/api/v1/user/list', requireAdminAuth, requestProperties, requestPagination, async (request, _) => {
+        expressApp.get('/api/v1/user/list', requireAdminAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, _) => {
             const view = request.view;
             const properties = request.requestProperties;
             assert(properties !== undefined);
@@ -38,7 +45,7 @@ class UserRoutes {
 
 
         // TODO ajouter withAuth
-        expressApp.post('/api/v1/user', requireAdminAuth, async (request, _) => {
+        expressApp.post('/api/v1/user', requireAdminAuthMiddleware, async (request, _) => {
             const view = request.view;
             try {
                 if (request.isAdministrator === false && request.companyId === null)
@@ -76,7 +83,7 @@ class UserRoutes {
             }
         });
 
-        expressApp.get('/api/v1/user/:id', requireAdminAuth, async (request) => {
+        expressApp.get('/api/v1/user/:id', requireAdminAuthMiddleware, async (request) => {
             const userId = request.params.id;
             const view = request.view;
             try {
@@ -93,7 +100,7 @@ class UserRoutes {
             }
         });
 
-        expressApp.post('/api/v1/user/:id', requireAdminAuth, async (request) => {
+        expressApp.post('/api/v1/user/:id', requireAdminAuthMiddleware, async (request) => {
             assert(request.userId);
             assert(request.companyId);
             const view = request.view;
@@ -128,7 +135,7 @@ class UserRoutes {
             }
         });
 
-        expressApp.delete('/api/v1/user/:id/delete', requireAdminAuth, async (request) => {
+        expressApp.delete('/api/v1/user/:id/delete', requireAdminAuthMiddleware, async (request) => {
             assert(request.userId);
             assert(request.companyId);
             const view = request.view;

@@ -4,7 +4,11 @@ import assert from 'assert';
 import View from '../view.js';
 import ModelSingleton from '../model.js';
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
-import { requireAdminAuth, requireUserAuth, renewTokens, renewContext } from './middleware.js';
+
+import requireAdminAuthMiddleware from '../middlewares/requireAdminAuthMiddleware.js';
+import requireUserAuthMiddleware from '../middlewares/requireUserAuthMiddleware.js';
+import renewTokensMiddleware from '../middlewares/renewTokensMiddleware.js';
+import renewContextMiddleware from '../middlewares/renewContextMiddleware.js';
 
 import { controlObject, controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs';
 import companyObjectDef from '../../../common/src/objects/company-object-def.mjs';
@@ -17,13 +21,13 @@ class CompanyRoutes {
         const companyModel = model.getCompanyModel();
         const userModel = model.getUserModel();
 
-	    expressApp.get('/api/v1/company/list', requireAdminAuth, async (request, response) => {
+	    expressApp.get('/api/v1/company/list', requireAdminAuthMiddleware, async (request, response) => {
             const view = request.view;
 			const companyList = await companyModel.findCompanyList();
             view.json({ companyList });
         });
 
-        expressApp.post('/api/v1/company', requireAdminAuth, async (request, response) => {
+        expressApp.post('/api/v1/company', requireAdminAuthMiddleware, async (request, response) => {
             const view = request.view;
             try {
                 let company = request.body.company;
@@ -42,7 +46,7 @@ class CompanyRoutes {
             }
         });
 
-        expressApp.post('/api/v1/company/initialize', requireUserAuth, async (request, response) => {
+        expressApp.post('/api/v1/company/initialize', requireUserAuthMiddleware, async (request, response) => {
             const view = request.view;
             try {
                 assert(request.userId);
@@ -73,8 +77,8 @@ class CompanyRoutes {
                 user = await userModel.editUser(user);
 
                 request.companyId = company.id;
-                await renewTokens(request);
-                await renewContext(request, user);
+                await renewTokensMiddleware(request);
+                await renewContextMiddleware(request, user);
 
                 company = buildPublicObjectVersion(companyObjectDef, company);
                 view.json({company});

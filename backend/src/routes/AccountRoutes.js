@@ -4,7 +4,7 @@ import assert from 'assert';
 
 import View from '../view.js';
 import ModelSingleton from '../model.js';
-import { requireUserAuth } from './middleware.js';
+import requireUserAuthMiddleware from '../middlewares/requireUserAuthMiddleware.js';
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs';
 import { controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs';
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
@@ -16,7 +16,7 @@ class AccountRoutes {
 
         const accountModel = model.getAccountModel();
 
-        expressApp.get('/api/v1/account/profile', requireUserAuth, async (request, response) => {
+        expressApp.get('/api/v1/account/profile', requireUserAuthMiddleware, async (request, response) => {
             const view = request.view;
             try {
                 const userId = request.userId;
@@ -30,7 +30,7 @@ class AccountRoutes {
             }
         });
 
-        expressApp.post('/api/v1/account/change-password', requireUserAuth, async (request, response) => {
+        expressApp.post('/api/v1/account/change-password', requireUserAuthMiddleware, async (request, response) => {
             const view = request.view;
             try {
                 const userId = request.userId;
@@ -74,7 +74,7 @@ class AccountRoutes {
         });
 
 
-        expressApp.post('/api/v1/account/change-email', requireUserAuth, async (request, response) => {
+        expressApp.post('/api/v1/account/change-email', requireUserAuthMiddleware, async (request, response) => {
             const view = request.view;
             try {
                 const userId = request.userId;
@@ -128,7 +128,7 @@ class AccountRoutes {
             }
         });
 
-        expressApp.post('/api/v1/account/delete', requireUserAuth, async (request, _) => {
+        expressApp.post('/api/v1/account/delete', requireUserAuthMiddleware, async (request, _) => {
             const view = request.view;
             try {
                 const userId = request.userId;
@@ -166,7 +166,7 @@ class AccountRoutes {
             }
         });
 
-        expressApp.post('/api/v1/account/unlock', requireUserAuth, async (request, _) => {
+        expressApp.post('/api/v1/account/unlock', requireUserAuthMiddleware, async (request, _) => {
             const view = request.view;
             try {
                 const userId = request.userId;

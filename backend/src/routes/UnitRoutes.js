@@ -2,11 +2,18 @@
 import assert from 'assert';
 
 import ModelSingleton from '../model.js';
-import { requireUserWithCompanyAuth, requestPagination, requestFilters, requestProperties } from './middleware.js';
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
 import { controlObject } from '../../../common/src/objects/object-util.mjs';
 import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs';
 
+import requireUserWithCompanyAuthMiddleware from '../middlewares/requireUserWithCompanyAuthMiddleware.js';
+import requireAdminAuthMiddleware from '../middlewares/requireAdminAuthMiddleware.js';
+import requireUserAuthMiddleware from '../middlewares/requireUserAuthMiddleware.js';
+import renewTokensMiddleware from '../middlewares/renewTokensMiddleware.js';
+import renewContextMiddleware from '../middlewares/renewContextMiddleware.js';
+import requestPaginationMiddleware from '../middlewares/requestPaginationMiddleware.js';
+import requestFiltersMiddleware from '../middlewares/requestFiltersMiddleware.js';
+import requestPropertiesMiddleware from '../middlewares/requestPropertiesMiddleware.js';
 
 class UnitRoutes {
 
@@ -14,7 +21,7 @@ class UnitRoutes {
         const model  = ModelSingleton.getInstance();
         const unitModel = model.getUnitModel();
 
-        expressApp.get('/api/v1/unit/list', requireUserWithCompanyAuth, requestProperties, requestPagination, async (request, _) => {
+        expressApp.get('/api/v1/unit/list', requireUserWithCompanyAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, _) => {
             const view = request.view;
             const properties = request.requestProperties;
             assert(properties !== undefined);
@@ -35,7 +42,7 @@ class UnitRoutes {
             }
         });
 
-        expressApp.post('/api/v1/unit/search', requireUserWithCompanyAuth, requestProperties, requestFilters, requestPagination,  async (request) => {
+        expressApp.post('/api/v1/unit/search', requireUserWithCompanyAuthMiddleware, requestPropertiesMiddleware, requestFiltersMiddleware, requestPaginationMiddleware,  async (request) => {
             const view = request.view;
             const properties = request.requestProperties;
             assert(properties !== undefined);
@@ -57,7 +64,7 @@ class UnitRoutes {
             }
         });
 
-        expressApp.post('/api/v1/unit', requireUserWithCompanyAuth, async (request) => {
+        expressApp.post('/api/v1/unit', requireUserWithCompanyAuthMiddleware, async (request) => {
             const view = request.view;
             try {
                 if (request.isAdministrator === false && request.companyId === null)
@@ -88,7 +95,7 @@ class UnitRoutes {
             }
         });
 
-        expressApp.get('/api/v1/unit/:id', requireUserWithCompanyAuth, async (request) => {
+        expressApp.get('/api/v1/unit/:id', requireUserWithCompanyAuthMiddleware, async (request) => {
             const unitId = request.params.id;
             const view = request.view;
             try {
@@ -105,7 +112,7 @@ class UnitRoutes {
             }
         });
 
-        expressApp.post('/api/v1/unit/:id', requireUserWithCompanyAuth, async (request) => {
+        expressApp.post('/api/v1/unit/:id', requireUserWithCompanyAuthMiddleware, async (request) => {
             assert(request.userId);
             assert(request.companyId);
             const view = request.view;
@@ -140,7 +147,7 @@ class UnitRoutes {
             }
         });
 
-        expressApp.delete('/api/v1/unit/:id/delete', requireUserWithCompanyAuth, async (request) => {
+        expressApp.delete('/api/v1/unit/:id/delete', requireUserWithCompanyAuthMiddleware, async (request) => {
             assert(request.userId);
             assert(request.companyId);
             const view = request.view;
