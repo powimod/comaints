@@ -1,18 +1,17 @@
 'use strict';
 import assert from 'assert'
 
+import GlobalController from '../controllers/GlobalController.js';
 import View from '../view.js';
-import ModelSingleton from '../models/model.js';
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 
 import { controlObject } from '../../../common/src/objects/object-util.mjs';
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 
-
 class GlobalRoutes {
 
     initialize(expressApp, config, apiVersion) {
-	    const model  = ModelSingleton.getInstance();
+        const globalController = GlobalController.getInstance();
 
         // special API routes to check i18n support
         expressApp.get(`/api/welcome`, (request, response) => {
@@ -53,17 +52,7 @@ class GlobalRoutes {
 
         expressApp.post(`/api/${apiVersion}/check-database`, async (request, response) => {
             const view = new View(request, response);
-            let success = false;
-            let message = null;
-            try {
-                await model.checkAccess();
-                success = true;
-                message = 'Success';
-            }
-            catch (error) {
-                message = error.message;
-            }
-            view.json({ success, message });
+            await globalController.checkDatabase(view);
         });
     }
 }

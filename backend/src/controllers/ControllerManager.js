@@ -11,6 +11,7 @@ import UserController    from './UserController.js';
 //FIXME not used : import TokenController   from './TokenController.js';
 import CompanyController from './CompanyController.js';
 import UnitController    from './UnitController.js';
+import GlobalController  from './GlobalController.js';
 
 const API_VERSION = 'v1';
 
@@ -24,6 +25,7 @@ class ControllerManager {
 	#userController = null;
 	#tokenController = null;
 	#unitController = null;
+    #globalController = null;
 
     constructor() {
         if (ControllerManager.#instance !== null)
@@ -66,6 +68,9 @@ class ControllerManager {
 
         this.#unitController = UnitController.getInstance();
         this.#unitController.initialize(expressApp);
+
+        this.#globalController = GlobalController.getInstance();
+        this.#globalController.initialize(expressApp);
     }
 
 }
