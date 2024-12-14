@@ -5,7 +5,7 @@ import View from '../view.js';
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 
 //import AuthController    from './AuthController.js';
-//import AccountController from './AccountController.js';
+import AccountController from './AccountController.js';
 import AdminController   from './AdminController.js';
 import UserController    from './UserController.js';
 import CompanyController from './CompanyController.js';
@@ -49,8 +49,8 @@ class ControllerManager {
 //        this.#authController = AuthController.getInstance();
 //        this.#authController.initialize(expressApp);
 
-//        this.#accountController = AccountController.getInstance();
-//        this.#accountController.initialize(expressApp);
+        this.#accountController = AccountController.getInstance();
+        this.#accountController.initialize(expressApp);
 
         this.#companyController = CompanyController.getInstance();
         this.#companyController.initialize(expressApp);

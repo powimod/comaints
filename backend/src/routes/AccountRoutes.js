@@ -2,8 +2,8 @@
 
 import assert from 'assert';
 
+import AccountController from '../controllers/AccountController.js';
 import View from '../view.js';
-import ModelSingleton from '../models/model.js';
 import requireUserAuthMiddleware from '../middlewares/requireUserAuthMiddleware.js';
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiError } from '../../../common/src/error.mjs';
 import { controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs';
@@ -12,22 +12,13 @@ import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 class AccountRoutes {
 
     initialize(expressApp) {
-        const model  = ModelSingleton.getInstance();
-
-        const accountModel = model.getAccountModel();
+        const accountController = AccountController.getInstance();
 
         expressApp.get('/api/v1/account/profile', requireUserAuthMiddleware, async (request, response) => {
             const view = request.view;
-            try {
-                const userId = request.userId;
-                assert(userId !== null);
-                let user = await accountModel.getUserProfile(userId);
-                user = buildPublicObjectVersion(userObjectDef, user);
-                view.json({ profile:user });
-            }
-            catch(error) {
-                view.error(error);
-            }
+            const userId = request.userId;
+            assert(userId !== null);
+            await accountController.getProfile(userId, view);
         });
 
         expressApp.post('/api/v1/account/change-password', requireUserAuthMiddleware, async (request, response) => {
@@ -35,40 +26,22 @@ class AccountRoutes {
             try {
                 const userId = request.userId;
                 assert(userId !== null);
-                const user = await accountModel.getUserProfile(userId);
-                if (! user)
-                    throw new Error('User not found');
 
                 let currentPassword = request.body.currentPassword;
                 if (currentPassword === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'currentPassword'});
                 if (typeof(currentPassword) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'currentPassword'});
-                const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'password', currentPassword);
-                if (errorMsg1)
-                    throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1);
 
                 let newPassword = request.body.newPassword;
                 if (newPassword === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'newPassword'});
                 if (typeof(newPassword) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'newPassword'});
-                const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', newPassword);
-                if (errorMsg2)
-                    throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2);
 
-
-                const isCurrentPassordValid = await accountModel.checkPassword(userId, currentPassword);
-                if (! isCurrentPassordValid )
-                    throw new ComaintApiErrorUnauthorized('error.invalid_password');
-
-                await accountModel.changePassword(userId, newPassword);
-
-                // no special info to return (exception thrown when an error occures)
-                view.json({message: 'Password changed'});
+                await accountController.changePassword(userId, currentPassword, newPassword, view);
             }
             catch(error) {
-                console.log(error);
                 view.error(error);
             }
         });
@@ -79,31 +52,18 @@ class AccountRoutes {
             try {
                 const userId = request.userId;
                 assert(userId !== null);
-                let user = await accountModel.getUserProfile(userId);
-                if (! user)
-                    throw new Error('User not found');
 
                 let newEmail = request.body.email;
                 if (newEmail === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'email'});
                 if (typeof(newEmail) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'newEmail'});
-                const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', newEmail);
-                if (errorMsg1)
-                    throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1);
 
                 let currentPassword = request.body.password;
                 if (currentPassword === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'password'});
                 if (typeof(currentPassword) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'password'});
-                const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', currentPassword);
-                if (errorMsg2)
-                    throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2);
-
-                const isCurrentPassordValid = await accountModel.checkPassword(userId, currentPassword);
-                if (! isCurrentPassordValid )
-                    throw new ComaintApiErrorUnauthorized('error.invalid_password');
 
                 // self-test does not send validation code by email
                 const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
@@ -112,16 +72,12 @@ class AccountRoutes {
                 const invalidateCodeImmediately = (request.body.invalidateCodeImmediately !== undefined) ?
                     request.body.invalidateCodeImmediately : false;
 
-                // make a random validation code which will be sent by email to unlock account
-                const authCode = accountModel.generateRandomAuthCode();
-                console.log(`Validation code is ${ authCode }`); // TODO remove this
+                const options = {
+                    sendCodeByEmail,
+                    invalidateCodeImmediately 
+                };
 
-                user = await accountModel.prepareEmailChange(userId, newEmail, authCode, invalidateCodeImmediately);
-
-                if (sendCodeByEmail)
-                    await accountModel.sendChangeEmailAuthCode(authCode, user.email, newEmail, view.translation);
-
-                view.json({message: 'Done, waiting for validation code'});
+                await accountController.changeEmail(userId, newEmail, currentPassword, options, view);
             }
             catch(error) {
                 view.error(error);
@@ -133,9 +89,6 @@ class AccountRoutes {
             try {
                 const userId = request.userId;
                 assert(userId !== null);
-                let user = await accountModel.getUserProfile(userId);
-                if (! user)
-                    throw new Error('User not found');
 
                 let confirmation = request.body.confirmation;
                 if (confirmation === undefined)
@@ -150,16 +103,12 @@ class AccountRoutes {
                 const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
                     request.body.sendCodeByEmail : true;
 
-                // make a random validation code which will be sent by email to delete account
-                const authCode = accountModel.generateRandomAuthCode();
-                console.log(`Validation code is ${ authCode }`); // TODO remove this
+                const options = {
+                    invalidateCodeImmediately,
+                    sendCodeByEmail 
+                };
 
-                user = await accountModel.prepareAccountDeletion(userId, authCode, invalidateCodeImmediately);
-
-                if (sendCodeByEmail)
-                    await accountModel.sendAccountDeletionAuthCode(authCode, user.email, view.translation);
-
-                view.json({ message: 'Done, waiting for validation code' });
+                await accountController.deleteAccount(userId, options, view);
             }
             catch(error) {
                 view.error(error);
@@ -171,33 +120,21 @@ class AccountRoutes {
             try {
                 const userId = request.userId;
                 assert(userId !== null);
-                let user = await accountModel.getUserProfile(userId);
-                if (! user)
-                    throw new Error('User not found');
 
                 // self-test does not send validation code by email
                 const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
                     request.body.sendCodeByEmail : true;
 
-                // make a random validation code which will be sent by email to delete account
-                const authCode = accountModel.generateRandomAuthCode();
+                const options = {
+                    sendCodeByEmail 
+                };
 
-                user = await accountModel.prepareAccountUnlock(userId, authCode);
-
-                console.log("dOm send mail", sendCodeByEmail);
-                if (sendCodeByEmail)
-                    await accountModel.sendUnlockAccountAuthCode(authCode, user.email, view.translation);
-
-                view.json({message: 'Done, waiting for validation code'});
+                await accountController.unlockAccount(userId, options, view);
             }
             catch(error) {
-                console.log("dOm error", error);
                 view.error(error);
             }
         });
-
-
-
 
     }
 }

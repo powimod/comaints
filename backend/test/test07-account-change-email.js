@@ -60,7 +60,7 @@ describe('Test change password route', () => {
 
         it('Try to change email with malformed email', async () => {
             try {
-                const json = await jsonPost(ROUTE_CHANGE_EMAIL, {email:'abc'});
+                const json = await jsonPost(ROUTE_CHANGE_EMAIL, {email:'abc', password: PASSWORD });
                 expect.fail('Call with malformed email not detected');
             }
             catch (error) {
