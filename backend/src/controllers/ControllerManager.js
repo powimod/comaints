@@ -8,7 +8,7 @@ import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 //import AccountController from './AccountController.js';
 //import AdminController   from './AdminController.js';
 import UserController    from './UserController.js';
-//import TokenController   from './TokenController.js';
+//FIXME not used : import TokenController   from './TokenController.js';
 import CompanyController from './CompanyController.js';
 import UnitController    from './UnitController.js';
 
@@ -45,27 +45,27 @@ class ControllerManager {
 	    const model  = ModelSingleton.getInstance();
 
         // IMPORTANT :authController must be initialized first because it has a middleware to handle session cookies
-//        this.#authController = AuthControllerSingleton.getInstance();
+//        this.#authController = AuthController.getInstance();
 //        this.#authController.initialize(expressApp);
 
-//        this.#accountController = AccountControllerSingleton.getInstance();
+//        this.#accountController = AccountController.getInstance();
 //        this.#accountController.initialize(expressApp);
 
         this.#companyController = CompanyController.getInstance();
         this.#companyController.initialize(expressApp);
 
-//        this.#adminController = AdminControllerSingleton.getInstance();
+//        this.#adminController = AdminController.getInstance();
 //        this.#adminController.initialize(expressApp);
 
         this.#userController = UserController.getInstance();
         this.#userController.initialize(expressApp);
 
-//        this.#tokenController = TokenControllerSingleton.getInstance();
+// FIXME not used
+//        this.#tokenController = TokenController.getInstance();
 //        this.#tokenController.initialize(expressApp);
 
         this.#unitController = UnitController.getInstance();
         this.#unitController.initialize(expressApp);
-
     }
 
 }

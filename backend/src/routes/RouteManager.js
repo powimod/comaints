@@ -11,7 +11,7 @@ import AccountRoutesSingleton from '../routes/AccountRoutes.js';
 import CompanyRoutesSingleton from '../routes/CompanyRoutes.js';
 import AdminRoutesSingleton   from '../routes/AdminRoutes.js';
 import UserRoutesSingleton    from '../routes/UserRoutes.js';
-import TokenRoutesSingleton   from '../routes/TokenRoutes.js';
+// FIXME not used : import TokenRoutesSingleton   from '../routes/TokenRoutes.js';
 import UnitRoutesSingleton    from '../routes/UnitRoutes.js';
 
 const API_VERSION = 'v1';
@@ -25,7 +25,7 @@ class RouteManager {
 	#adminRoutes = null;
 	#companyRoutes = null;
 	#userRoutes = null;
-	#tokenRoutes = null;
+	//#tokenRoutes = null;
 	#unitRoutes = null;
 	#globalRoutes = null;
 
@@ -63,8 +63,9 @@ class RouteManager {
         this.#userRoutes = UserRoutesSingleton.getInstance();
         this.#userRoutes.initialize(expressApp);
 
-        this.#tokenRoutes = TokenRoutesSingleton.getInstance();
-        this.#tokenRoutes.initialize(expressApp);
+// FIXME not used
+//        this.#tokenRoutes = TokenRoutesSingleton.getInstance();
+//        this.#tokenRoutes.initialize(expressApp);
 
         this.#unitRoutes = UnitRoutesSingleton.getInstance();
         this.#unitRoutes.initialize(expressApp);
