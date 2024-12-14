@@ -8,12 +8,10 @@ import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 import { controlObject } from '../../../common/src/objects/object-util.mjs';
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 
-const API_VERSION = 'v1'; // TODO remove this
 
 class GlobalRoutes {
 
-
-    initialize(expressApp, config) {
+    initialize(expressApp, config, apiVersion) {
 	    const model  = ModelSingleton.getInstance();
 
         // special API routes to check i18n support
@@ -45,15 +43,15 @@ class GlobalRoutes {
 
         expressApp.get(`/api/version`, (request, response) => {
             const view = new View(request, response);
-            view.json({ version: API_VERSION });
+            view.json({ version: apiVersion });
         });
 
-        expressApp.get(`/api/${API_VERSION}/backend-version`, (request, response) => {
+        expressApp.get(`/api/${apiVersion}/backend-version`, (request, response) => {
             const view = new View(request, response);
             view.json({ version: config.version});
         });
 
-        expressApp.post(`/api/${API_VERSION}/check-database`, async (request, response) => {
+        expressApp.post(`/api/${apiVersion}/check-database`, async (request, response) => {
             const view = new View(request, response);
             let success = false;
             let message = null;
@@ -83,9 +81,6 @@ class GlobalRoutesSingleton {
             GlobalRoutesSingleton.#instance = new GlobalRoutes();
         return GlobalRoutesSingleton.#instance;
     }
-
-
-
 }
 
 

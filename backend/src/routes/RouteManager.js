@@ -47,7 +47,7 @@ class RouteManager {
 
 	    const model  = ModelSingleton.getInstance();
 
-        // IMPORTANT :authRoutes must be initialized first because it has a middleware to handle session cookies
+        // IMPORTANT :authRoutes must be initialized first because it declares a middleware to handle session cookies
         this.#authRoutes = AuthRoutesSingleton.getInstance();
         this.#authRoutes.initialize(expressApp);
 
@@ -70,7 +70,7 @@ class RouteManager {
         this.#unitRoutes.initialize(expressApp);
 
         this.#globalRoutes = GlobalRoutesSingleton.getInstance();
-        this.#globalRoutes.initialize(expressApp, config);
+        this.#globalRoutes.initialize(expressApp, config, API_VERSION);
 
     }
 }
