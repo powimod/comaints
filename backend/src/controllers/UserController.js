@@ -44,106 +44,88 @@ class UserController {
         }
     }
 
-/* FIXME not used
-    async searchUserList(properties, filters, pagination, view) {
-        assert(properties !== undefined);
-        assert(filters !== undefined);
-        assert(pagination !== undefined);
+    async createUser(user, view) {
+        assert(user !== undefined);
         assert(view !== undefined);
 
         try {
-            const result = await this.#userModel.findUserList(properties, filters, pagination);
-            view.json(result);
+            const [ errorMsg, errorParam ] = controlObject(userObjectDef, user, { fullCheck:true, checkId:false });
+            if (errorMsg)
+                throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam);
+
+            user = await this.#userModel.createUser(user);
+
+            // delete protected properties
+            delete user.companyId;
+            delete user.password;
+            delete user.state;
+            delete user.lastUse;
+            delete user.authAction;
+            delete user.authData;
+            delete user.authCode;
+            delete user.authExpiration;
+            delete user.authAttempts;
+
+
+            view.json({user});
         }
         catch(error) {
             view.error(error);
         }
-        });
-*/
+    }
 
-
-        async createUser(user, view) {
-            assert(user !== undefined);
-            assert(view !== undefined);
-
-            try {
-                const [ errorMsg, errorParam ] = controlObject(userObjectDef, user, { fullCheck:true, checkId:false });
-                if (errorMsg)
-                    throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam);
-
-                user = await this.#userModel.createUser(user);
-
-                // delete protected properties
-                delete user.companyId;
-                delete user.password;
-                delete user.state;
-                delete user.lastUse;
-                delete user.authAction;
-                delete user.authData;
-                delete user.authCode;
-                delete user.authExpiration;
-                delete user.authAttempts;
-
-
-                view.json({user});
-            }
-            catch(error) {
-                view.error(error);
-            }
+    async getUserById(userId, view, controlAccess) {
+        assert(userId !== undefined);
+        assert(view !== undefined);
+        assert(controlAccess !== undefined);
+        try {
+            let user = await this.#userModel.getUserById(userId);
+            if (user && ! controlAccess(user))
+                user = null;
+            view.json({user});
         }
-
-        async getUserById(userId, view, controlAccess) {
-            assert(userId !== undefined);
-            assert(view !== undefined);
-            assert(controlAccess !== undefined);
-            try {
-                let user = await this.#userModel.getUserById(userId);
-                if (user && ! controlAccess(user))
-                    user = null;
-                view.json({user});
-            }
-            catch(error) {
-                console.log(error)
-                view.error(error);
-            }
+        catch(error) {
+            console.log(error)
+            view.error(error);
         }
+    }
 
-        async editUser(user, view, controlAccess) {
-            assert(user !== undefined);
-            assert(view !== undefined);
-            assert(controlAccess !== undefined);
+    async editUser(user, view, controlAccess) {
+        assert(user !== undefined);
+        assert(view !== undefined);
+        assert(controlAccess !== undefined);
 
-            try {
-                const [ errorMsg, errorParam ] = controlObject(userObjectDef, user, { fullCheck:true, checkId:false });
-                if (errorMsg)
-                    throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam);
-                let controlUser = await this.#userModel.getUserById(user.id);
-                if (controlUser && ! controlAccess(controlUser))
-                    throw new ComaintApiErrorUnauthorized('error.not_owner');
-                user = await this.#userModel.editUser(user);
-                view.json({user});
-            }
-            catch(error) {
-                view.error(error);
-            }
+        try {
+            const [ errorMsg, errorParam ] = controlObject(userObjectDef, user, { fullCheck:true, checkId:false });
+            if (errorMsg)
+                throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam);
+            let controlUser = await this.#userModel.getUserById(user.id);
+            if (controlUser && ! controlAccess(controlUser))
+                throw new ComaintApiErrorUnauthorized('error.not_owner');
+            user = await this.#userModel.editUser(user);
+            view.json({user});
         }
-
-        async deleteUserById(userId, view, controlAccess) {
-            assert(userId !== undefined);
-            assert(view !== undefined);
-            try {
-                let user = await this.#userModel.getUserById(userId);
-                if (user === null)
-                    throw new ComaintApiErrorUnauthorized('error.not_found');
-                if (! controlAccess(user))
-                    throw new ComaintApiErrorUnauthorized('error.not_owner');
-                const deleted = await this.#userModel.deleteUserById(userId);
-                view.json({deleted});
-            }
-            catch(error) {
-                view.error(error);
-            }
+        catch(error) {
+            view.error(error);
         }
+    }
+
+    async deleteUserById(userId, view, controlAccess) {
+        assert(userId !== undefined);
+        assert(view !== undefined);
+        try {
+            let user = await this.#userModel.getUserById(userId);
+            if (user === null)
+                throw new ComaintApiErrorUnauthorized('error.not_found');
+            if (! controlAccess(user))
+                throw new ComaintApiErrorUnauthorized('error.not_owner');
+            const deleted = await this.#userModel.deleteUserById(userId);
+            view.json({deleted});
+        }
+        catch(error) {
+            view.error(error);
+        }
+    }
 }
 
 
