@@ -20,7 +20,6 @@ const requestPropertiesMiddleware = (request, _, next) => {
         return;
     }
     request.requestProperties = properties;
-console.log("dOm ==================================== requestPropertiesMiddleware : ", request.requestProperties)
     next();
 };
 

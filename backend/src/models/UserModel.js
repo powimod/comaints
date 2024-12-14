@@ -55,8 +55,6 @@ class UserModel {
         // get record of selected page
         if ( recordCount > 0 ) {
             sql = `SELECT ${sqlFields} FROM users ${sqlWhere} ${sqlSort} LIMIT ? OFFSET ?`;
-            console.log("dOm sql", sql);
-            console.log("dOm params", fieldValues);
             fieldValues.push(pagination.limit, pagination.offset);
             const result = await this.#db.query(sql, fieldValues);
 

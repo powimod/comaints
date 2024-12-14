@@ -12,7 +12,7 @@ import { fileURLToPath } from 'url';
 import MailManagerModel from './MailManager.js';
 
 import RouteManager from './routes/RouteManager.js';
-import ControllerSingleton from './controllers/controller.js';
+import ControllerManager from './controllers/ControllerManager.js';
 import ModelSingleton from './models/model.js';
 import View from './view.js';
 
@@ -113,10 +113,8 @@ const main = async () => {
 	const model = ModelSingleton.getInstance();
 	await model.initialize(config);
 
-/*
-	const controller = ControllerSingleton.getInstance();
-	await controller.initialize(config, app);
-*/
+	const controllerManager = ControllerManager.getInstance();
+	await controllerManager.initialize(config);
 
 	const routeManager = RouteManager.getInstance();
 	await routeManager.initializeRoutes(config, app);
