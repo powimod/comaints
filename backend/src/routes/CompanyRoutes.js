@@ -1,12 +1,14 @@
 'use strict';
 import assert from 'assert';
 
-import View from '../view.js';
-import ModelSingleton from '../models/model.js';
+import CompanyController from '../controllers/CompanyController.js';
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 
 import requireAdminAuthMiddleware from '../middlewares/requireAdminAuthMiddleware.js';
 import requireUserAuthMiddleware from '../middlewares/requireUserAuthMiddleware.js';
+import requestPaginationMiddleware from '../middlewares/requestPaginationMiddleware.js';
+import requestFiltersMiddleware from '../middlewares/requestFiltersMiddleware.js';
+import requestPropertiesMiddleware from '../middlewares/requestPropertiesMiddleware.js';
 import renewTokensMiddleware from '../middlewares/renewTokensMiddleware.js';
 import renewContextMiddleware from '../middlewares/renewContextMiddleware.js';
 
@@ -16,17 +18,21 @@ import companyObjectDef from '../../../common/src/objects/company-object-def.mjs
 class CompanyRoutes {
 
     initialize(expressApp) {
-	    const model  = ModelSingleton.getInstance();
-        
-        const companyModel = model.getCompanyModel();
-        const userModel = model.getUserModel();
+        const companyController = CompanyController.getInstance();
 
-	    expressApp.get('/api/v1/company/list', requireAdminAuthMiddleware, async (request, response) => {
+        // company list route
+	    expressApp.get('/api/v1/company/list', requireAdminAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, response) => {
+            const properties = request.requestProperties;
+            assert(properties !== undefined);
+            const pagination = request.requestPagination;
+            assert(pagination !== undefined);
             const view = request.view;
-			const companyList = await companyModel.findCompanyList();
-            view.json({ companyList });
+
+            await companyController.findCompanyList(properties, filters, pagination, view);
         });
 
+
+        // create company route
         expressApp.post('/api/v1/company', requireAdminAuthMiddleware, async (request, response) => {
             const view = request.view;
             try {
@@ -38,14 +44,15 @@ class CompanyRoutes {
                 const [ errorMsg, errorParam ] = controlObject(companyObjectDef, company, { fullCheck:true, checkId:false });
                 if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam);
-			    company = await companyModel.createCompany(company);
-                view.json(company);
+
+                await companyController.createCompany(company, view);
             }
             catch(error) {
                 view.error(error);
             }
         });
 
+        // initialize company route
         expressApp.post('/api/v1/company/initialize', requireUserAuthMiddleware, async (request, response) => {
             const view = request.view;
             try {
@@ -55,33 +62,15 @@ class CompanyRoutes {
                 if (request.companyId)
                     throw new ComaintApiErrorInvalidRequest('error.company_already_initialized');
 
-                let user = await userModel.getUserById(userId);
-                assert(user !== null);
-                if (user.companyId)
-                    throw new ComaintApiErrorInvalidRequest('error.company_already_initialized');
-
                 let companyName = request.body.companyName;
                 if (companyName === undefined)
                     throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'companyName'});
-                const [ errorMsg1, errorParam1 ] = controlObjectProperty(companyObjectDef, 'name', companyName);
-                if (errorMsg1)
-                    throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1);
 
-                let company = {
-                    managerId: request.userId,
-                    name: companyName
-                };
-			    company = await companyModel.createCompany(company);
-
-                user.companyId = company.id;
-                user = await userModel.editUser(user);
-
-                request.companyId = company.id;
-                await renewTokensMiddleware(request);
-                await renewContextMiddleware(request, user);
-
-                company = buildPublicObjectVersion(companyObjectDef, company);
-                view.json({company});
+                await companyController.initializeCompany(companyName, userId, view, async user => {
+                    request.companyId = user.companyId;
+                    await renewTokensMiddleware(request);
+                    await renewContextMiddleware(request, user);
+                });
             }
             catch(error) {
                 view.error(error);

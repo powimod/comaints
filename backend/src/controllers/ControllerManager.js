@@ -7,11 +7,11 @@ import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 /*
 import AuthControllerSingleton    from './AuthController.js';
 import AccountControllerSingleton from './AccountController.js';
-import CompanyControllerSingleton from './CompanyController.js';
 import AdminControllerSingleton   from './AdminController.js';
 import UserControllerSingleton    from './UserController.js';
 import TokenControllerSingleton   from './TokenController.js';
 */
+import CompanyController from './CompanyController.js';
 import UnitController    from './UnitController.js';
 
 const API_VERSION = 'v1';
@@ -54,9 +54,11 @@ class ControllerManager {
         this.#accountController = AccountControllerSingleton.getInstance();
         this.#accountController.initialize(expressApp);
 
-        this.#companyController = CompanyControllerSingleton.getInstance();
+*/
+        this.#companyController = CompanyController.getInstance();
         this.#companyController.initialize(expressApp);
 
+/*
         this.#adminController = AdminControllerSingleton.getInstance();
         this.#adminController.initialize(expressApp);
 

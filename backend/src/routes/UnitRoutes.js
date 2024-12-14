@@ -20,6 +20,7 @@ class UnitRoutes {
     initialize(expressApp) {
         const unitController = UnitController.getInstance();
 
+        // unit list route
         expressApp.get('/api/v1/unit/list', requireUserWithCompanyAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, _) => {
             const properties = request.requestProperties;
             assert(properties !== undefined);
@@ -35,6 +36,8 @@ class UnitRoutes {
             await unitController.findUnitList(properties, filters, pagination, view);
         });
 
+
+        // unit search route
         expressApp.post('/api/v1/unit/search', requireUserWithCompanyAuthMiddleware, requestPropertiesMiddleware, requestFiltersMiddleware, requestPaginationMiddleware,  async (request) => {
             const properties = request.requestProperties;
             assert(properties !== undefined);
