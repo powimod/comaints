@@ -6,9 +6,8 @@ import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 
 //import AuthController    from './AuthController.js';
 //import AccountController from './AccountController.js';
-//import AdminController   from './AdminController.js';
+import AdminController   from './AdminController.js';
 import UserController    from './UserController.js';
-//FIXME not used : import TokenController   from './TokenController.js';
 import CompanyController from './CompanyController.js';
 import UnitController    from './UnitController.js';
 import GlobalController  from './GlobalController.js';
@@ -56,15 +55,11 @@ class ControllerManager {
         this.#companyController = CompanyController.getInstance();
         this.#companyController.initialize(expressApp);
 
-//        this.#adminController = AdminController.getInstance();
-//        this.#adminController.initialize(expressApp);
+        this.#adminController = AdminController.getInstance();
+        this.#adminController.initialize(expressApp);
 
         this.#userController = UserController.getInstance();
         this.#userController.initialize(expressApp);
-
-// FIXME not used
-//        this.#tokenController = TokenController.getInstance();
-//        this.#tokenController.initialize(expressApp);
 
         this.#unitController = UnitController.getInstance();
         this.#unitController.initialize(expressApp);
