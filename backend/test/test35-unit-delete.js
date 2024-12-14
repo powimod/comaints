@@ -85,7 +85,6 @@ describe('Test unit suppression', () => {
             try {
                 const route = prepareRequestPath(ROUTE_UNIT_DELETE, { unitId: unit1.id});
                 const json = await jsonDelete(route);
-                console.log(json);
                 throw new Error('Non existent unit ID not detected');
             }
             catch (error) {
@@ -132,7 +131,6 @@ describe('Test unit suppression', () => {
             try {
                 const route = prepareRequestPath(ROUTE_UNIT_DELETE, { unitId: unit.id});
                 json = await jsonDelete(route);
-                console.log(json);
                 throw new Error('Unauthorized access not detected');
             }
             catch (error) {

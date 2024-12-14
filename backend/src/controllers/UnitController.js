@@ -118,14 +118,16 @@ class UnitController {
             }
         }
 
-        async deleteUnit(unit, view, controlAccess) {
-            assert(unit !== undefined);
+        async deleteUnitById(unitId, view, controlAccess) {
+            assert(unitId !== undefined);
             assert(view !== undefined);
             try {
-                let controlUnit = await this.#unitModel.getUnitById(unitId);
-                if (controlUnit && ! controlAccess(controlUnit))
+                let unit = await this.#unitModel.getUnitById(unitId);
+                if (unit === null)
+                    throw new ComaintApiErrorUnauthorized('error.not_found');
+                if (! controlAccess(unit))
                     throw new ComaintApiErrorUnauthorized('error.not_owner');
-                const deleted = await this.#unitModel.deleteUnitById(unit.id);
+                const deleted = await this.#unitModel.deleteUnitById(unitId);
                 view.json({deleted});
             }
             catch(error) {

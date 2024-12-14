@@ -2,7 +2,6 @@
 import assert from 'assert';
 
 import UnitController from '../controllers/UnitController.js';
-import ModelSingleton from '../models/model.js';
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
 import { controlObject } from '../../../common/src/objects/object-util.mjs';
 import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs';
@@ -19,8 +18,6 @@ import requestPropertiesMiddleware from '../middlewares/requestPropertiesMiddlew
 class UnitRoutes {
 
     initialize(expressApp) {
-        const model  = ModelSingleton.getInstance();
-        const unitModel = model.getUnitModel();
         const unitController = UnitController.getInstance();
 
         expressApp.get('/api/v1/unit/list', requireUserWithCompanyAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, _) => {
@@ -139,18 +136,9 @@ class UnitRoutes {
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'id'});
                 unitId = parseInt(unitId);
 
-                let unit = await unitModel.getUnitById(unitId);
-                if (unit === null)
-                    throw new ComaintApiErrorUnauthorized('error.not_found');
-
-                if (unit.companyId !== request.companyId)
-                    throw new ComaintApiErrorUnauthorized('error.not_owner');
-                unit = null;
-
-                const deleted = await unitModel.deleteUnitById(unitId, view, unit => (
+                const deleted = await unitController.deleteUnitById(unitId, view, unit => (
                     request.isAdministrator === true || unit.companyId === request.companyId
                 ));
-                view.json({deleted});
             }
             catch(error) {
                 view.error(error);
