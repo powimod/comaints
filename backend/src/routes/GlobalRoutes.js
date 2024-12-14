@@ -1,0 +1,92 @@
+'use strict';
+import assert from 'assert'
+
+import View from '../view.js';
+import ModelSingleton from '../models/model.js';
+import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
+
+import { controlObject } from '../../../common/src/objects/object-util.mjs';
+import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
+
+const API_VERSION = 'v1'; // TODO remove this
+
+class GlobalRoutes {
+
+
+    initialize(expressApp, config) {
+	    const model  = ModelSingleton.getInstance();
+
+        // special API routes to check i18n support
+        expressApp.get(`/api/welcome`, (request, response) => {
+            const view = new View(request, response);
+            view.json({
+                response: view.translation('general.welcome')
+            });
+        });
+
+        expressApp.post(`/api/welcome`, (request, response) => {
+            const view = new View(request, response);
+            try {
+                const firstname = request.body.firstname;
+                if (firstname === undefined)
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'firstname'});
+                if (typeof(firstname) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'firstname'});
+                const lastname = request.body.lastname;
+                view.json({
+                    response: view.translation('general.hello', { firstname, lastname })
+                });
+            }
+            catch(error) {
+                view.error(error);
+            }
+        });
+
+
+        expressApp.get(`/api/version`, (request, response) => {
+            const view = new View(request, response);
+            view.json({ version: API_VERSION });
+        });
+
+        expressApp.get(`/api/${API_VERSION}/backend-version`, (request, response) => {
+            const view = new View(request, response);
+            view.json({ version: config.version});
+        });
+
+        expressApp.post(`/api/${API_VERSION}/check-database`, async (request, response) => {
+            const view = new View(request, response);
+            let success = false;
+            let message = null;
+            try {
+                await model.checkAccess();
+                success = true;
+                message = 'Success';
+            }
+            catch (error) {
+                message = error.message;
+            }
+            view.json({ success, message });
+        });
+    }
+}
+
+class GlobalRoutesSingleton {
+
+    static #instance = null;
+
+    constructor() {
+        throw new Error('Can not instanciate GlobalRoutesSingleton!');
+    }
+
+    static getInstance() {
+        if (! GlobalRoutesSingleton.#instance)
+            GlobalRoutesSingleton.#instance = new GlobalRoutes();
+        return GlobalRoutesSingleton.#instance;
+    }
+
+
+
+}
+
+
+export default GlobalRoutesSingleton; 

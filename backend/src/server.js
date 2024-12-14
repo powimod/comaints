@@ -10,8 +10,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import MailManagerModel from './MailManager.js';
+
+import RouteManager from './routes/RouteManager.js';
+import ControllerSingleton from './controllers/controller.js';
 import ModelSingleton from './models/model.js';
-import ControllerSingleton from './controller.js';
 import View from './view.js';
 
 dotenv.config();
@@ -111,9 +113,13 @@ const main = async () => {
 	const model = ModelSingleton.getInstance();
 	await model.initialize(config);
 
+/*
 	const controller = ControllerSingleton.getInstance();
 	await controller.initialize(config, app);
+*/
 
+	const routeManager = RouteManager.getInstance();
+	await routeManager.initializeRoutes(config, app);
 
     // catch signals to stop daemon
     const stopService = async () => {
