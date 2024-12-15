@@ -1,7 +1,6 @@
 import assert from 'assert';
 
-import ModelSingleton from '../models/model.js';
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
+import {ComaintApiErrorInvalidRequest} from '../../../common/src/error.mjs';
 
 const requestPaginationMiddleware = (request, _, next) => {
     const DEFAULT_PAGE = 1;
@@ -18,15 +17,15 @@ const requestPaginationMiddleware = (request, _, next) => {
         limit = request.body?.limit || DEFAULT_LIMIT;
     }
     if (isNaN(page) || page < 1) {
-        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'page'}));
+        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'page'}));
         return;
     }
     if (isNaN(limit) || limit < 1) {
-        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'limit'}));
+        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'limit'}));
         return;
     }
     const offset = (page - 1) * limit;
-    request.requestPagination = { page, limit, offset };
+    request.requestPagination = {page, limit, offset};
     next();
 };
 

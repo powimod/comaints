@@ -1,8 +1,7 @@
-
 import assert from 'assert';
 
 import ModelSingleton from '../models/model.js';
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
+import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
 import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs';
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 import { AccountState } from '../../../common/src/global.mjs';

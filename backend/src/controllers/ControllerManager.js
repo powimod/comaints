@@ -1,29 +1,21 @@
-
-
-import ModelSingleton from '../models/model.js';
-import View from '../view.js';
-import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
-
-import AuthController    from './AuthController.js';
+import AuthController from './AuthController.js';
 import AccountController from './AccountController.js';
-import AdminController   from './AdminController.js';
-import UserController    from './UserController.js';
+import AdminController from './AdminController.js';
+import UserController from './UserController.js';
 import CompanyController from './CompanyController.js';
-import UnitController    from './UnitController.js';
-import GlobalController  from './GlobalController.js';
+import UnitController from './UnitController.js';
+import GlobalController from './GlobalController.js';
 
-const API_VERSION = 'v1';
 
 class ControllerManager {
     static #instance = null;
 
-	#authController = null;
-	#accountController = null;
-	#adminController = null;
-	#companyController = null;
-	#userController = null;
-	#tokenController = null;
-	#unitController = null;
+    #authController = null;
+    #accountController = null;
+    #adminController = null;
+    #companyController = null;
+    #userController = null;
+    #unitController = null;
     #globalController = null;
 
     constructor() {
@@ -37,13 +29,8 @@ class ControllerManager {
         return ControllerManager.#instance;
     }
 
-    async initializeControllers(config, expressApp) {
+    async initializeControllers(expressApp) {
 
-    }
-
-    async initialize(config, expressApp) {
-
-	    const model  = ModelSingleton.getInstance();
 
         // IMPORTANT :authController must be initialized first because it has a middleware to handle session cookies
         this.#authController = AuthController.getInstance();

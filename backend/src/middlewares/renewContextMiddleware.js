@@ -1,8 +1,5 @@
 import assert from 'assert';
 
-import ModelSingleton from '../models/model.js';
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
-
 const renewContextMiddleware = async (request, user) => {
     assert(request);
     assert(user);
@@ -14,7 +11,7 @@ const renewContextMiddleware = async (request, user) => {
     const administrator = user ? user.administrator : null;
 
     const connected = request.userConnected;
-    assert(typeof(connected) === 'boolean');
+    assert(typeof (connected) === 'boolean');
 
     view.storeRenewedContext({
         email,

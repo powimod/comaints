@@ -1,9 +1,6 @@
-
 import assert from 'assert';
 
 import ModelSingleton from '../models/model.js';
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
-
 
 class GlobalController {
     static #instance = null;
@@ -16,12 +13,12 @@ class GlobalController {
     }
 
     static getInstance() {
-        if (! GlobalController.#instance)
+        if (!GlobalController.#instance)
             GlobalController.#instance = new GlobalController();
         return GlobalController.#instance;
     }
 
-    initialize(config) {
+    initialize() {
         this.#model = ModelSingleton.getInstance();
     }
 
@@ -37,7 +34,7 @@ class GlobalController {
         catch (error) {
             message = error.message;
         }
-        view.json({ success, message });
+        view.json({success, message});
     }
 }
 

@@ -122,7 +122,7 @@ const main = async () => {
     await model.initialize(config);
 
     const controllerManager = ControllerManager.getInstance();
-    await controllerManager.initialize(config);
+    await controllerManager.initializeControllers(app);
 
     const routeManager = RouteManager.getInstance();
     await routeManager.initializeRoutes(config, app);

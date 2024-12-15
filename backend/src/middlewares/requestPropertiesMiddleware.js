@@ -1,7 +1,6 @@
 import assert from 'assert';
 
-import ModelSingleton from '../models/model.js';
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
+import {ComaintApiErrorInvalidRequest} from '../../../common/src/error.mjs';
 
 const requestPropertiesMiddleware = (request, _, next) => {
     const view = request.view;
@@ -9,14 +8,14 @@ const requestPropertiesMiddleware = (request, _, next) => {
     let properties = null;
     if (request.method === 'GET') {
         const stringValue = request.query?.properties || null;
-        if (stringValue !== null) 
+        if (stringValue !== null)
             properties = stringValue.split(',');
     }
     else {
         properties = request.body.properties || null;
     }
-    if (properties !== null && ! (properties instanceof Array)) {
-        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'properties'}));
+    if (properties !== null && !(properties instanceof Array)) {
+        view.error(new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'properties'}));
         return;
     }
     request.requestProperties = properties;

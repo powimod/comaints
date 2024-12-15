@@ -308,7 +308,7 @@ class AuthRoutes {
                 if (typeof (refreshToken) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'token'});
 
-                const [userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken] = await _renewTokensMiddleware(refreshToken, view);
+                const [userId, _CompanyId, _connected, _refreshTokenId, newAccessToken, newRefreshToken] = await _renewTokensMiddleware(refreshToken, view);
 
                 console.log(`auth/refresh - send new tokens userId ${userId}`);
                 view.storeRenewedTokens(newAccessToken, newRefreshToken);

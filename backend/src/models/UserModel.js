@@ -3,25 +3,24 @@
 import assert from 'assert';
 import bcrypt from 'bcrypt';
 
-import { buildFieldNameArray, buildFieldArrays, convertObjectFromDb } from '../../../common/src/objects/object-util.mjs';
+import {buildFieldNameArray, buildFieldArrays, convertObjectFromDb} from '../../../common/src/objects/object-util.mjs';
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
-import { comaintErrors, buildComaintError } from '../../../common/src/error.mjs';
-import { AccountState } from '../../../common/src/global.mjs';
+import {comaintErrors, buildComaintError} from '../../../common/src/error.mjs';
+import {AccountState} from '../../../common/src/global.mjs';
 
-const defaultResultPropertyList = [ 'id', 'email', 'firstname', 'lastname' ];
-const defaultOrderPropertyList = [ 'email' ];
+const defaultResultPropertyList = ['id', 'email', 'firstname', 'lastname'];
+const defaultOrderPropertyList = ['email'];
 
 class UserModel {
     #db = null;
     #hashSalt = null;
 
-    initialize (db, hashSalt) {
-        assert (db !== undefined);
-        assert (hashSalt !== undefined);
+    initialize(db, hashSalt) {
+        assert(db !== undefined);
+        assert(hashSalt !== undefined);
         this.#db = db;
         this.#hashSalt = parseInt(hashSalt);
     }
-
 
     async findUserList(properties = null, filters = null, pagination = null) {
         assert(this.#db !== null);
@@ -29,14 +28,14 @@ class UserModel {
             properties = defaultResultPropertyList;
         if (!(properties instanceof Array))
             throw new Error("Parameter «properties» is not an array");
-        if (typeof(filters) !== 'object')
+        if (typeof (filters) !== 'object')
             throw new Error("Parameter «filters» is not an object");
 
         const sqlFields = buildFieldNameArray(userObjectDef, properties);
         if (sqlFields.length === 0)
             throw new Error("No request properties found");
 
-        const [ fieldNames, fieldValues ] = buildFieldArrays(userObjectDef, filters);
+        const [fieldNames, fieldValues] = buildFieldArrays(userObjectDef, filters);
         const sqlWhere = fieldNames.length === 0 ? '' :
             'WHERE ' + fieldNames.map(f => `${f} = ?`).join(' AND ');
 
@@ -53,7 +52,7 @@ class UserModel {
         const userList = [];
 
         // get record of selected page
-        if ( recordCount > 0 ) {
+        if (recordCount > 0) {
             sql = `SELECT ${sqlFields} FROM users ${sqlWhere} ${sqlSort} LIMIT ? OFFSET ?`;
             fieldValues.push(pagination.limit, pagination.offset);
             const result = await this.#db.query(sql, fieldValues);
@@ -107,7 +106,7 @@ class UserModel {
             throw new Error('User password missing');
         await this.encryptPasswordIfPresent(user);
 
-        const [ fieldNames, fieldValues ] = buildFieldArrays(userObjectDef, user);
+        const [fieldNames, fieldValues] = buildFieldArrays(userObjectDef, user);
         const markArray = Array(fieldValues.length).fill('?').join(',');
         const sqlRequest = `
             INSERT INTO users(${fieldNames.join(', ')}) VALUES (${markArray})
@@ -136,11 +135,11 @@ class UserModel {
     async editUser(user) {
         await this.encryptPasswordIfPresent(user);
 
-        const [ fieldNames, fieldValues ] = buildFieldArrays(userObjectDef, user);
+        const [fieldNames, fieldValues] = buildFieldArrays(userObjectDef, user);
         const sqlRequest = `UPDATE users SET ${fieldNames.map(field => `${field}=?`).join(', ')} WHERE id = ?`;
         fieldValues.push(user.id); // WHERE clause
 
-        const result = await this.#db.query(sqlRequest, fieldValues);
+        await this.#db.query(sqlRequest, fieldValues);
         const userId = user.id;
         user = this.getUserById(userId);
         return user;
@@ -149,34 +148,34 @@ class UserModel {
     async changePasswordHash(email, encryptedPassword) {
         // remet le compte à l'état actif (state=1) au cas où il ait été verrouillé
         const sqlRequest = `UPDATE users SET password = ?, state = ? WHERE email = ?`;
-        await this.#db.query(sqlRequest, [ encryptedPassword, AccountState.ACTIVE, email]);
+        await this.#db.query(sqlRequest, [encryptedPassword, AccountState.ACTIVE, email]);
     }
 
 
     async encryptPassword(password) {
-        assert (password !== undefined);
+        assert(password !== undefined);
         if (password === undefined)
             return;
-        return await bcrypt.hash(password, this.#hashSalt);
+        return bcrypt.hash(password, this.#hashSalt);
     }
 
 
     async encryptPasswordIfPresent(user) {
-        assert (user !== undefined);
+        assert(user !== undefined);
         if (user.password === undefined)
             return;
-        user.password = await this.encryptPassword(user.password); 
+        user.password = await this.encryptPassword(user.password);
     }
 
 
     async checkPassword(userId, password) {
         if (userId === undefined)
             throw new Error('Argument <password> required');
-        if (typeof(userId) !== 'number')
+        if (typeof (userId) !== 'number')
             throw new Error('Argument <userId> is not a number');
         if (password === undefined)
             throw new Error('Argument <password> required');
-        if (typeof(password) !== 'string')
+        if (typeof (password) !== 'string')
             throw new Error('Argument <password> is not a string');
         let sql = `SELECT password FROM users WHERE id = ?`;
         const result = await this.#db.query(sql, [userId]);
@@ -191,11 +190,11 @@ class UserModel {
     async checkAuthCode(userId, authCode) {
         if (userId === undefined)
             throw new Error('Argument <userId> required');
-        if (typeof(userId) !== 'number')
+        if (typeof (userId) !== 'number')
             throw new Error('Argument <userId> is not a number');
         if (authCode === undefined)
             throw new Error('Argument <authCode> required');
-        if (typeof(authCode) !== 'number')
+        if (typeof (authCode) !== 'number')
             throw new Error('Argument <authCode> is not a number');
 
         let sql = `SELECT auth_code FROM users WHERE id = ?`;
@@ -207,9 +206,9 @@ class UserModel {
         return validated;
     }
 
-    async deleteUserById(userId){
+    async deleteUserById(userId) {
         assert(userId !== undefined);
-        if (typeof(userId) !== 'number')
+        if (typeof (userId) !== 'number')
             throw new Error('Argument <userId> is not a number');
         const sql = `DELETE FROM users WHERE id = ?`;
         const result = await this.#db.query(sql, [userId]);
@@ -227,7 +226,7 @@ class UserModelSingleton {
     }
 
     static getInstance() {
-        if (! UserModelSingleton.#instance)
+        if (!UserModelSingleton.#instance)
             UserModelSingleton.#instance = new UserModel();
         return UserModelSingleton.#instance;
     }

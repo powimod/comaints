@@ -1,9 +1,8 @@
 import assert from 'assert';
 
-import ModelSingleton from '../models/model.js';
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
+import {ComaintApiErrorUnauthorized} from '../../../common/src/error.mjs';
 
-const requireUserAuthMiddleware = (request, _ , next) => {
+const requireUserAuthMiddleware = (request, _, next) => {
     const view = request.view;
     assert(view !== undefined);
     const userId = request.userId;

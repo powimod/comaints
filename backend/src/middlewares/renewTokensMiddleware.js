@@ -1,7 +1,7 @@
 import assert from 'assert';
 
 import ModelSingleton from '../models/model.js';
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
+import {ComaintApiErrorUnauthorized} from '../../../common/src/error.mjs';
 
 const renewTokensMiddleware = async (request) => {
     assert(request);
@@ -14,9 +14,9 @@ const renewTokensMiddleware = async (request) => {
     const refreshTokenId = request.refreshTokenId;
     assert(refreshTokenId !== null);
     const connected = request.userConnected;
-    assert(typeof(connected) === 'boolean');
+    assert(typeof (connected) === 'boolean');
 
-    const model  = ModelSingleton.getInstance();
+    const model = ModelSingleton.getInstance();
     const authModel = model.getAuthModel();
 
     // remove refresh token from database
@@ -34,8 +34,8 @@ const renewTokensMiddleware = async (request) => {
     if (companyId !== user.companyId)
         throw new Error('Invalid company ID in refresh token');
 
-    const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, connected);
-    const newAccessToken  = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId, true);
+    const [newRefreshToken, newRefreshTokenId] = await authModel.generateRefreshToken(userId, companyId, connected);
+    const newAccessToken = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId, true);
 
     view.storeRenewedTokens(newAccessToken, newRefreshToken);
 };
