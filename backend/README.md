@@ -1,4 +1,4 @@
-# Writing the README file based on the user's requirements
+# Comaint backend
 
 This is the backend of the **Comaint** application.
 __Comaint Backend__ is built with **Node.js** and **Express.js**. 
@@ -36,9 +36,19 @@ Make sure you have the following installed:
    npm install
    ```
 
+3. Create database tables by running : 
+   ```bash
+   mysql -u comaint -p<PASSWORD> --database db_comaint < ../scripts/init-db.sql 
+   ```
+
 3. Set up environment variables:
    - Copy the `env.template` file to `.env`.
    - Edit the `.env` file to configure your environment-specific settings.
+
+4. Set up self-tests :
+   - Copy the `test/env.template` file to `test/.env`.
+   - Edit the `test/.env` file to configure your environment-specific settings.
+
 
 # Running the Server
 
@@ -68,6 +78,9 @@ Run the test suite using **Mocha** and **Chai**:
 
 - `documentation/api/`: Contains API documentation in Markdown format.
 - `src/`: Source code of the backend.
+- `src/controllers`: Controllers files.
+- `src/models`: Models files.
+- `src/middlewares`: Express middlewares.
 - `tests/`: Test files.
 
 # License
