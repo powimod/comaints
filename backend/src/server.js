@@ -8,6 +8,8 @@ import middleware from 'i18next-http-middleware';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import swaggerUi from 'swagger-ui-express';
+import swaggerConfig from './swaggerConfig.js';
 
 import MailManagerModel from './MailManager.js';
 
@@ -16,6 +18,7 @@ import ControllerManager from './controllers/ControllerManager.js';
 import ModelSingleton from './models/model.js';
 import View from './view.js';
 
+
 dotenv.config();
 
 const main = async () => {
@@ -23,6 +26,13 @@ const main = async () => {
     const app = express();
     app.use(express.json());
     app.use(express.urlencoded({extended: true}));
+
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerConfig));
+    //console.log(JSON.stringify(swaggerConfig.paths, null, 2));
+    app.get('/swagger.json', (req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(swaggerConfig);
+    });
 
     // i18n support
     i18next.use(Backend).use(middleware.LanguageDetector).init({

@@ -43,7 +43,13 @@ export default defineConfig({
             },
             '/locales/common': {
                 target: 'http://localhost:9101', // backend address
-            }
+            },
+            '/swagger.json': {
+                target: 'http://localhost:9101', // backend address
+            },
+            '/api-docs': {
+                target: 'http://localhost:9101', // backend address
+            },
         }
     }
 });
