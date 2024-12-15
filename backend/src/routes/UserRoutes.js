@@ -16,20 +16,22 @@ class UserRoutes {
     initialize(expressApp) {
         const userController = UserController.getInstance();
 
-        expressApp.get('/api/v1/user/list', requireAdminAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, _) => {
-            const view = request.view;
-            const properties = request.requestProperties;
-            assert(properties !== undefined);
-            const pagination = request.requestPagination;
-            assert(pagination !== undefined);
+        expressApp.get('/api/v1/user/list', requireAdminAuthMiddleware,
+            requestPropertiesMiddleware, requestPaginationMiddleware,
+            async (request, _) => {
+                const view = request.view;
+                const properties = request.requestProperties;
+                assert(properties !== undefined);
+                const pagination = request.requestPagination;
+                assert(pagination !== undefined);
 
-            // for non admin users, add a filter on user company
-            const filters = {};
-            if (request.companyId !== null)
-                filters.companyId = request.companyId;
+                // for non admin users, add a filter on user company
+                const filters = {};
+                if (request.companyId !== null)
+                    filters.companyId = request.companyId;
 
-            await userController.findUserList(properties, filters, pagination, view);
-        });
+                await userController.findUserList(properties, filters, pagination, view);
+            });
 
 
         // user create route

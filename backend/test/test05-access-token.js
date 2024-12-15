@@ -43,7 +43,8 @@ describe('Test user login', () => {
                     password: PASSWORD
                 });
                 expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'message', 'access-token', 'refresh-token');
-                expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company');
+                expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected',
+                    'administrator', 'company');
                 expect(json.context.email).to.be.a('string').and.to.equal(userEmail1);
                 expect(json.context.connected).to.be.a('boolean').and.to.equal(true);
                 expect(json.context.administrator).to.be.a('boolean').and.to.equal(false);

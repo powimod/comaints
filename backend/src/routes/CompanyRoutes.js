@@ -20,15 +20,16 @@ class CompanyRoutes {
         const companyController = CompanyController.getInstance();
 
         // company list route
-        expressApp.get('/api/v1/company/list', requireAdminAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, _) => {
-            const properties = request.requestProperties;
-            assert(properties !== undefined);
-            const pagination = request.requestPagination;
-            assert(pagination !== undefined);
-            const view = request.view;
+        expressApp.get('/api/v1/company/list', requireAdminAuthMiddleware,
+            requestPropertiesMiddleware, requestPaginationMiddleware, async (request, _) => {
+                const properties = request.requestProperties;
+                assert(properties !== undefined);
+                const pagination = request.requestPagination;
+                assert(pagination !== undefined);
+                const view = request.view;
 
-            await companyController.findCompanyList(properties, filters, pagination, view);
-        });
+                await companyController.findCompanyList(properties, filters, pagination, view);
+            });
 
 
         // create company route

@@ -2,7 +2,8 @@ import assert from 'assert';
 
 import AuthController from '../controllers/AuthController.js';
 import ModelSingleton from '../models/model.js';
-import {ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken} from '../../../common/src/error.mjs';
+import {ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken}
+    from '../../../common/src/error.mjs';
 import {controlObjectProperty} from '../../../common/src/objects/object-util.mjs';
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 
@@ -24,7 +25,8 @@ class AuthRoutes {
                 // if a token is not found in database, it should be an attempt to usurp token :
                 // since a refresh token is deleted when used, it will not be found with a second attempt to use it.
                 console.log(`Token ${tokenId} not found in database`);
-                console.log(`Token renew - detection of an attempt to reuse a refresh token : lock account userId = ${userId}`);
+                console.log('Token renew - detection of an attempt to reuse a refresh token : ' +
+                    `lock account userId = ${userId}`);
                 await authModel.lockAccount(userId);
                 // TODO send an email
                 throw new ComaintApiErrorUnauthorized(view.translation('error.attempt_to_reuse_token'));
@@ -48,7 +50,8 @@ class AuthRoutes {
 
             assert(typeof (connected) === 'boolean');
             const [newRefreshToken, newRefreshTokenId] = await authModel.generateRefreshToken(userId, companyId, connected);
-            const newAccessToken = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId, true);
+            const newAccessToken = await authModel.generateAccessToken(userId,
+                companyId, user.administrator, newRefreshTokenId, true);
 
             return [userId, companyId, connected, newRefreshTokenId, newAccessToken, newRefreshToken, administrator];
         };
@@ -80,7 +83,8 @@ class AuthRoutes {
                 console.log(`Token middleware - refresh token found -> renew tokens`);
                 try {
                     let newAccessToken, newRefreshToken;
-                    [userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken, administrator] = await _renewTokensMiddleware(refreshToken, view);
+                    [userId, companyId, connected, refreshTokenId,
+                        newAccessToken, newRefreshToken, administrator] = await _renewTokensMiddleware(refreshToken, view);
                     view.storeRenewedTokens(newAccessToken, newRefreshToken);
                 }
                 catch (error) {
@@ -93,7 +97,8 @@ class AuthRoutes {
             else if (accessToken !== undefined) {
                 console.log(`Token middleware - access token found`);
                 try {
-                    [userId, companyId, refreshTokenId, connected, administrator] = await authModel.checkAccessToken(accessToken, expiredAccessTokenEmulation);
+                    [userId, companyId, refreshTokenId,
+                        connected, administrator] = await authModel.checkAccessToken(accessToken, expiredAccessTokenEmulation);
                 }
                 catch (error) {
                     // TODO add selftest to check invalid token
@@ -107,7 +112,8 @@ class AuthRoutes {
             else {
                 console.log(`Token middleware - token not found (anonymous request)`);
             }
-            console.log(`Token middleware : userId=${userId}, companyId=${companyId}, connected=${connected}, refreshTokenId = ${refreshTokenId}`);
+            console.log(`Token middleware : userId=${userId}, companyId=${companyId}, ` +
+                `connected=${connected}, refreshTokenId = ${refreshTokenId}`);
             request.userId = userId;
             request.companyId = companyId;
             request.refreshTokenId = refreshTokenId;
@@ -258,7 +264,8 @@ class AuthRoutes {
                 const userId = user.id;
                 const companyId = user.companyId;
                 const [newRefreshToken, newRefreshTokenId] = await authModel.generateRefreshToken(userId, companyId, true);
-                const newAccessToken = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId, true);
+                const newAccessToken = await authModel.generateAccessToken(userId, companyId,
+                    user.administrator, newRefreshTokenId, true);
                 view.storeRenewedContext({
                     email: user.email,
                     connected: true,
@@ -308,7 +315,8 @@ class AuthRoutes {
                 if (typeof (refreshToken) !== 'string')
                     throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'token'});
 
-                const [userId, _CompanyId, _connected, _refreshTokenId, newAccessToken, newRefreshToken] = await _renewTokensMiddleware(refreshToken, view);
+                const [userId, _companyId, _connected, _refreshTokenId,
+                    newAccessToken, newRefreshToken] = await _renewTokensMiddleware(refreshToken, view);
 
                 console.log(`auth/refresh - send new tokens userId ${userId}`);
                 view.storeRenewedTokens(newAccessToken, newRefreshToken);

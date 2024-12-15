@@ -1,10 +1,10 @@
 import assert from 'assert';
 
 import ModelSingleton from '../models/model.js';
-import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
-import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs';
+import {ComaintApiErrorInvalidRequest} from '../../../common/src/error.mjs';
+import {controlObjectProperty} from '../../../common/src/objects/object-util.mjs';
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
-import { AccountState } from '../../../common/src/global.mjs';
+import {AccountState} from '../../../common/src/global.mjs';
 
 class AuthController {
     static #instance = null;
@@ -18,12 +18,12 @@ class AuthController {
     }
 
     static getInstance() {
-        if (! AuthController.#instance)
+        if (!AuthController.#instance)
             AuthController.#instance = new AuthController();
         return AuthController.#instance;
     }
 
-    initialize(config) {
+    initialize() {
         this.#model = ModelSingleton.getInstance();
         this.#authModel = this.#model.getAuthModel();
     }
@@ -31,11 +31,11 @@ class AuthController {
 
     async register(email, password, options, view) {
         try {
-            const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email);
+            const [errorMsg1, errorParam1] = controlObjectProperty(userObjectDef, 'email', email);
             if (errorMsg1)
                 throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1);
 
-            const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', password);
+            const [errorMsg2, errorParam2] = controlObjectProperty(userObjectDef, 'password', password);
             if (errorMsg2)
                 throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2);
 
@@ -75,19 +75,21 @@ class AuthController {
                 userId = user.id;
                 companyId = user.companyId;
                 assert(userId !== undefined);
-                assert (companyId === null); // companyId should be null
-                assert (user.administrator !== undefined);
+                assert(companyId === null); // companyId should be null
+                assert(user.administrator !== undefined);
                 administrator = user.administrator;
 
                 if (options.sendCodeByEmail)
                     await this.#authModel.sendRegisterAuthCode(authCode, email, view.translation);
             }
 
-            assert (administrator !== null);
+            assert(administrator !== null);
 
             // generate new tokens with userConnected = false
-            const [ newRefreshToken, newRefreshTokenId ] = await this.#authModel.generateRefreshToken(userId, companyId, false);
-            const newAccessToken  = await this.#authModel.generateAccessToken(userId, companyId, administrator, newRefreshTokenId, false);
+            const [newRefreshToken, newRefreshTokenId] =
+                await this.#authModel.generateRefreshToken(userId, companyId, false);
+            const newAccessToken = await this.#authModel.generateAccessToken(userId,
+                companyId, administrator, newRefreshTokenId, false);
 
             view.json({
                 message: 'User registration done, waiting for validation code',
@@ -95,14 +97,14 @@ class AuthController {
                 'access-token': newAccessToken
             });
         }
-        catch(error) {
+        catch (error) {
             view.error(error);
         }
     }
 
     async validateCode(userId, code, view) {
         try {
-            const [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'authCode', code);
+            const [errorMsg, errorParam] = controlObjectProperty(userObjectDef, 'authCode', code);
             if (errorMsg)
                 throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam);
 
@@ -123,8 +125,10 @@ class AuthController {
                 else {
                     // TODO delete previous refresh token stored in request.refreshTokenId ?
                     // generate a new access token with userConnected = true
-                    const [ newRefreshToken, newRefreshTokenId ] = await this.#authModel.generateRefreshToken(user.id, user.companyId, true);
-                    const newAccessToken  = await this.#authModel.generateAccessToken(user.id, user.companyId, user.administrator, newRefreshTokenId, true);
+                    const [newRefreshToken, newRefreshTokenId] =
+                        await this.#authModel.generateRefreshToken(user.id, user.companyId, true);
+                    const newAccessToken = await this.#authModel.generateAccessToken(user.id,
+                        user.companyId, user.administrator, newRefreshTokenId, true);
                     view.storeRenewedTokens(newAccessToken, newRefreshToken);
                     view.storeRenewedContext({
                         email: user.email,
@@ -134,9 +138,9 @@ class AuthController {
                     });
                 }
             }
-            view.json({ validated: isAuthCodeValid });
+            view.json({validated: isAuthCodeValid});
         }
-        catch(error) {
+        catch (error) {
             view.error(error);
         }
     }
@@ -153,9 +157,9 @@ class AuthController {
                 const email = request.body.email;
                 if (email === undefined)
                     throw new Error("Can't identify user by access-token or email"); // TODO use ComaintApiError
-                if (typeof(email) !== 'string')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'});
-                const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email);
+                if (typeof (email) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'email'});
+                const [errorMsg1, errorParam1] = controlObjectProperty(userObjectDef, 'email', email);
                 if (errorMsg1)
                     throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1);
                 profile = await this.#authModel.getUserProfileByEmail(email);
@@ -168,46 +172,46 @@ class AuthController {
             if (options.sendCodeByEmail)
                 await this.#authModel.sendRegisterAuthCode(authCode, profile.email, view.translation);
             await this.#authModel.changeAuthCode(profile.id, authCode);
-            view.json({ message: "Code resent"});
+            view.json({message: "Code resent"});
         }
-        catch(error) {
+        catch (error) {
             view.error(error);
         }
     }
 
-/* TODO
-    async login(userId, options, view) {
-        try {
+    /* TODO
+        async login(userId, options, view) {
+            try {
+            }
+            catch(error) {
+                view.error(error);
+            }
         }
-        catch(error) {
-            view.error(error);
+     
+        async logout(userId, options, view) {
+            try {
+            }
+            catch(error) {
+                view.error(error);
+            }
         }
-    }
- 
-    async logout(userId, options, view) {
-        try {
+    
+        async refreshTokens(userId, options, view) {
+            try {
+            }
+            catch(error) {
+                view.error(error);
+            }
         }
-        catch(error) {
-            view.error(error);
-        }
-    }
-
-    async refreshTokens(userId, options, view) {
-        try {
-        }
-        catch(error) {
-            view.error(error);
-        }
-    }
-*/
+    */
 
     async resetPassword(email, newPassword, options, view) {
         try {
-            const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email);
+            const [errorMsg1, errorParam1] = controlObjectProperty(userObjectDef, 'email', email);
             if (errorMsg1)
                 throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1);
 
-            const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', newPassword);
+            const [errorMsg2, errorParam2] = controlObjectProperty(userObjectDef, 'password', newPassword);
             if (errorMsg2)
                 throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2);
 
@@ -216,13 +220,13 @@ class AuthController {
                 await this.#authModel.sendResetPasswordAuthCode(authCode, email, view.translation);
             await this.#authModel.preparePasswordReset(email, newPassword, authCode, false);
 
-            view.json({ message: 'Password changed, waiting for validation code' });
+            view.json({message: 'Password changed, waiting for validation code'});
         }
-        catch(error) {
+        catch (error) {
             view.error(error);
         }
     }
- 
+
 }
 
 export default AuthController;

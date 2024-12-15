@@ -17,38 +17,42 @@ class UnitRoutes {
         const unitController = UnitController.getInstance();
 
         // unit list route
-        expressApp.get('/api/v1/unit/list', requireUserWithCompanyAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, _) => {
-            const properties = request.requestProperties;
-            assert(properties !== undefined);
-            const pagination = request.requestPagination;
-            assert(pagination !== undefined);
-            const view = request.view;
+        expressApp.get('/api/v1/unit/list', requireUserWithCompanyAuthMiddleware,
+            requestPropertiesMiddleware, requestPaginationMiddleware,
+            async (request, _) => {
+                const properties = request.requestProperties;
+                assert(properties !== undefined);
+                const pagination = request.requestPagination;
+                assert(pagination !== undefined);
+                const view = request.view;
 
-            // for non admin users, add a filter on user company
-            const filters = {};
-            if (request.companyId !== null)
-                filters.companyId = request.companyId;
+                // for non admin users, add a filter on user company
+                const filters = {};
+                if (request.companyId !== null)
+                    filters.companyId = request.companyId;
 
-            await unitController.findUnitList(properties, filters, pagination, view);
-        });
+                await unitController.findUnitList(properties, filters, pagination, view);
+            });
 
 
         // unit search route
-        expressApp.post('/api/v1/unit/search', requireUserWithCompanyAuthMiddleware, requestPropertiesMiddleware, requestFiltersMiddleware, requestPaginationMiddleware, async (request) => {
-            const properties = request.requestProperties;
-            assert(properties !== undefined);
-            const filters = request.requestFilters;
-            assert(filters !== undefined);
-            const pagination = request.requestPagination;
-            assert(pagination !== undefined);
-            const view = request.view;
+        expressApp.post('/api/v1/unit/search', requireUserWithCompanyAuthMiddleware,
+            requestPropertiesMiddleware, requestFiltersMiddleware, requestPaginationMiddleware,
+            async (request) => {
+                const properties = request.requestProperties;
+                assert(properties !== undefined);
+                const filters = request.requestFilters;
+                assert(filters !== undefined);
+                const pagination = request.requestPagination;
+                assert(pagination !== undefined);
+                const view = request.view;
 
-            // for non admin users, add a filter on user company
-            if (request.companyId !== null)
-                filters.companyId = request.companyId;
+                // for non admin users, add a filter on user company
+                if (request.companyId !== null)
+                    filters.companyId = request.companyId;
 
-            await unitController.findUnitList(properties, filters, pagination, view);
-        });
+                await unitController.findUnitList(properties, filters, pagination, view);
+            });
 
 
         // create unit route

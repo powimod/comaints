@@ -16,7 +16,8 @@ export default [
             "semi": ["error", "always"], // Toujours un point-virgule
             "no-console": "off", // Permet l'utilisation de `console.log` (utile en backend)
             "strict": ["error", "global"], // Force le mode strict au niveau global
-            "no-unused-vars": ["error", {"args": "none"}]
+            "no-unused-vars": ["error", {"args": "none"}],
+            "max-len": ["error", {"code": 127, "tabWidth": 2, "ignoreUrls": true}]
         },
     }
 ];
