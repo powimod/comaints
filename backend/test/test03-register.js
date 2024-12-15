@@ -1,17 +1,17 @@
 
-import { expect } from 'chai';
+import {expect} from 'chai';
 
-import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js';
-import { userPublicProperties, getDatabaseUserByEmail } from './helpers.js';
+import {loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken} from './util.js';
+import {userPublicProperties, getDatabaseUserByEmail} from './helpers.js';
 
 const ROUTE_REGISTER = 'api/v1/auth/register';
 const ROUTE_VALIDATE = 'api/v1/auth/validate';
-const ROUTE_LOGOUT   = 'api/v1/auth/logout';
-const ROUTE_PROFILE  = 'api/v1/account/profile';
+const ROUTE_LOGOUT = 'api/v1/auth/logout';
+const ROUTE_PROFILE = 'api/v1/account/profile';
 
 describe('Test user registration', () => {
 
-    let authCode  = null;
+    let authCode = null;
     const dte = new Date();
 
     const userEmail = `u${dte.getTime()}@x.y`;
@@ -19,154 +19,152 @@ describe('Test user registration', () => {
     const userEmail3 = `u${dte.getTime()}3@x.y`;
     const userEmail4 = `u${dte.getTime()}3@x.y`;
     let userId = null;
-    let userId2  = null;
-    let userId3  = null;
 
-    before( async () =>  {
+    before(async () => {
         loadConfig();
         await connectDb();
     }),
 
-    after( async () =>  {
-        await requestDb('DELETE FROM users WHERE email=?', userEmail);
-        await requestDb('DELETE FROM users WHERE email=?', userEmail2);
-        await requestDb('DELETE FROM users WHERE email=?', userEmail3);
-        await requestDb('DELETE FROM users WHERE email=?', userEmail4);
-        await disconnectDb();
-    }),
+        after(async () => {
+            await requestDb('DELETE FROM users WHERE email=?', userEmail);
+            await requestDb('DELETE FROM users WHERE email=?', userEmail2);
+            await requestDb('DELETE FROM users WHERE email=?', userEmail3);
+            await requestDb('DELETE FROM users WHERE email=?', userEmail4);
+            await disconnectDb();
+        }),
 
-    describe(`Call route /${ROUTE_REGISTER} with invalid data`, () => {
+        describe(`Call route /${ROUTE_REGISTER} with invalid data`, () => {
 
-        it(`Should detect missing email in request`, async () => {
-            try {
-                await jsonPost(ROUTE_REGISTER, {
-                        email_missing:'',
-                        password:'',
+            it(`Should detect missing email in request`, async () => {
+                try {
+                    await jsonPost(ROUTE_REGISTER, {
+                        email_missing: '',
+                        password: '',
                         sendCodeByEmail: false
                     });
-                expect.fail("Missing «email» parameter not detected");
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal(`Parameter «email» not found in request`);
-            }
-        });
+                    expect.fail("Missing «email» parameter not detected");
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal(`Parameter «email» not found in request`);
+                }
+            });
 
 
-        it(`Should detect empty email in request`, async () => {
-            try {
-                await jsonPost(ROUTE_REGISTER, {
-                        email:'',
-                        password:'',
+            it(`Should detect empty email in request`, async () => {
+                try {
+                    await jsonPost(ROUTE_REGISTER, {
+                        email: '',
+                        password: '',
                         sendCodeByEmail: false
                     });
-                expect.fail("Missing «email» parameter not detected");
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal(`Property «email» is too short`);
-            }
-        });
+                    expect.fail("Missing «email» parameter not detected");
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal(`Property «email» is too short`);
+                }
+            });
 
-        it(`Should detect malformed email in request`, async () => {
-            try {
-                await jsonPost(ROUTE_REGISTER, {
-                        email:'abcdef',
-                        password:'',
+            it(`Should detect malformed email in request`, async () => {
+                try {
+                    await jsonPost(ROUTE_REGISTER, {
+                        email: 'abcdef',
+                        password: '',
                         sendCodeByEmail: false
                     });
-                expect.fail("Missing «email» parameter not detected");
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal(`Property «email» is not a valid email`);
-            }
-        });
+                    expect.fail("Missing «email» parameter not detected");
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal(`Property «email» is not a valid email`);
+                }
+            });
 
 
-        it('Should detect missing password in request', async () => {
-            try {
-                await jsonPost(ROUTE_REGISTER, {
-                        email:'a@b.c',
-                        password_missing:'',
+            it('Should detect missing password in request', async () => {
+                try {
+                    await jsonPost(ROUTE_REGISTER, {
+                        email: 'a@b.c',
+                        password_missing: '',
                         sendCodeByEmail: false
                     });
-                expect.fail('Missing «password» parameter not detected');
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal('Parameter «password» not found in request');
-            }
-        });
+                    expect.fail('Missing «password» parameter not detected');
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal('Parameter «password» not found in request');
+                }
+            });
 
-        it('Should detect too small password in request', async () => {
-            try {
-                await jsonPost(ROUTE_REGISTER, {
-                        email:'a@b.c',
-                        password:'abc',
+            it('Should detect too small password in request', async () => {
+                try {
+                    await jsonPost(ROUTE_REGISTER, {
+                        email: 'a@b.c',
+                        password: 'abc',
                         sendCodeByEmail: false
                     });
-                expect.fail('Invalid «password» parameter not detected');
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal('Password is too small');
-            }
-        });
+                    expect.fail('Invalid «password» parameter not detected');
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal('Password is too small');
+                }
+            });
 
-        it('Should detect password with no uppercase letter in request', async () => {
-            try {
-                await jsonPost(ROUTE_REGISTER, {
-                        email:'a@b.c',
-                        password:'abcdefghijk9.',
+            it('Should detect password with no uppercase letter in request', async () => {
+                try {
+                    await jsonPost(ROUTE_REGISTER, {
+                        email: 'a@b.c',
+                        password: 'abcdefghijk9.',
                         sendCodeByEmail: false
                     });
-                expect.fail('Invalid «password» parameter not detected');
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal('Password does not contain uppercase letter');
-            }
-        });
+                    expect.fail('Invalid «password» parameter not detected');
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal('Password does not contain uppercase letter');
+                }
+            });
 
-        it('Should detect password with no digit character in request', async () => {
-            try {
-                await jsonPost(ROUTE_REGISTER, {
-                        email:'a@b.c',
-                        password:'aBcdefghijkl.',
+            it('Should detect password with no digit character in request', async () => {
+                try {
+                    await jsonPost(ROUTE_REGISTER, {
+                        email: 'a@b.c',
+                        password: 'aBcdefghijkl.',
                         sendCodeByEmail: false
                     });
-                expect.fail('Invalid «password» parameter not detected');
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal('Password does not contain digit character');
-            }
-        });
+                    expect.fail('Invalid «password» parameter not detected');
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal('Password does not contain digit character');
+                }
+            });
 
-        it('Should detect password with no special character in request', async () => {
-            try {
-                await jsonPost(ROUTE_REGISTER, {
-                        email:'a@b.c',
-                        password:'aBcdefghijkl9',
+            it('Should detect password with no special character in request', async () => {
+                try {
+                    await jsonPost(ROUTE_REGISTER, {
+                        email: 'a@b.c',
+                        password: 'aBcdefghijkl9',
                         sendCodeByEmail: false
                     });
-                expect.fail('Invalid «password» parameter not detected');
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal('Password does not contain special character');
-            }
+                    expect.fail('Invalid «password» parameter not detected');
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal('Password does not contain special character');
+                }
+            });
         });
-    });
 
 
     describe(`Test route /${ROUTE_REGISTER} with valid data`, () => {
 
         it('User regisration', async () => {
             const json = await jsonPost(ROUTE_REGISTER, {
-                email:userEmail,
-                password:'aBcdef+ghijkl9',
+                email: userEmail,
+                password: 'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             });
             expect(json).to.have.keys('access-token', 'refresh-token', 'message');
@@ -177,10 +175,10 @@ describe('Test user registration', () => {
 
         it('Check registration attempt with an existing email', async () => {
             const json = await jsonPost(ROUTE_REGISTER, {
-                    email:userEmail,
-                    password:'aBcdef+ghijkl9',
-                    sendCodeByEmail: false
-                });
+                email: userEmail,
+                password: 'aBcdef+ghijkl9',
+                sendCodeByEmail: false
+            });
             expect(json).to.have.keys('access-token', 'refresh-token', 'message');
             expect(json['access-token']).to.be.a('string');
             expect(json['refresh-token']).to.be.a('string');
@@ -190,7 +188,7 @@ describe('Test user registration', () => {
         });
 
         it('Check newly created user in database', async () => {
-            const res = await requestDb('select * from users where email=?', [ userEmail ]);
+            const res = await requestDb('select * from users where email=?', [userEmail]);
             expect(res).to.be.instanceOf(Array);
             const user = res[0];
             expect(user).to.be.instanceOf(Object);
@@ -257,7 +255,7 @@ describe('Test user registration', () => {
 
         it('Try to validate registration with invalid code', async () => {
             try {
-                await jsonPost(ROUTE_VALIDATE, { code: 'abcd' });
+                await jsonPost(ROUTE_VALIDATE, {code: 'abcd'});
                 expect.fail("Invalid «code» parameter not detected");
             }
             catch (error) {
@@ -268,7 +266,7 @@ describe('Test user registration', () => {
 
         it('Try to validate registration with too large code', async () => {
             try {
-                await jsonPost(ROUTE_VALIDATE, { code: 1234567 });
+                await jsonPost(ROUTE_VALIDATE, {code: 1234567});
                 expect.fail("Too large code not detected");
             }
             catch (error) {
@@ -280,13 +278,13 @@ describe('Test user registration', () => {
 
         it('Send incorrect validation code', async () => {
             const incorrectCode = authCode + 1;
-            const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode });
+            const json = await jsonPost(ROUTE_VALIDATE, {code: incorrectCode});
             expect(json).to.be.instanceOf(Object).and.to.have.keys('validated');
             expect(json.validated).to.be.a('boolean').and.to.equal(false);
         });
 
         it('Send validation code', async () => {
-            const json = await jsonPost(ROUTE_VALIDATE, { code: authCode});
+            const json = await jsonPost(ROUTE_VALIDATE, {code: authCode});
             expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'validated', 'access-token', 'refresh-token');
             expect(json.validated).to.be.a('boolean').and.to.equal(true);
             expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company');
@@ -299,7 +297,7 @@ describe('Test user registration', () => {
         });
 
         it('Check newly registered user in database', async () => {
-            const res = await requestDb('select * from users where id=?', [ userId ]);
+            const res = await requestDb('select * from users where id=?', [userId]);
             expect(res).to.be.instanceOf(Array);
             const user = res[0];
             expect(user).to.be.instanceOf(Object);
@@ -365,7 +363,7 @@ describe('Test user registration', () => {
         });
 
         it('Check profile access when disconnected', async () => {
-            const res = await requestDb('select * from users where id=?', [ userId ]);
+            const res = await requestDb('select * from users where id=?', [userId]);
             const user = res[0];
             expect(user).to.have.property('auth_action');
             expect(user.auth_action).to.be.equal(null);
@@ -395,8 +393,8 @@ describe('Test user registration', () => {
         // register
         it('User regisration', async () => {
             const json = await jsonPost(ROUTE_REGISTER, {
-                email:userEmail2,
-                password:'aBcdef+ghijkl9',
+                email: userEmail2,
+                password: 'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             });
             expect(json).to.have.keys('access-token', 'refresh-token', 'message');
@@ -406,13 +404,12 @@ describe('Test user registration', () => {
         });
 
         it('Check newly created user in database', async () => {
-            const res = await requestDb('select * from users where email=?', [ userEmail2 ]);
+            const res = await requestDb('select * from users where email=?', [userEmail2]);
             expect(res).to.be.instanceOf(Array);
             const user = res[0];
             expect(user).to.be.instanceOf(Object);
 
             expect(user).to.have.property('id');
-            userId2 = user.id;
 
             expect(user).to.have.property('state');
             expect(user.state).to.a('number').and.to.equal(0); // pending
@@ -436,19 +433,18 @@ describe('Test user registration', () => {
         //───────────── First attempt
         it('First attempt to confirm registration with an invalid code', async () => {
             const incorrectCode = authCode + 1;
-            const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode });
+            const json = await jsonPost(ROUTE_VALIDATE, {code: incorrectCode});
             expect(json).to.be.instanceOf(Object).and.to.have.keys('validated');
             expect(json.validated).to.be.a('boolean').and.to.equal(false);
         });
 
         it('Check user in database after first attempt', async () => {
-            const res = await requestDb('select * from users where email=?', [ userEmail2 ]);
+            const res = await requestDb('select * from users where email=?', [userEmail2]);
             expect(res).to.be.instanceOf(Array);
             const user = res[0];
             expect(user).to.be.instanceOf(Object);
 
             expect(user).to.have.property('id');
-            userId2 = user.id;
 
             expect(user).to.have.property('state');
             expect(user.state).to.a('number').and.to.equal(0); // pending
@@ -471,13 +467,13 @@ describe('Test user registration', () => {
         //───────────── Second attempt
         it('Second attempt to confirm registration with an invalid code', async () => {
             const incorrectCode = authCode + 1;
-            const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode });
+            const json = await jsonPost(ROUTE_VALIDATE, {code: incorrectCode});
             expect(json).to.be.instanceOf(Object).and.to.have.keys('validated');
             expect(json.validated).to.be.a('boolean').and.to.equal(false);
         });
 
         it('Check user in database after second attempt', async () => {
-            const res = await requestDb('select * from users where email=?', [ userEmail2 ]);
+            const res = await requestDb('select * from users where email=?', [userEmail2]);
             expect(res).to.be.instanceOf(Array);
             const user = res[0];
             expect(user).to.be.instanceOf(Object);
@@ -494,13 +490,13 @@ describe('Test user registration', () => {
         //───────────── Third attempt
         it('Third attempt to confirm registration with an invalid code', async () => {
             const incorrectCode = authCode + 1;
-            const json = await jsonPost(ROUTE_VALIDATE, { code: incorrectCode });
+            const json = await jsonPost(ROUTE_VALIDATE, {code: incorrectCode});
             expect(json).to.be.instanceOf(Object).and.to.have.keys('validated');
             expect(json.validated).to.be.a('boolean').and.to.equal(false);
         });
 
         it('Check user in database after third attempt', async () => {
-            const res = await requestDb('select * from users where email=?', [ userEmail2 ]);
+            const res = await requestDb('select * from users where email=?', [userEmail2]);
             expect(res).to.be.instanceOf(Array);
             const user = res[0];
             expect(user).to.be.instanceOf(Object);
@@ -530,8 +526,8 @@ describe('Test user registration', () => {
 
         it('User regisration', async () => {
             const json = await jsonPost(ROUTE_REGISTER, {
-                email:userEmail3,
-                password:'aBcdef+ghijkl9',
+                email: userEmail3,
+                password: 'aBcdef+ghijkl9',
                 sendCodeByEmail: false,
                 invalidateCodeImmediately: true // set code validity to zero
             });
@@ -542,13 +538,12 @@ describe('Test user registration', () => {
         });
 
         it('Check newly created user in database', async () => {
-            const res = await requestDb('select * from users where email=?', [ userEmail3 ]);
+            const res = await requestDb('select * from users where email=?', [userEmail3]);
             expect(res).to.be.instanceOf(Array);
             const user = res[0];
             expect(user).to.be.instanceOf(Object);
 
             expect(user).to.have.property('id');
-            userId3 = user.id;
 
             expect(user).to.have.property('state');
             expect(user.state).to.a('number').and.to.equal(0); // pending
@@ -575,7 +570,7 @@ describe('Test user registration', () => {
 
         it('Send validation code after code expiration', async () => {
             try {
-                await jsonPost(ROUTE_VALIDATE, { code: authCode });
+                await jsonPost(ROUTE_VALIDATE, {code: authCode});
                 expect.fail("Code expiration was not detected");
             }
             catch (error) {
@@ -589,8 +584,8 @@ describe('Test user registration', () => {
 
         it('First user regisration', async () => {
             const json = await jsonPost(ROUTE_REGISTER, {
-                email:userEmail4,
-                password:'aBcdef+ghijkl9',
+                email: userEmail4,
+                password: 'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             });
             expect(json).to.have.keys('access-token', 'refresh-token', 'message');
@@ -610,8 +605,8 @@ describe('Test user registration', () => {
         //  ça ne doit pas générer d'erreur et générer un nouveau code
         it('Second user regisration', async () => {
             const json = await jsonPost(ROUTE_REGISTER, {
-                email:userEmail4,
-                password:'aBcdef+ghijkl9',
+                email: userEmail4,
+                password: 'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             });
             expect(json).to.have.keys('access-token', 'refresh-token', 'message');
@@ -630,7 +625,7 @@ describe('Test user registration', () => {
         });
 
         it('Send validation code', async () => {
-            const json = await jsonPost(ROUTE_VALIDATE, { code: authCode});
+            const json = await jsonPost(ROUTE_VALIDATE, {code: authCode});
             expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'validated', 'access-token', 'refresh-token');
             expect(json.validated).to.be.a('boolean').and.to.equal(true);
             expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company');
@@ -642,7 +637,7 @@ describe('Test user registration', () => {
             expect(json['refresh-token']).to.be.a('string').and.to.have.length.above(0);
         });
 
-       it('Check user registration in database', async () => {
+        it('Check user registration in database', async () => {
             const user = await getDatabaseUserByEmail(userEmail4);
             expect(user.state).to.equal(1); // ACTIVE
             expect(user.auth_code).to.equal(null);
@@ -666,8 +661,8 @@ describe('Test user registration', () => {
 
         it('Attempt to register an already registered email', async () => {
             const json = await jsonPost(ROUTE_REGISTER, {
-                email:userEmail4,
-                password:'aBcdef+ghijkl9',
+                email: userEmail4,
+                password: 'aBcdef+ghijkl9',
                 sendCodeByEmail: false
             });
             expect(json).to.be.instanceOf(Object).and.to.have.keys('access-token', 'refresh-token', 'message');

@@ -1,9 +1,8 @@
 
-import { expect } from 'chai';
-import assert from 'assert';
+import {expect} from 'chai';
 
-import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js';
-import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserByEmail } from './helpers.js';
+import {loadConfig, jsonGet, jsonPost, connectDb, disconnectDb} from './util.js';
+import {createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserByEmail} from './helpers.js';
 
 const ROUTE_LOGIN = 'api/v1/auth/login';
 const ROUTE_LOGOUT = 'api/v1/auth/logout';
@@ -19,149 +18,149 @@ describe('Test reset password', () => {
     let validationCode = null;
     let passwordHash = null;
 
-    before( async () =>  {
+    before(async () => {
         loadConfig();
         await connectDb();
-        user = await createUserAccount({password: PASSWORD1, logout:true});
+        user = await createUserAccount({password: PASSWORD1, logout: true});
     }),
 
-    after( async () =>  {
-        await deleteUserAccount(user);
-        await disconnectDb();
-    }),
+        after(async () => {
+            await deleteUserAccount(user);
+            await disconnectDb();
+        }),
 
-    describe(`Call route /${ROUTE_RESET_PASSWORD} with invalid data`, () => {
+        describe(`Call route /${ROUTE_RESET_PASSWORD} with invalid data`, () => {
 
-        it(`Should detect missing email in request`, async () => {
-            try {
-                let json = await jsonPost(ROUTE_RESET_PASSWORD, {
-                        email_missing:'',
-                        password:''
+            it(`Should detect missing email in request`, async () => {
+                try {
+                    await jsonPost(ROUTE_RESET_PASSWORD, {
+                        email_missing: '',
+                        password: ''
                     });
-                expect.fail("Missing «email» parameter not detected");
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal(`Parameter «email» not found in request`);
-            }
-        });
+                    expect.fail("Missing «email» parameter not detected");
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal(`Parameter «email» not found in request`);
+                }
+            });
 
-        it(`Should detect empty email in request`, async () => {
-            try {
-                let json = await jsonPost(ROUTE_RESET_PASSWORD, {
-                        email:'',
-                        password:''
+            it(`Should detect empty email in request`, async () => {
+                try {
+                    await jsonPost(ROUTE_RESET_PASSWORD, {
+                        email: '',
+                        password: ''
                     });
-                expect.fail("Missing «email» parameter not detected");
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal(`Property «email» is too short`);
-            }
-        });
+                    expect.fail("Missing «email» parameter not detected");
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal(`Property «email» is too short`);
+                }
+            });
 
-        it(`Should detect malformed email in request`, async () => {
-            try {
-                let json = await jsonPost(ROUTE_RESET_PASSWORD, {
-                        email:'abcdef',
-                        password:''
+            it(`Should detect malformed email in request`, async () => {
+                try {
+                    await jsonPost(ROUTE_RESET_PASSWORD, {
+                        email: 'abcdef',
+                        password: ''
                     });
-                expect.fail("Missing «email» parameter not detected");
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal(`Property «email» is not a valid email`);
-            }
-        });
+                    expect.fail("Missing «email» parameter not detected");
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal(`Property «email» is not a valid email`);
+                }
+            });
 
-        it('Should detect missing password in request', async () => {
-            try {
-                let json = await jsonPost(ROUTE_RESET_PASSWORD, {
-                        email:'a@b.c',
-                        password_missing:'',
+            it('Should detect missing password in request', async () => {
+                try {
+                    await jsonPost(ROUTE_RESET_PASSWORD, {
+                        email: 'a@b.c',
+                        password_missing: '',
                         sendCodeByEmail: false
                     });
-                expect.fail('Missing «password» parameter not detected');
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal('Parameter «password» not found in request');
-            }
-        });
+                    expect.fail('Missing «password» parameter not detected');
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal('Parameter «password» not found in request');
+                }
+            });
 
 
-        it('Should detect too small password in request', async () => {
-            try {
-                let json = await jsonPost(ROUTE_RESET_PASSWORD, {
-                        email:'a@b.c',
-                        password:'abc',
+            it('Should detect too small password in request', async () => {
+                try {
+                    await jsonPost(ROUTE_RESET_PASSWORD, {
+                        email: 'a@b.c',
+                        password: 'abc',
                         sendCodeByEmail: false
                     });
-                expect.fail('Invalid «password» parameter not detected');
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal('Password is too small');
-            }
-        });
+                    expect.fail('Invalid «password» parameter not detected');
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal('Password is too small');
+                }
+            });
 
-        it('Should detect password with no uppercase letter in request', async () => {
-            try {
-                let json = await jsonPost(ROUTE_RESET_PASSWORD, {
-                        email:'a@b.c',
-                        password:'abcdefghijk9.',
+            it('Should detect password with no uppercase letter in request', async () => {
+                try {
+                    await jsonPost(ROUTE_RESET_PASSWORD, {
+                        email: 'a@b.c',
+                        password: 'abcdefghijk9.',
                         sendCodeByEmail: false
                     });
-                expect.fail('Invalid «password» parameter not detected');
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal('Password does not contain uppercase letter');
-            }
-        });
+                    expect.fail('Invalid «password» parameter not detected');
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal('Password does not contain uppercase letter');
+                }
+            });
 
-        it('Should detect password with no digit character in request', async () => {
-            try {
-                let json = await jsonPost(ROUTE_RESET_PASSWORD, {
-                        email:'a@b.c',
-                        password:'aBcdefghijkl.',
+            it('Should detect password with no digit character in request', async () => {
+                try {
+                    await jsonPost(ROUTE_RESET_PASSWORD, {
+                        email: 'a@b.c',
+                        password: 'aBcdefghijkl.',
                         sendCodeByEmail: false
                     });
-                expect.fail('Invalid «password» parameter not detected');
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal('Password does not contain digit character');
-            }
-        });
+                    expect.fail('Invalid «password» parameter not detected');
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal('Password does not contain digit character');
+                }
+            });
 
-        it('Should detect password with no special character in request', async () => {
-            try {
-                let json = await jsonPost(ROUTE_RESET_PASSWORD, {
-                        email:'a@b.c',
-                        password:'aBcdefghijkl9',
+            it('Should detect password with no special character in request', async () => {
+                try {
+                    await jsonPost(ROUTE_RESET_PASSWORD, {
+                        email: 'a@b.c',
+                        password: 'aBcdefghijkl9',
                         sendCodeByEmail: false
                     });
-                expect.fail('Invalid «password» parameter not detected');
-            }
-            catch (error) {
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal('Password does not contain special character');
-            }
-        });
+                    expect.fail('Invalid «password» parameter not detected');
+                }
+                catch (error) {
+                    expect(error).to.be.instanceOf(Error);
+                    expect(error.message).to.equal('Password does not contain special character');
+                }
+            });
 
-    });
+        });
 
     describe(`Call route /${ROUTE_RESET_PASSWORD} with valid data`, () => {
 
-         it('Reset password', async () => {
+        it('Reset password', async () => {
             let json = await jsonPost(ROUTE_RESET_PASSWORD, {
-                    email:user.email,
-                    password: PASSWORD2,
-                    sendCodeByEmail: false
-                });
-             expect(json).to.be.instanceOf(Object).and.to.have.keys('message');
-             expect(json.message).to.be.equal('Password changed, waiting for validation code');
+                email: user.email,
+                password: PASSWORD2,
+                sendCodeByEmail: false
+            });
+            expect(json).to.be.instanceOf(Object).and.to.have.keys('message');
+            expect(json.message).to.be.equal('Password changed, waiting for validation code');
         });
 
         it('Get auth code from database', async () => {
@@ -174,13 +173,13 @@ describe('Test reset password', () => {
 
         it('Call route with bad code', async () => {
             const badCode = validationCode + 1;
-            const json = await jsonPost(ROUTE_VALIDATE, { email: user.email, code: badCode});
+            const json = await jsonPost(ROUTE_VALIDATE, {email: user.email, code: badCode});
             expect(json).to.be.instanceOf(Object).and.to.have.keys('validated');
             expect(json.validated).to.be.a('boolean').and.to.equal(false);
         });
 
         it('Call route with code', async () => {
-            const json = await jsonPost(ROUTE_VALIDATE, { email: user.email, code: validationCode});
+            const json = await jsonPost(ROUTE_VALIDATE, {email: user.email, code: validationCode});
             expect(json).to.be.instanceOf(Object).and.to.have.keys('validated', 'context', 'access-token', 'refresh-token');
 
             expect(json.validated).to.be.a('boolean').and.to.equal(true);
@@ -229,11 +228,11 @@ describe('Test reset password', () => {
             expect(json.context.company).to.be.a('boolean').and.to.equal(false);
             expect(json.message).to.be.a('string').and.to.equal('logout success');
         });
- 
+
 
         it('Try to log in with previous password', async () => {
             try {
-                let json = await jsonPost(ROUTE_LOGIN, { email:user.email, password:PASSWORD1 });
+                await jsonPost(ROUTE_LOGIN, {email: user.email, password: PASSWORD1});
                 expect.fail("Wrong password not detected");
             }
             catch (error) {
@@ -243,7 +242,7 @@ describe('Test reset password', () => {
         });
 
         it('Try to log in with new password', async () => {
-            let json = await jsonPost(ROUTE_LOGIN, { email:user.email, password:PASSWORD2 });
+            let json = await jsonPost(ROUTE_LOGIN, {email: user.email, password: PASSWORD2});
             expect(json).to.be.instanceOf(Object);
             expect(json).to.have.property('message', 'login success');
         });
@@ -264,9 +263,9 @@ describe('Test reset password', () => {
     describe(`Call route /${ROUTE_RESET_PASSWORD} with non existing email`, () => {
         it('Try to change password with non existing email', async () => {
             try {
-                let json = await jsonPost(ROUTE_RESET_PASSWORD, {
+                await jsonPost(ROUTE_RESET_PASSWORD, {
                     email: 'non@existing.email',
-                    password:PASSWORD1,
+                    password: PASSWORD1,
                     sendCodeByEmail: false
                 });
                 // FIXME le message indique que le compte n'existe pas : ça aide pour le piratage

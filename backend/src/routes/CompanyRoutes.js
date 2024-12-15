@@ -2,17 +2,16 @@
 import assert from 'assert';
 
 import CompanyController from '../controllers/CompanyController.js';
-import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
+import {ComaintApiErrorInvalidRequest} from '../../../common/src/error.mjs';
 
 import requireAdminAuthMiddleware from '../middlewares/requireAdminAuthMiddleware.js';
 import requireUserAuthMiddleware from '../middlewares/requireUserAuthMiddleware.js';
 import requestPaginationMiddleware from '../middlewares/requestPaginationMiddleware.js';
-import requestFiltersMiddleware from '../middlewares/requestFiltersMiddleware.js';
 import requestPropertiesMiddleware from '../middlewares/requestPropertiesMiddleware.js';
 import renewTokensMiddleware from '../middlewares/renewTokensMiddleware.js';
 import renewContextMiddleware from '../middlewares/renewContextMiddleware.js';
 
-import { controlObject, controlObjectProperty, buildPublicObjectVersion } from '../../../common/src/objects/object-util.mjs';
+import {controlObject} from '../../../common/src/objects/object-util.mjs';
 import companyObjectDef from '../../../common/src/objects/company-object-def.mjs';
 
 class CompanyRoutes {
@@ -21,7 +20,7 @@ class CompanyRoutes {
         const companyController = CompanyController.getInstance();
 
         // company list route
-	    expressApp.get('/api/v1/company/list', requireAdminAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, response) => {
+        expressApp.get('/api/v1/company/list', requireAdminAuthMiddleware, requestPropertiesMiddleware, requestPaginationMiddleware, async (request, _) => {
             const properties = request.requestProperties;
             assert(properties !== undefined);
             const pagination = request.requestPagination;
@@ -33,27 +32,27 @@ class CompanyRoutes {
 
 
         // create company route
-        expressApp.post('/api/v1/company', requireAdminAuthMiddleware, async (request, response) => {
+        expressApp.post('/api/v1/company', requireAdminAuthMiddleware, async (request, _) => {
             const view = request.view;
             try {
                 let company = request.body.company;
                 if (company === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'company'});
-                if (typeof(company) !== 'object')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'company'});
-                const [ errorMsg, errorParam ] = controlObject(companyObjectDef, company, { fullCheck:true, checkId:false });
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'company'});
+                if (typeof (company) !== 'object')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'company'});
+                const [errorMsg, errorParam] = controlObject(companyObjectDef, company, {fullCheck: true, checkId: false});
                 if (errorMsg)
                     throw new ComaintApiErrorInvalidRequest(errorMsg, errorParam);
 
                 await companyController.createCompany(company, view);
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
 
         // initialize company route
-        expressApp.post('/api/v1/company/initialize', requireUserAuthMiddleware, async (request, response) => {
+        expressApp.post('/api/v1/company/initialize', requireUserAuthMiddleware, async (request, _) => {
             const view = request.view;
             try {
                 assert(request.userId);
@@ -64,7 +63,7 @@ class CompanyRoutes {
 
                 let companyName = request.body.companyName;
                 if (companyName === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'companyName'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'companyName'});
 
                 await companyController.initializeCompany(companyName, userId, view, async user => {
                     request.companyId = user.companyId;
@@ -72,7 +71,7 @@ class CompanyRoutes {
                     await renewContextMiddleware(request, user);
                 });
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
@@ -84,15 +83,15 @@ class CompanyRoutesSingleton {
 
     static #instance = null;
 
-	constructor() {
-		throw new Error('Can not instanciate CompanyRoutesSingleton!');
-	}
+    constructor() {
+        throw new Error('Can not instanciate CompanyRoutesSingleton!');
+    }
 
-	static getInstance() {
-		if (! CompanyRoutesSingleton.#instance)
-			CompanyRoutesSingleton.#instance = new CompanyRoutes();
-		return CompanyRoutesSingleton.#instance;
-	}
+    static getInstance() {
+        if (!CompanyRoutesSingleton.#instance)
+            CompanyRoutesSingleton.#instance = new CompanyRoutes();
+        return CompanyRoutesSingleton.#instance;
+    }
 }
 
 export default CompanyRoutesSingleton; 

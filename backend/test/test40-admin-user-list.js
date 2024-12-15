@@ -1,8 +1,8 @@
 
-import { expect } from 'chai';
+import {expect} from 'chai';
 
-import { loadConfig, jsonGet, connectDb, disconnectDb } from './util.js';
-import { createUserAccount, deleteUserAccount, changeUser, connectWithAdminAccount } from './helpers.js';
+import {loadConfig, jsonGet, connectDb, disconnectDb} from './util.js';
+import {createUserAccount, deleteUserAccount, connectWithAdminAccount} from './helpers.js';
 
 const ROUTE_USER_LIST = '/api/v1/user/list';
 
@@ -11,14 +11,14 @@ describe('Test users list with admin account', () => {
     const userCount = 15;
     let userPool = [];
 
-    before( async () =>  {
+    before(async () => {
         loadConfig();
         await connectDb();
         for (let iUser = 1; iUser <= userCount; iUser++)
-            userPool.push(await createUserAccount({withCompany:true, logout:true}));
+            userPool.push(await createUserAccount({withCompany: true, logout: true}));
     });
 
-    after( async () =>  {
+    after(async () => {
         for (const user of userPool)
             await deleteUserAccount(user);
         await disconnectDb();
@@ -29,9 +29,9 @@ describe('Test users list with admin account', () => {
     describe('Check user list with admin account', () => {
 
         it(`Log with admin account`, async () => {
-            const json= await connectWithAdminAccount();
+            const json = await connectWithAdminAccount();
             expect(json.context).to.be.instanceOf(Object);
-            expect(json.context).to.have.property('administrator',true);
+            expect(json.context).to.have.property('administrator', true);
             expect(json.context).to.have.property('company', false);
         });
 
@@ -45,7 +45,7 @@ describe('Test users list with admin account', () => {
             expect(userList).to.be.instanceOf(Array).and.to.have.lengthOf(10);
             //console.log("users", userList.map( u => u.name).join(', '))
             let user = userList[0];
-            expect(user).to.be.instanceOf(Object).and.to.have.keys([ 'id', 'email', 'firstname', 'lastname' ]);
+            expect(user).to.be.instanceOf(Object).and.to.have.keys(['id', 'email', 'firstname', 'lastname']);
             expect(user.id).to.be.a('number');
         });
 
@@ -92,7 +92,7 @@ describe('Test users list with admin account', () => {
                 expect(userList).to.be.instanceOf(Array).and.to.have.lengthOf(6);
                 //console.log("users", userList.map( u => u.name).join(', '))
                 user = userList[0];
-                expect(user).to.be.instanceOf(Object).and.to.have.keys([ 'id', 'email', 'firstname', 'lastname' ]);
+                expect(user).to.be.instanceOf(Object).and.to.have.keys(['id', 'email', 'firstname', 'lastname']);
             });
 
         });
@@ -101,25 +101,25 @@ describe('Test users list with admin account', () => {
             it(`Check user list without properties`, async () => {
                 let user;
                 let json = await jsonGet(ROUTE_USER_LIST, {
-                    properties: [ 'id', 'email', 'administrator', 'manager' ]
+                    properties: ['id', 'email', 'administrator', 'manager']
                 });
                 expect(json).to.be.instanceOf(Object).and.to.have.keys('userList', 'count', 'page', 'limit');
                 const userList = json.userList;
                 expect(userList).to.be.instanceOf(Array).and.to.have.lengthOf(10);
                 user = userList[0];
-                expect(user).to.be.instanceOf(Object).and.to.have.keys([ 'id', 'email', 'administrator', 'manager' ]);
+                expect(user).to.be.instanceOf(Object).and.to.have.keys(['id', 'email', 'administrator', 'manager']);
             });
 
             it(`Check password filtering`, async () => {
                 let user;
                 let json = await jsonGet(ROUTE_USER_LIST, {
-                    properties: [ 'id', 'email', 'password' ]
+                    properties: ['id', 'email', 'password']
                 });
                 expect(json).to.be.instanceOf(Object).and.to.have.keys('userList', 'count', 'page', 'limit');
                 const userList = json.userList;
                 expect(userList).to.be.instanceOf(Array).and.to.have.lengthOf(10);
                 user = userList[0];
-                expect(user).to.be.instanceOf(Object).and.to.have.keys([ 'id', 'email' ]); // password must not be present
+                expect(user).to.be.instanceOf(Object).and.to.have.keys(['id', 'email']); // password must not be present
             });
         });
 

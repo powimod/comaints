@@ -1,12 +1,10 @@
 
-import assert from 'assert';
-
 import GlobalController from '../controllers/GlobalController.js';
 import View from '../view.js';
-import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
+import {ComaintApiErrorInvalidRequest} from '../../../common/src/error.mjs';
 
-import { controlObject } from '../../../common/src/objects/object-util.mjs';
-import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
+//import { controlObject } from '../../../common/src/objects/object-util.mjs';
+//import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 
 class GlobalRoutes {
 
@@ -79,15 +77,15 @@ class GlobalRoutes {
             try {
                 const firstname = request.body.firstname;
                 if (firstname === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'firstname'});
-                if (typeof(firstname) !== 'string')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'firstname'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'firstname'});
+                if (typeof (firstname) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'firstname'});
                 const lastname = request.body.lastname;
                 view.json({
-                    response: view.translation('general.hello', { firstname, lastname })
+                    response: view.translation('general.hello', {firstname, lastname})
                 });
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
@@ -113,7 +111,7 @@ class GlobalRoutes {
          */
         expressApp.get(`/api/version`, (request, response) => {
             const view = new View(request, response);
-            view.json({ version: apiVersion });
+            view.json({version: apiVersion});
         });
 
         /**
@@ -137,7 +135,7 @@ class GlobalRoutes {
          */
         expressApp.get(`/api/${apiVersion}/backend-version`, (request, response) => {
             const view = new View(request, response);
-            view.json({ version: config.version});
+            view.json({version: config.version});
         });
 
         /**
@@ -179,7 +177,7 @@ class GlobalRoutesSingleton {
     }
 
     static getInstance() {
-        if (! GlobalRoutesSingleton.#instance)
+        if (!GlobalRoutesSingleton.#instance)
             GlobalRoutesSingleton.#instance = new GlobalRoutes();
         return GlobalRoutesSingleton.#instance;
     }

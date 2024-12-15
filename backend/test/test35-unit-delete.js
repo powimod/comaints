@@ -1,11 +1,11 @@
 
-import { expect } from 'chai';
+import {expect} from 'chai';
 
-import { loadConfig, jsonGet, jsonPost, jsonDelete, prepareRequestPath, connectDb, disconnectDb } from './util.js';
-import { createUserAccount, deleteUserAccount, changeUser } from './helpers.js';
+import {loadConfig, jsonGet, jsonPost, jsonDelete, prepareRequestPath, connectDb, disconnectDb} from './util.js';
+import {createUserAccount, deleteUserAccount, changeUser} from './helpers.js';
 
 const ROUTE_UNIT_CREATE = '/api/v1/unit';
-const ROUTE_UNIT_DELETE= '/api/v1/unit/{{unitId}}/delete';
+const ROUTE_UNIT_DELETE = '/api/v1/unit/{{unitId}}/delete';
 const ROUTE_UNIT_GET = '/api/v1/unit/{{unitId}}';
 
 describe('Test unit suppression', () => {
@@ -18,14 +18,14 @@ describe('Test unit suppression', () => {
     let user2 = null;
     let unit1 = null;
 
-    before( async () =>  {
+    before(async () => {
         loadConfig();
         await connectDb();
-        user2 = await createUserAccount({withCompany:true});
-        user1 = await createUserAccount({withCompany:true});
+        user2 = await createUserAccount({withCompany: true});
+        user1 = await createUserAccount({withCompany: true});
     });
 
-    after( async () =>  {
+    after(async () => {
         await deleteUserAccount(user1);
         await deleteUserAccount(user2);
         await disconnectDb();
@@ -56,7 +56,7 @@ describe('Test unit suppression', () => {
 
 
         it(`Check first unit exists`, async () => {
-            const route = prepareRequestPath(ROUTE_UNIT_GET, { unitId: unit1.id});
+            const route = prepareRequestPath(ROUTE_UNIT_GET, {unitId: unit1.id});
             const json = await jsonGet(route);
             expect(json).to.be.instanceOf(Object);
             expect(json.unit).to.have.property('id', unit1.id);
@@ -65,7 +65,7 @@ describe('Test unit suppression', () => {
 
 
         it(`Delete first unit`, async () => {
-            const route = prepareRequestPath(ROUTE_UNIT_DELETE, { unitId: unit1.id});
+            const route = prepareRequestPath(ROUTE_UNIT_DELETE, {unitId: unit1.id});
             const json = await jsonDelete(route);
             expect(json).to.be.instanceOf(Object).and.to.have.keys('deleted');
             expect(json.deleted).to.be.a('boolean').and.to.equal(true);
@@ -73,7 +73,7 @@ describe('Test unit suppression', () => {
 
 
         it(`Check first unit is deleted`, async () => {
-            const route = prepareRequestPath(ROUTE_UNIT_GET, { unitId: unit1.id});
+            const route = prepareRequestPath(ROUTE_UNIT_GET, {unitId: unit1.id});
             const json = await jsonGet(route);
             expect(json).to.be.instanceOf(Object).and.to.have.keys('unit');
             expect(json.unit).to.equal(null);
@@ -82,8 +82,8 @@ describe('Test unit suppression', () => {
 
         it(`Try to delete already deleted unit`, async () => {
             try {
-                const route = prepareRequestPath(ROUTE_UNIT_DELETE, { unitId: unit1.id});
-                const json = await jsonDelete(route);
+                const route = prepareRequestPath(ROUTE_UNIT_DELETE, {unitId: unit1.id});
+                await jsonDelete(route);
                 throw new Error('Non existent unit ID not detected');
             }
             catch (error) {
@@ -110,7 +110,7 @@ describe('Test unit suppression', () => {
             expect(json).to.have.keys('unit');
             unit = json.unit;
             // delete this unit with same user with same user
-            const route = prepareRequestPath(ROUTE_UNIT_DELETE, { unitId: unit.id});
+            const route = prepareRequestPath(ROUTE_UNIT_DELETE, {unitId: unit.id});
             json = await jsonDelete(route);
             expect(json).to.be.instanceOf(Object).and.to.have.keys('deleted');
             expect(json.deleted).to.be.a('boolean').and.to.equal(true);
@@ -128,7 +128,7 @@ describe('Test unit suppression', () => {
             // delete this unit with same user with other user
             await changeUser(user2);
             try {
-                const route = prepareRequestPath(ROUTE_UNIT_DELETE, { unitId: unit.id});
+                const route = prepareRequestPath(ROUTE_UNIT_DELETE, {unitId: unit.id});
                 json = await jsonDelete(route);
                 throw new Error('Unauthorized access not detected');
             }

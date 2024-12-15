@@ -2,14 +2,14 @@
 
 import mysql from 'promise-mysql';
 
-import { sleep } from '../util.js';
-import CompanyModelSingleton  from './CompanyModel.js';
-import UserModelSingleton     from './UserModel.js';
-import AccountModelSingleton  from './AccountModel.js';
-import TokenModelSingleton    from './TokenModel.js';
-import AuthModelSingleton     from './AuthModel.js';
-import UnitModelSingleton     from './UnitModel.js';
-import { AccountState } from '../../../common/src/global.mjs';
+import {sleep} from '../util.js';
+import CompanyModelSingleton from './CompanyModel.js';
+import UserModelSingleton from './UserModel.js';
+import AccountModelSingleton from './AccountModel.js';
+import TokenModelSingleton from './TokenModel.js';
+import AuthModelSingleton from './AuthModel.js';
+import UnitModelSingleton from './UnitModel.js';
+import {AccountState} from '../../../common/src/global.mjs';
 
 class Model {
     #dbPool = null;
@@ -27,11 +27,11 @@ class Model {
         const dbConfig = config.database;
         if (dbConfig === undefined)
             throw new Error(`Config «database» section not defined`);
-        const dbParameterNames = [ 
-            'name', 'host', 'port', 'user', 'password', 
+        const dbParameterNames = [
+            'name', 'host', 'port', 'user', 'password',
             'retry_interval', 'max_retries', 'ping_interval'
         ];
-        for (const parameterName of dbParameterNames ) {
+        for (const parameterName of dbParameterNames) {
             if (dbConfig[parameterName] === undefined)
                 throw new Error(`Parameter «${parameterName}» not defined`);
         }
@@ -40,15 +40,15 @@ class Model {
         if (config.security === undefined)
             throw new Error(`Config «security» section not defined`);
 
-		// connection retry loop
-		const retryInterval = dbConfig.retry_interval;
-		let maxRetries = dbConfig.max_retries;
+        // connection retry loop
+        const retryInterval = dbConfig.retry_interval;
+        let maxRetries = dbConfig.max_retries;
         if (maxRetries < 0)
             maxRetries = Infinity;
 
         // L'initialisation du pool ne tente pas directement une connexion à la base
         // les connexions réelles à la base se font lors des requêtes
-		let dbPool =  await mysql.createPool({
+        let dbPool = await mysql.createPool({
             host: dbConfig.host,
             database: dbConfig.name,
             user: dbConfig.user,
@@ -58,44 +58,44 @@ class Model {
         });
 
         let connection = false;
-		for (let retry = 0; retry < maxRetries ; retry++){
-			console.log(`Connecting database ...`);
-			try {
+        for (let retry = 0; retry < maxRetries; retry++) {
+            console.log(`Connecting database ...`);
+            try {
                 // execute a fake query to initialize database connection
                 await dbPool.query('SELECT 1');
                 connection = true;
                 break;
-			}
-			catch (error) {
-				console.log(`Database connection error : ${error.message}`);
-			}
-			console.log(`Connection retry n°${retry+1}/${maxRetries} : waiting ${retryInterval}s...`);
-			await sleep(retryInterval * 1000);
-		}
+            }
+            catch (error) {
+                console.log(`Database connection error : ${error.message}`);
+            }
+            console.log(`Connection retry n°${retry + 1}/${maxRetries} : waiting ${retryInterval}s...`);
+            await sleep(retryInterval * 1000);
+        }
         if (connection === false)
             throw new Error(`Can not connect database`);
 
         this.#dbPool = dbPool;
 
-		// setting regular database ping to keep connection alive
-		const pingInterval = dbConfig.ping_interval;
-		console.log(`Database ping interval : ${pingInterval}s`);
+        // setting regular database ping to keep connection alive
+        const pingInterval = dbConfig.ping_interval;
+        console.log(`Database ping interval : ${pingInterval}s`);
         let interrupt = false;
-		setInterval( async () => {
-			try {
-				await dbPool.query('SELECT 1');
+        setInterval(async () => {
+            try {
+                await dbPool.query('SELECT 1');
                 if (interrupt) {
-				    console.log('Database connection resumed'); 
+                    console.log('Database connection resumed');
                     interrupt = false;
                 }
-			} catch(error) {
-                if (! interrupt) {
-				    console.log('Database connection lost'); 
+            } catch (error) {
+                if (!interrupt) {
+                    console.log('Database connection lost');
                 }
-				console.log(`Database ping error : ${error.message}`);
+                console.log(`Database ping error : ${error.message}`);
                 interrupt = true;
-			}
-		}, pingInterval * 1000);
+            }
+        }, pingInterval * 1000);
 
         // company model is used by user model
         this.#companyModel = CompanyModelSingleton.getInstance();
@@ -114,7 +114,7 @@ class Model {
         this.#adminModel.initialize(dbPool);
         this.#companyModel.initialize(dbPool);
         this.#unitModel.initialize(dbPool);
-        
+
         const adminEmail = config.admin.email;
         const adminPassword = config.admin.password;
         if (adminEmail !== null && adminPassword !== null) {
@@ -141,12 +141,12 @@ class Model {
     async checkAccess() {
         const rows = await this.#dbPool.query('SELECT 1');
         // [ RowDataPacket { '1': 1 } ]
-        if (! (rows instanceof Array))
+        if (!(rows instanceof Array))
             throw new Error('Invalid result');
         if (rows.length !== 1)
             throw new Error('Invalid result');
         const res = rows[0];
-        if (! (rows instanceof Object))
+        if (!(res instanceof Object))
             throw new Error('Invalid result');
     }
 
@@ -182,15 +182,15 @@ class Model {
 
 class ModelSingleton {
 
-	constructor() {
-		throw new Error('Can not instanciate ModelSingleton!');
-	}
+    constructor() {
+        throw new Error('Can not instanciate ModelSingleton!');
+    }
 
-	static getInstance() {
-		if (! ModelSingleton.instance)
-			ModelSingleton.instance = new Model();
-		return ModelSingleton.instance;
-	}
+    static getInstance() {
+        if (!ModelSingleton.instance)
+            ModelSingleton.instance = new Model();
+        return ModelSingleton.instance;
+    }
 }
 
 export default ModelSingleton;

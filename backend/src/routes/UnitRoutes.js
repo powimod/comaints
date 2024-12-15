@@ -2,15 +2,11 @@
 import assert from 'assert';
 
 import UnitController from '../controllers/UnitController.js';
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
-import { controlObject } from '../../../common/src/objects/object-util.mjs';
-import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs';
+import {ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized} from '../../../common/src/error.mjs';
+//import { controlObject } from '../../../common/src/objects/object-util.mjs';
+//import unitObjectDef from '../../../common/src/objects/unit-object-def.mjs';
 
 import requireUserWithCompanyAuthMiddleware from '../middlewares/requireUserWithCompanyAuthMiddleware.js';
-import requireAdminAuthMiddleware from '../middlewares/requireAdminAuthMiddleware.js';
-import requireUserAuthMiddleware from '../middlewares/requireUserAuthMiddleware.js';
-import renewTokensMiddleware from '../middlewares/renewTokensMiddleware.js';
-import renewContextMiddleware from '../middlewares/renewContextMiddleware.js';
 import requestPaginationMiddleware from '../middlewares/requestPaginationMiddleware.js';
 import requestFiltersMiddleware from '../middlewares/requestFiltersMiddleware.js';
 import requestPropertiesMiddleware from '../middlewares/requestPropertiesMiddleware.js';
@@ -38,7 +34,7 @@ class UnitRoutes {
 
 
         // unit search route
-        expressApp.post('/api/v1/unit/search', requireUserWithCompanyAuthMiddleware, requestPropertiesMiddleware, requestFiltersMiddleware, requestPaginationMiddleware,  async (request) => {
+        expressApp.post('/api/v1/unit/search', requireUserWithCompanyAuthMiddleware, requestPropertiesMiddleware, requestFiltersMiddleware, requestPaginationMiddleware, async (request) => {
             const properties = request.requestProperties;
             assert(properties !== undefined);
             const filters = request.requestFilters;
@@ -65,9 +61,9 @@ class UnitRoutes {
 
                 let unit = request.body.unit;
                 if (unit === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'unit'});
-                if (typeof(unit) !== 'object')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'unit'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'unit'});
+                if (typeof (unit) !== 'object')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'unit'});
 
                 // for non admin users, force user company ID
                 if (request.companyId !== null)
@@ -75,7 +71,7 @@ class UnitRoutes {
 
                 await unitController.createUnit(unit, view);
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
@@ -99,17 +95,17 @@ class UnitRoutes {
             try {
                 let unitId = request.params.id;
                 if (isNaN(unitId))
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'id'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'id'});
                 unitId = parseInt(unitId);
 
                 let unit = request.body.unit;
                 if (unit === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'unit'});
-                if (typeof(unit) !== 'object')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'unit'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'unit'});
+                if (typeof (unit) !== 'object')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'unit'});
 
                 if (unit.id !== unitId)
-                    throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'unit', id: 'id'});
+                    throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', {object: 'unit', id: 'id'});
 
                 if (unit.companyId !== request.companyId)
                     throw new ComaintApiErrorUnauthorized('error.not_owner');
@@ -118,7 +114,7 @@ class UnitRoutes {
                     request.isAdministrator === true || unit.companyId === request.companyId
                 ));
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
@@ -131,14 +127,14 @@ class UnitRoutes {
             try {
                 let unitId = request.params.id;
                 if (isNaN(unitId))
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'id'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'id'});
                 unitId = parseInt(unitId);
 
-                const deleted = await unitController.deleteUnitById(unitId, view, unit => (
+                await unitController.deleteUnitById(unitId, view, unit => (
                     request.isAdministrator === true || unit.companyId === request.companyId
                 ));
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
@@ -155,7 +151,7 @@ class UnitRoutesSingleton {
     }
 
     static getInstance() {
-        if (! UnitRoutesSingleton.#instance)
+        if (!UnitRoutesSingleton.#instance)
             UnitRoutesSingleton.#instance = new UnitRoutes();
         return UnitRoutesSingleton.#instance;
     }

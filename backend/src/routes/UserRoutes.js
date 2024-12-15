@@ -2,18 +2,14 @@
 import assert from 'assert';
 
 import UserController from '../controllers/UserController.js';
-import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
+import {ComaintApiErrorInvalidRequest} from '../../../common/src/error.mjs';
 
 import requireAdminAuthMiddleware from '../middlewares/requireAdminAuthMiddleware.js';
-import requireUserAuthMiddleware from '../middlewares/requireUserAuthMiddleware.js';
-import renewTokensMiddleware from '../middlewares/renewTokensMiddleware.js';
-import renewContextMiddleware from '../middlewares/renewContextMiddleware.js';
 import requestPaginationMiddleware from '../middlewares/requestPaginationMiddleware.js';
-import requestFiltersMiddleware from '../middlewares/requestFiltersMiddleware.js';
 import requestPropertiesMiddleware from '../middlewares/requestPropertiesMiddleware.js';
 
-import { controlObject } from '../../../common/src/objects/object-util.mjs';
-import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
+//import { controlObject } from '../../../common/src/objects/object-util.mjs';
+//import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 
 class UserRoutes {
 
@@ -45,13 +41,13 @@ class UserRoutes {
 
                 let user = request.body.user;
                 if (user === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'user'});
-                if (typeof(user) !== 'object')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'user'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'user'});
+                if (typeof (user) !== 'object')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'user'});
 
                 await userController.createUser(user, view);
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
@@ -73,26 +69,26 @@ class UserRoutes {
             try {
                 let userId = request.params.id;
                 if (isNaN(userId))
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'id'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'id'});
                 userId = parseInt(userId);
 
                 let user = request.body.user;
                 if (user === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'user'});
-                if (typeof(user) !== 'object')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'user'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'user'});
+                if (typeof (user) !== 'object')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'user'});
 
                 if (user.id !== userId)
-                    throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', { object: 'user', id: 'id'});
+                    throw new ComaintApiErrorInvalidRequest('error.invalid_object_id', {object: 'user', id: 'id'});
 
                 if (user.companyId !== request.companyId)
                     throw new ComaintApiErrorUnauthorized('error.not_owner');
 
-                await userController.editUser(user, view, unit => (
+                await userController.editUser(user, view, user => (
                     request.isAdministrator === true || user.companyId === request.companyId
                 ));
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
@@ -105,14 +101,14 @@ class UserRoutes {
             try {
                 let userId = request.params.id;
                 if (isNaN(userId))
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'id'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'id'});
                 userId = parseInt(userId);
 
-                const deleted = await userController.deleteUserById(userId, view, user => (
+                await userController.deleteUserById(userId, view, user => (
                     request.isAdministrator === true || user.companyId === request.companyId
                 ));
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
@@ -129,7 +125,7 @@ class UserRoutesSingleton {
     }
 
     static getInstance() {
-        if (! UserRoutesSingleton.#instance)
+        if (!UserRoutesSingleton.#instance)
             UserRoutesSingleton.#instance = new UserRoutes();
         return UserRoutesSingleton.#instance;
     }

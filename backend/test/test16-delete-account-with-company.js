@@ -1,30 +1,30 @@
 
-import { expect } from 'chai';
+import {expect} from 'chai';
 
-import { loadConfig, jsonPost, connectDb, disconnectDb, refreshToken, accessToken } from './util.js';
-import { createUserAccount, deleteUserAccount, getDatabaseUserById } from './helpers.js';
+import {loadConfig, jsonPost, connectDb, disconnectDb} from './util.js';
+import {createUserAccount, deleteUserAccount, getDatabaseUserById} from './helpers.js';
 
 const ROUTE_DELETE_ACCOUNT = 'api/v1/account/delete';
 const ROUTE_VALIDATE = 'api/v1/auth/validate';
-const ROUTE_INITIALIZE_COMPANY= 'api/v1/company/initialize';
+const ROUTE_INITIALIZE_COMPANY = 'api/v1/company/initialize';
 
 describe('Test delete account route', () => {
 
     const companyName = 'My company';
- 
+
     let user = null;
     let userId = null;
-    let authCode  = null;
+    let authCode = null;
     let company = null;
 
-    before( async () =>  {
+    before(async () => {
         loadConfig();
         await connectDb();
         user = await createUserAccount();
         userId = user.id;
     });
 
-    after( async () =>  {
+    after(async () => {
         await deleteUserAccount(user);
         await disconnectDb();
     });
@@ -42,7 +42,7 @@ describe('Test delete account route', () => {
         });
 
         it('Call route to delete account', async () => {
-            const json = await jsonPost(ROUTE_DELETE_ACCOUNT, {confirmation:true, sendCodeByEmail: false});
+            const json = await jsonPost(ROUTE_DELETE_ACCOUNT, {confirmation: true, sendCodeByEmail: false});
             expect(json).to.be.instanceOf(Object);
             expect(json).to.have.property('message');
             expect(json.message).to.be.a('string').and.to.equal('Done, waiting for validation code');
@@ -56,7 +56,7 @@ describe('Test delete account route', () => {
         });
 
         it('Send validation code', async () => {
-            const json = await jsonPost(ROUTE_VALIDATE, { code: authCode });
+            const json = await jsonPost(ROUTE_VALIDATE, {code: authCode});
             expect(json).to.be.instanceOf(Object);
             expect(json).to.have.property('validated', true);
         });

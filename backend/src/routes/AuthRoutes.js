@@ -1,12 +1,9 @@
-
-
 import assert from 'assert';
 
 import AuthController from '../controllers/AuthController.js';
 import ModelSingleton from '../models/model.js';
-import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken } from '../../../common/src/error.mjs';
-import { AccountState } from '../../../common/src/global.mjs';
-import { controlObjectProperty } from '../../../common/src/objects/object-util.mjs';
+import {ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized, ComaintApiErrorInvalidToken} from '../../../common/src/error.mjs';
+import {controlObjectProperty} from '../../../common/src/objects/object-util.mjs';
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 
 class AuthRoutes {
@@ -14,17 +11,16 @@ class AuthRoutes {
     initialize(expressApp) {
 
         const authController = AuthController.getInstance();
-        // TODO ménage
-        const model  = ModelSingleton.getInstance();
+        const model = ModelSingleton.getInstance();
         const authModel = model.getAuthModel();
 
-        const _renewTokensMiddleware = async(refreshToken, view) => {
-            if (typeof(refreshToken) !== 'string')
+        const _renewTokensMiddleware = async (refreshToken, view) => {
+            if (typeof (refreshToken) !== 'string')
                 throw new Error('Invalid refresh token');
             let tokenFoundInDatabase, tokenId, userId, connected, companyId, administrator;
             [tokenFoundInDatabase, tokenId, userId, connected, companyId] = await authModel.checkRefreshToken(refreshToken);
 
-            if (! tokenFoundInDatabase) {
+            if (!tokenFoundInDatabase) {
                 // if a token is not found in database, it should be an attempt to usurp token :
                 // since a refresh token is deleted when used, it will not be found with a second attempt to use it.
                 console.log(`Token ${tokenId} not found in database`);
@@ -50,16 +46,16 @@ class AuthRoutes {
                 throw new Error('Invalid company ID in refresh token');
             administrator = user.administrator;
 
-            assert(typeof(connected) === 'boolean');
-            const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, connected);
-            const newAccessToken  = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId, true);
+            assert(typeof (connected) === 'boolean');
+            const [newRefreshToken, newRefreshTokenId] = await authModel.generateRefreshToken(userId, companyId, connected);
+            const newAccessToken = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId, true);
 
-            return [ userId, companyId, connected, newRefreshTokenId, newAccessToken, newRefreshToken, administrator ];
+            return [userId, companyId, connected, newRefreshTokenId, newAccessToken, newRefreshToken, administrator];
         };
 
 
         // middleware to manage access and refresh tokens
-        expressApp.use( async (request, _, next) => {
+        expressApp.use(async (request, _, next) => {
             assert(request.view !== undefined); // view middleware must have been called first
             const view = request.view;
             console.log(`Token middleware : token management for request ${request.url} ...`);
@@ -68,29 +64,29 @@ class AuthRoutes {
             let companyId = null;
             let refreshTokenId = null;
             let connected = false;
-            let administrator = null; 
+            let administrator = null;
 
             // parameter «expiredToken» to emulate expired access Token (in GET or POST request)
             let expiredAccessTokenEmulation = false;
-            if (request.query.expiredAccessTokenEmulation  === 'true') // GET : value is a string not a boolean
+            if (request.query.expiredAccessTokenEmulation === 'true') // GET : value is a string not a boolean
                 expiredAccessTokenEmulation = true;
             if (request.body.expiredAccessTokenEmulation === true) // POST
                 expiredAccessTokenEmulation = true;
 
             const refreshToken = request.headers['x-refresh-token'];
-            const accessToken  = request.headers['x-access-token'];
+            const accessToken = request.headers['x-access-token'];
 
             if (refreshToken !== undefined) {
                 console.log(`Token middleware - refresh token found -> renew tokens`);
                 try {
                     let newAccessToken, newRefreshToken;
-                    [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken, administrator ] = await _renewTokensMiddleware(refreshToken, view);
+                    [userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken, administrator] = await _renewTokensMiddleware(refreshToken, view);
                     view.storeRenewedTokens(newAccessToken, newRefreshToken);
                 }
                 catch (error) {
                     const errorMessage = error.message ? error.message : error;
                     console.log(`Token middleware - error : `, errorMessage);
-                    view.error( new ComaintApiErrorInvalidToken(), { resetAccount: true });
+                    view.error(new ComaintApiErrorInvalidToken(), {resetAccount: true});
                     return;
                 }
             }
@@ -127,15 +123,15 @@ class AuthRoutes {
             try {
                 let email = request.body.email;
                 if (email === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'email'});
-                if (typeof(email) !== 'string')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'email'});
+                if (typeof (email) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'email'});
 
                 let password = request.body.password;
                 if (password === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'password'});
-                if (typeof(password) !== 'string')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'password'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'password'});
+                if (typeof (password) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'password'});
 
                 // self-test does not send validation code by email
                 const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
@@ -146,18 +142,18 @@ class AuthRoutes {
 
                 const options = {
                     sendCodeByEmail,
-                    invalidateCodeImmediately 
+                    invalidateCodeImmediately
                 };
                 await authController.register(email, password, options, view);
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
 
 
         // this route is public for registration, and private for email change, account unlock and account deletion
-        expressApp.post('/api/v1/auth/validate', async (request, response) => {
+        expressApp.post('/api/v1/auth/validate', async (request, _) => {
             const view = request.view;
             try {
                 // TODO utiliser le contrôleur
@@ -166,9 +162,9 @@ class AuthRoutes {
                     const email = request.body.email;
                     if (email === undefined)
                         throw new Error("Can't identify user by access-token or email"); // TODO use ComaintApiError
-                    if (typeof(email) !== 'string')
-                        throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'});
-                    const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email);
+                    if (typeof (email) !== 'string')
+                        throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'email'});
+                    const [errorMsg1, errorParam1] = controlObjectProperty(userObjectDef, 'email', email);
                     if (errorMsg1)
                         throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1);
                     const user = await authModel.getUserProfileByEmail(email);
@@ -179,19 +175,19 @@ class AuthRoutes {
 
                 const code = request.body.code;
                 if (code === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'code'});
-                if (typeof(code) !== 'number')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'code'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'code'});
+                if (typeof (code) !== 'number')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'code'});
 
                 await authController.validateCode(userId, code, view);
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
 
         // public route
-        expressApp.post('/api/v1/auth/resend-code', async (request, response) => {
+        expressApp.post('/api/v1/auth/resend-code', async (request, _) => {
             const view = request.view;
             // self-test does not send validation code by email
             const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?
@@ -206,9 +202,9 @@ class AuthRoutes {
                     const email = request.body.email;
                     if (email === undefined)
                         throw new Error("Can't identify user by access-token or email"); // TODO use ComaintApiError
-                    if (typeof(email) !== 'string')
-                        throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'});
-                    const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email);
+                    if (typeof (email) !== 'string')
+                        throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'email'});
+                    const [errorMsg1, errorParam1] = controlObjectProperty(userObjectDef, 'email', email);
                     if (errorMsg1)
                         throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1);
                     const user = await authModel.getUserProfileByEmail(email);
@@ -225,7 +221,7 @@ class AuthRoutes {
 
 
         // public route
-        expressApp.post('/api/v1/auth/login', async (request, response) => {
+        expressApp.post('/api/v1/auth/login', async (request, _) => {
             const view = request.view;
             try {
                 if (request.userConnected)
@@ -233,18 +229,18 @@ class AuthRoutes {
 
                 let email = request.body.email;
                 if (email === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'email'});
-                if (typeof(email) !== 'string')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'});
-                const [ errorMsg1, errorParam1 ] = controlObjectProperty(userObjectDef, 'email', email);
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'email'});
+                if (typeof (email) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'email'});
+                const [errorMsg1, errorParam1] = controlObjectProperty(userObjectDef, 'email', email);
                 if (errorMsg1)
                     throw new ComaintApiErrorInvalidRequest(errorMsg1, errorParam1);
 
                 let password = request.body.password;
                 if (password === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'password'});
-                if (typeof(password) !== 'string')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'password'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'password'});
+                if (typeof (password) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'password'});
                 // FIXME strange error «Cannot set properties of undefined (setting 'undefined')»
                 // let errorMsg, errorParam
                 // First call :
@@ -253,7 +249,7 @@ class AuthRoutes {
                 // Second call :
                 //      [ errorMsg, errorParam ] = controlObjectProperty(userObjectDef, 'password', password)
                 //      => Error «Cannot set properties of undefined (setting 'undefined')»
-                const [ errorMsg2, errorParam2 ] = controlObjectProperty(userObjectDef, 'password', password);
+                const [errorMsg2, errorParam2] = controlObjectProperty(userObjectDef, 'password', password);
                 if (errorMsg2)
                     throw new ComaintApiErrorInvalidRequest(errorMsg2, errorParam2);
 
@@ -261,8 +257,8 @@ class AuthRoutes {
                 const user = await authModel.login(email, password);
                 const userId = user.id;
                 const companyId = user.companyId;
-                const [ newRefreshToken, newRefreshTokenId ] = await authModel.generateRefreshToken(userId, companyId, true);
-                const newAccessToken  = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId , true);
+                const [newRefreshToken, newRefreshTokenId] = await authModel.generateRefreshToken(userId, companyId, true);
+                const newAccessToken = await authModel.generateAccessToken(userId, companyId, user.administrator, newRefreshTokenId, true);
                 view.storeRenewedContext({
                     email: user.email,
                     connected: true,
@@ -270,15 +266,15 @@ class AuthRoutes {
                     company: user.companyId !== null
                 });
                 view.storeRenewedTokens(newAccessToken, newRefreshToken);
-                view.json({ message: 'login success'});
+                view.json({message: 'login success'});
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
 
         // public route (user not logged in are detected insight this function)
-        expressApp.post('/api/v1/auth/logout', async (request, response) => {
+        expressApp.post('/api/v1/auth/logout', async (request, _) => {
             const view = request.view;
             try {
                 const userId = request.userId; // HTTP token header
@@ -294,29 +290,29 @@ class AuthRoutes {
                     administrator: false,
                     company: false
                 });
-                view.json({ message: 'logout success'});
+                view.json({message: 'logout success'});
             }
-            catch(error) {
+            catch (error) {
                 view.error(error);
             }
         });
 
         // public route
-        expressApp.post('/api/v1/auth/refresh', async (request, response) => {
+        expressApp.post('/api/v1/auth/refresh', async (request, _) => {
             // do not control HTTP header access/refresh tokens : they may be null
             const view = request.view;
             try {
                 const refreshToken = request.body.token;
                 if (refreshToken === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'token'});
-                if (typeof(refreshToken) !== 'string')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'token'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'token'});
+                if (typeof (refreshToken) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'token'});
 
-                const [ userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken ] = await _renewTokensMiddleware(refreshToken, view);
+                const [userId, companyId, connected, refreshTokenId, newAccessToken, newRefreshToken] = await _renewTokensMiddleware(refreshToken, view);
 
                 console.log(`auth/refresh - send new tokens userId ${userId}`);
                 view.storeRenewedTokens(newAccessToken, newRefreshToken);
-                view.json({ message: 'token refresh done'});
+                view.json({message: 'token refresh done'});
             }
             catch (error) {
                 console.error("auth/refresh - error:", (error.message) ? error.message : error);
@@ -324,24 +320,24 @@ class AuthRoutes {
             }
         });
 
-        expressApp.post('/api/v1/auth/reset-password', async (request, response) => {
+        expressApp.post('/api/v1/auth/reset-password', async (request, _) => {
             const view = request.view;
-            const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?  request.body.sendCodeByEmail : true;
+            const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ? request.body.sendCodeByEmail : true;
             const options = {
                 sendCodeByEmail
             };
             try {
                 let email = request.body.email;
                 if (email === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'email'});
-                if (typeof(email) !== 'string')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'email'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'email'});
+                if (typeof (email) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'email'});
 
                 let newPassword = request.body.password;
                 if (newPassword === undefined)
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', { parameter: 'password'});
-                if (typeof(newPassword) !== 'string')
-                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', { parameter: 'password'});
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_not_found', {parameter: 'password'});
+                if (typeof (newPassword) !== 'string')
+                    throw new ComaintApiErrorInvalidRequest('error.request_param_invalid', {parameter: 'password'});
 
 
                 await authController.resetPassword(email, newPassword, options, view);
@@ -351,7 +347,7 @@ class AuthRoutes {
                 view.error(error);
             }
         });
- 
+
     }
 }
 
@@ -363,7 +359,7 @@ class AuthRoutesSingleton {
     }
 
     static getInstance() {
-        if (! AuthRoutesSingleton.#instance)
+        if (!AuthRoutesSingleton.#instance)
             AuthRoutesSingleton.#instance = new AuthRoutes();
         return AuthRoutesSingleton.#instance;
     }

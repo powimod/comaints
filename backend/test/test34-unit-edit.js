@@ -1,8 +1,8 @@
 
-import { expect } from 'chai';
+import {expect} from 'chai';
 
-import { loadConfig, jsonGet, jsonPost, prepareRequestPath, connectDb, disconnectDb } from './util.js';
-import { createUserAccount, deleteUserAccount, changeUser } from './helpers.js';
+import {loadConfig, jsonPost, prepareRequestPath, connectDb, disconnectDb} from './util.js';
+import {createUserAccount, deleteUserAccount, changeUser} from './helpers.js';
 
 const ROUTE_UNIT_CREATE = '/api/v1/unit';
 const ROUTE_UNIT_EDIT = '/api/v1/unit/{{unitId}}';
@@ -18,14 +18,14 @@ describe('Test unit edition', () => {
     let unit1 = null;
     let unit2 = null;
 
-    before( async () =>  {
+    before(async () => {
         loadConfig();
         await connectDb();
-        user2 = await createUserAccount({withCompany:true});
-        user1 = await createUserAccount({withCompany:true});
+        user2 = await createUserAccount({withCompany: true});
+        user1 = await createUserAccount({withCompany: true});
     });
 
-    after( async () =>  {
+    after(async () => {
         await deleteUserAccount(user1);
         await deleteUserAccount(user2);
         await disconnectDb();
@@ -58,8 +58,8 @@ describe('Test unit edition', () => {
 
         it(`Try to edit unit with no unit parameter`, async () => {
             try {
-                const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: unit1.id});
-                const json = await jsonPost(route, { });
+                const route = prepareRequestPath(ROUTE_UNIT_EDIT, {unitId: unit1.id});
+                const json = await jsonPost(route, {});
                 console.log(json);
                 throw new Error('Missing unit parameter not detected');
             }
@@ -71,8 +71,8 @@ describe('Test unit edition', () => {
 
         it(`Try to edit unit with invalid unit parameter`, async () => {
             try {
-                const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: unit1.id});
-                const json = await jsonPost(route, { unit: 'abc' });
+                const route = prepareRequestPath(ROUTE_UNIT_EDIT, {unitId: unit1.id});
+                const json = await jsonPost(route, {unit: 'abc'});
                 console.log(json);
                 throw new Error('Invalid unit parameter not detected');
             }
@@ -83,11 +83,11 @@ describe('Test unit edition', () => {
         });
 
         it(`Try to edit unit with missing ID`, async () => {
-            const unit = {... unit1};
+            const unit = {...unit1};
             delete unit.id;
             try {
-                const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: unit1.id});
-                const json = await jsonPost(route, { unit });
+                const route = prepareRequestPath(ROUTE_UNIT_EDIT, {unitId: unit1.id});
+                const json = await jsonPost(route, {unit});
                 console.log(json);
                 throw new Error('Missing ID not detected');
             }
@@ -98,11 +98,11 @@ describe('Test unit edition', () => {
         });
 
         it(`Try to edit unit with empty name property`, async () => {
-            const unit = {... unit1};
+            const unit = {...unit1};
             unit.name = '';
             try {
-                const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: unit1.id});
-                const json = await jsonPost(route, { unit });
+                const route = prepareRequestPath(ROUTE_UNIT_EDIT, {unitId: unit1.id});
+                const json = await jsonPost(route, {unit});
                 console.log(json);
                 throw new Error('Empty name property not detected');
             }
@@ -118,11 +118,11 @@ describe('Test unit edition', () => {
 
         it(`Edit first unit`, async () => {
             const refUnit = unit1;
-            const editedUnit = {... refUnit};
+            const editedUnit = {...refUnit};
             const newName = editedUnit.name + '_edited';
             editedUnit.name = newName;
-            const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: refUnit.id});
-            const json = await jsonPost(route, { unit: editedUnit });
+            const route = prepareRequestPath(ROUTE_UNIT_EDIT, {unitId: refUnit.id});
+            const json = await jsonPost(route, {unit: editedUnit});
             expect(json).to.have.keys('unit');
             const unit = json.unit;
             expect(unit).to.have.property('id', refUnit.id);
@@ -133,11 +133,11 @@ describe('Test unit edition', () => {
 
         it(`Edit first unit with already used name`, async () => {
             const refUnit = unit1;
-            const editedUnit = {... refUnit};
+            const editedUnit = {...refUnit};
             editedUnit.name = unit2.name;
             try {
-                const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: refUnit.id});
-                await jsonPost(route, { unit: editedUnit });
+                const route = prepareRequestPath(ROUTE_UNIT_EDIT, {unitId: refUnit.id});
+                await jsonPost(route, {unit: editedUnit});
                 throw new Error('Duplicated name not detected');
             }
             catch (error) {
@@ -152,11 +152,11 @@ describe('Test unit edition', () => {
         it(`Check owner can edit its units`, async () => {
             await changeUser(user1);
             const refUnit = unit2;
-            const editedUnit = {... refUnit};
+            const editedUnit = {...refUnit};
             const newName = editedUnit.name + '_edited';
             editedUnit.name = newName;
-            const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: refUnit.id});
-            const json = await jsonPost(route, { unit: editedUnit });
+            const route = prepareRequestPath(ROUTE_UNIT_EDIT, {unitId: refUnit.id});
+            const json = await jsonPost(route, {unit: editedUnit});
             expect(json).to.have.keys('unit');
             const unit = json.unit;
             expect(unit).to.have.property('id', refUnit.id);
@@ -167,12 +167,12 @@ describe('Test unit edition', () => {
         it(`Check other user can not edit this units`, async () => {
             await changeUser(user2);
             const refUnit = unit2;
-            const editedUnit = {... refUnit};
+            const editedUnit = {...refUnit};
             const newName = editedUnit.name + '_edited';
             editedUnit.name = newName;
-            const route = prepareRequestPath(ROUTE_UNIT_EDIT, { unitId: refUnit.id});
+            const route = prepareRequestPath(ROUTE_UNIT_EDIT, {unitId: refUnit.id});
             try {
-                const json = await jsonPost(route, { unit: editedUnit });
+                const json = await jsonPost(route, {unit: editedUnit});
                 console.log(json);
                 throw new Error('Unauthorized acces non detected');
             }

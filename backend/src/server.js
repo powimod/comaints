@@ -7,7 +7,7 @@ import Backend from 'i18next-fs-backend';
 import middleware from 'i18next-http-middleware';
 import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 import swaggerUi from 'swagger-ui-express';
 import swaggerConfig from './swaggerConfig.js';
 
@@ -16,8 +16,6 @@ import MailManagerModel from './MailManager.js';
 import RouteManager from './routes/RouteManager.js';
 import ControllerManager from './controllers/ControllerManager.js';
 import ModelSingleton from './models/model.js';
-import View from './view.js';
-
 
 dotenv.config();
 
@@ -30,15 +28,15 @@ const main = async () => {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerConfig));
     //console.log(JSON.stringify(swaggerConfig.paths, null, 2));
     app.get('/swagger.json', (req, res) => {
-      res.setHeader('Content-Type', 'application/json');
-      res.send(swaggerConfig);
+        res.setHeader('Content-Type', 'application/json');
+        res.send(swaggerConfig);
     });
 
     // i18n support
     i18next.use(Backend).use(middleware.LanguageDetector).init({
         fallbackLng: 'en',
         preload: ['en', 'fr'],
-        ns: [ 'backend', 'common'],
+        ns: ['backend', 'common'],
         defaultNS: 'backend',
         backend: {
             loadPath: (lng, ns) => {
@@ -60,17 +58,17 @@ const main = async () => {
     // configuration is defined in «.env» file
     const env = process.env;
     const dbPassword = env.DB_PASSWORD;
-    if (! dbPassword)
+    if (!dbPassword)
         throw new Error('DB_PASSWORD not defined');
     const tokenSecret = env.TOKEN_SECRET;
-    if (! tokenSecret)
+    if (!tokenSecret)
         throw new Error('TOKEN_SECRET not defined');
 
-    const mailServerPassword = env.MAIL_SERVER_PASSWORD; 
-    if (! mailServerPassword)
+    const mailServerPassword = env.MAIL_SERVER_PASSWORD;
+    if (!mailServerPassword)
         throw new Error('MAIL_SERVER_PASSWORD not defined');
     const mailServerFrom = env.MAIL_SERVER_FROM;
-    if (! mailServerFrom)
+    if (!mailServerFrom)
         throw new Error('MAIL_SERVER_FROM not defined');
 
     const adminEmail = env.ADMIN_EMAIL || null;
@@ -100,9 +98,9 @@ const main = async () => {
             refreshTokenLifespan: parseInt(env.REFRESH_TOKEN_LIFESPAN) || 365, // days
             accessTokenLifespan: parseInt(env.ACCESS_TOKEN_LIFESPAN) || 120, // seconds
             codeValidityPeriod: parseInt(env.CODE_VALIDITY_PERIOD) || 600, // seconds
-            maxAuthAttempts: parseInt(env.MAX_AUTH_ATTEMPTS ) || 5
+            maxAuthAttempts: parseInt(env.MAX_AUTH_ATTEMPTS) || 5
         },
-        admin : {
+        admin: {
             email: adminEmail,
             password: adminPassword
         }
@@ -114,36 +112,36 @@ const main = async () => {
         user: env.MAIL_SERVER_USER || 'comaint',
         password: mailServerPassword,
         from: mailServerFrom,
-	    secure: env.MAIL_SECURE === 'true'
+        secure: env.MAIL_SECURE === 'true'
     };
 
     const mailManager = MailManagerModel.getInstance();
     mailManager.initialize(mailConfig);
 
-	const model = ModelSingleton.getInstance();
-	await model.initialize(config);
+    const model = ModelSingleton.getInstance();
+    await model.initialize(config);
 
-	const controllerManager = ControllerManager.getInstance();
-	await controllerManager.initialize(config);
+    const controllerManager = ControllerManager.getInstance();
+    await controllerManager.initialize(config);
 
-	const routeManager = RouteManager.getInstance();
-	await routeManager.initializeRoutes(config, app);
+    const routeManager = RouteManager.getInstance();
+    await routeManager.initializeRoutes(config, app);
 
     // catch signals to stop daemon
     const stopService = async () => {
         console.log('Stopping Comaint backend...');
-	    await model.terminate();
+        await model.terminate();
         process.exit(0);
     };
-    process.on('SIGINT' , stopService); // catch CTRL+C signal 
+    process.on('SIGINT', stopService); // catch CTRL+C signal 
     process.on('SIGTERM', stopService); // catch CTRL+D signal (sent by SystemD)
 
     const port = config.server.port;
-    
+
     // use a Promise to transmit connection error to the main caller
-    await new Promise( (resolve, reject) => {
+    await new Promise((resolve, reject) => {
         const server = app.listen(
-            port, 
+            port,
             () => { // success
                 console.log(`Comaint backend listening on ${port}...`);
                 resolve(server);
@@ -158,8 +156,8 @@ const main = async () => {
 
 
 main()
-. catch (error => {
-	const message = error.message ? error.message : error;
-    console.error(`ERROR : Can not start Comaint backend : ${message}`);
-	process.exit(1);
-});
+    .catch(error => {
+        const message = error.message ? error.message : error;
+        console.error(`ERROR : Can not start Comaint backend : ${message}`);
+        process.exit(1);
+    });

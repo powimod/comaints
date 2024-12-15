@@ -1,13 +1,12 @@
 
-import { expect } from 'chai';
+import {expect} from 'chai';
 
-import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb, requestDb, refreshToken, accessToken } from './util.js';
-import { createUserAccount, deleteUserAccount, userPublicProperties, getDatabaseUserById } from './helpers.js';
+import {loadConfig, jsonPost, connectDb, disconnectDb, refreshToken, accessToken} from './util.js';
+import {createUserAccount, deleteUserAccount, getDatabaseUserById} from './helpers.js';
 
 const ROUTE_RESEND_CODE = 'api/v1/auth/resend-code';
-const ROUTE_LOGIN= 'api/v1/auth/login';
+const ROUTE_LOGIN = 'api/v1/auth/login';
 const ROUTE_CHANGE_EMAIL = 'api/v1/account/change-email';
-const ROUTE_VALIDATE = 'api/v1/auth/validate';
 
 describe('Test delete account route', () => {
 
@@ -15,26 +14,24 @@ describe('Test delete account route', () => {
     const dte = new Date();
     const originalEmail = `u${dte.getTime()}A@x.y`;
     const newEmail = `u${dte.getTime()}B@x.y`;
- 
-    let user = null;
-    let userId = null;
-    let authCode  = null;
 
-    before( async () =>  {
+    let user = null;
+    let authCode = null;
+
+    before(async () => {
         loadConfig();
         await connectDb();
-        user = await createUserAccount({email: originalEmail, password: PASSWORD, logout:true});
-        userId = user.id;
+        user = await createUserAccount({email: originalEmail, password: PASSWORD, logout: true});
     });
 
-    after( async () =>  {
+    after(async () => {
         await deleteUserAccount(user);
         await disconnectDb();
     });
 
-    it ('Try resending code without being connected', async () => {
+    it('Try resending code without being connected', async () => {
         try {
-            const json = await jsonPost(ROUTE_RESEND_CODE);
+            await jsonPost(ROUTE_RESEND_CODE);
             expect.fail('Call with no data not detected');
         }
         catch (error) {
@@ -43,11 +40,11 @@ describe('Test delete account route', () => {
         }
     });
 
-     it('Call login route', async () => {
+    it('Call login route', async () => {
         let json = await jsonPost(ROUTE_LOGIN, {
-                email:user.email,
-                password: PASSWORD
-            });
+            email: user.email,
+            password: PASSWORD
+        });
         expect(json).to.be.instanceOf(Object).and.to.have.keys('context', 'message', 'access-token', 'refresh-token');
         expect(json.context).to.be.instanceOf(Object).and.to.have.keys('email', 'connected', 'administrator', 'company');
         expect(json.context.email).to.be.a('string').and.to.equal(user.email);
@@ -61,9 +58,9 @@ describe('Test delete account route', () => {
         expect(refreshToken).not.to.equal(null);
     });
 
-    it ('Try resending code without auth operation in progress', async () => {
+    it('Try resending code without auth operation in progress', async () => {
         try {
-            const json = await jsonPost(ROUTE_RESEND_CODE, {sendCodeByEmail: false});
+            await jsonPost(ROUTE_RESEND_CODE, {sendCodeByEmail: false});
             expect.fail('Call with no data not detected');
         }
         catch (error) {
@@ -73,7 +70,7 @@ describe('Test delete account route', () => {
     });
 
     it('Call route to change email', async () => {
-        const json = await jsonPost(ROUTE_CHANGE_EMAIL, {email:newEmail, password:PASSWORD, sendCodeByEmail: false});
+        const json = await jsonPost(ROUTE_CHANGE_EMAIL, {email: newEmail, password: PASSWORD, sendCodeByEmail: false});
         expect(json).to.be.instanceOf(Object).and.to.have.keys('message');
         expect(json.message).to.be.a('string').and.to.equal('Done, waiting for validation code');
     });
@@ -89,13 +86,13 @@ describe('Test delete account route', () => {
         authCode = dbUser.auth_code;
     });
 
-    it ('Call route to resend auth code', async () => {
+    it('Call route to resend auth code', async () => {
         const json = await jsonPost(ROUTE_RESEND_CODE, {sendCodeByEmail: false});
         expect(json).to.be.instanceOf(Object).and.to.have.keys('message');
         expect(json.message).to.be.a('string').and.to.equal('Code resent');
     });
 
-     it('Get new auth token in database after code resent', async () => {
+    it('Get new auth token in database after code resent', async () => {
         const dbUser = await getDatabaseUserById(user.id);
         expect(dbUser).to.be.instanceOf(Object);
         expect(dbUser.auth_action).to.equal('change-email');
