@@ -1,4 +1,4 @@
-'use strict';
+
 import assert from 'assert';
 
 import ModelSingleton from '../models/model.js';
@@ -8,7 +8,7 @@ import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 import { AccountState } from '../../../common/src/global.mjs';
 
 class AuthController {
-    static #instance = null
+    static #instance = null;
 
     #model = null;
     #authModel = null;

@@ -1,4 +1,4 @@
-'use strict';
+
 import assert from 'assert';
 
 import ModelSingleton from '../models/model.js';
@@ -8,7 +8,7 @@ import companyObjectDef from '../../../common/src/objects/company-object-def.mjs
 
 
 class CompanyController {
-    static #instance = null
+    static #instance = null;
 
     #model = null;
     #companyModel = null;
@@ -113,7 +113,7 @@ class CompanyController {
             view.json({company});
         }
         catch(error) {
-            console.log(error)
+            console.log(error);
             view.error(error);
         }
     }

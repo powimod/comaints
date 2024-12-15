@@ -1,11 +1,11 @@
-'use strict';
+
 import assert from 'assert';
 
 import ModelSingleton from '../models/model.js';
 import { ComaintApiErrorInvalidRequest, ComaintApiErrorUnauthorized } from '../../../common/src/error.mjs';
 
 class AdminController {
-    static #instance = null
+    static #instance = null;
 
     #model = null;
     #adminModel = null;

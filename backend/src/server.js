@@ -1,4 +1,4 @@
-'use strict';
+
 const BACKEND_VERSION = '0.0.1';
 
 import express from 'express';
@@ -106,7 +106,7 @@ const main = async () => {
             email: adminEmail,
             password: adminPassword
         }
-    }
+    };
 
     const mailConfig = {
         host: env.MAIL_SERVER_HOST || 'localhost',
@@ -115,7 +115,7 @@ const main = async () => {
         password: mailServerPassword,
         from: mailServerFrom,
 	    secure: env.MAIL_SECURE === 'true'
-    }
+    };
 
     const mailManager = MailManagerModel.getInstance();
     mailManager.initialize(mailConfig);

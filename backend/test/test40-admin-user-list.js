@@ -1,4 +1,4 @@
-'use strict';
+
 import { expect } from 'chai';
 
 import { loadConfig, jsonGet, connectDb, disconnectDb } from './util.js';
@@ -30,7 +30,7 @@ describe('Test users list with admin account', () => {
 
         it(`Log with admin account`, async () => {
             const json= await connectWithAdminAccount();
-            expect(json.context).to.be.instanceOf(Object)
+            expect(json.context).to.be.instanceOf(Object);
             expect(json.context).to.have.property('administrator',true);
             expect(json.context).to.have.property('company', false);
         });
@@ -46,7 +46,7 @@ describe('Test users list with admin account', () => {
             //console.log("users", userList.map( u => u.name).join(', '))
             let user = userList[0];
             expect(user).to.be.instanceOf(Object).and.to.have.keys([ 'id', 'email', 'firstname', 'lastname' ]);
-            expect(user.id).to.be.a('number')
+            expect(user.id).to.be.a('number');
         });
 
 

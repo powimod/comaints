@@ -1,4 +1,4 @@
-'use strict';
+
 import assert from 'assert';
 
 import { buildFieldArrays, controlObject } from '../../../common/src/objects/object-util.mjs';

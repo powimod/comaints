@@ -1,4 +1,4 @@
-'use strict';
+
 import { expect } from 'chai';
 
 import { loadConfig, jsonGet, jsonPost, jsonDelete, prepareRequestPath, connectDb, disconnectDb } from './util.js';
@@ -17,7 +17,6 @@ describe('Test unit suppression', () => {
     let user1 = null;
     let user2 = null;
     let unit1 = null;
-    let unit2 = null;
 
     before( async () =>  {
         loadConfig();

@@ -1,4 +1,4 @@
-'use strict';
+
 import assert from 'assert';
 
 import ModelSingleton from '../models/model.js';
@@ -7,7 +7,7 @@ import { controlObjectProperty, buildPublicObjectVersion } from '../../../common
 import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 
 class AccountController {
-    static #instance = null
+    static #instance = null;
 
     #model = null;
     #accountModel = null;

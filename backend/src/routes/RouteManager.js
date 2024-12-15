@@ -1,4 +1,4 @@
-'use strict';
+
 
 import ModelSingleton from '../models/model.js';
 import View from '../view.js';

@@ -1,5 +1,5 @@
-'use strict';
-import assert from 'assert'
+
+import assert from 'assert';
 
 import GlobalController from '../controllers/GlobalController.js';
 import View from '../view.js';

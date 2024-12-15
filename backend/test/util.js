@@ -1,4 +1,4 @@
-'use strict';
+
 
 import dotenv from 'dotenv';
 import promise_mysql from 'promise-mysql';

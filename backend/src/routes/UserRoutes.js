@@ -1,5 +1,5 @@
-'use strict';
-import assert from 'assert'
+
+import assert from 'assert';
 
 import UserController from '../controllers/UserController.js';
 import { ComaintApiErrorInvalidRequest } from '../../../common/src/error.mjs';
@@ -28,7 +28,7 @@ class UserRoutes {
             assert(pagination !== undefined);
 
             // for non admin users, add a filter on user company
-            const filters = {}
+            const filters = {};
             if (request.companyId !== null)
                 filters.companyId = request.companyId;
 

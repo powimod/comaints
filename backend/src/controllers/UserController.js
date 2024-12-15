@@ -1,4 +1,4 @@
-'use strict';
+
 import assert from 'assert';
 
 import ModelSingleton from '../models/model.js';
@@ -8,7 +8,7 @@ import userObjectDef from '../../../common/src/objects/user-object-def.mjs';
 
 
 class UserController {
-    static #instance = null
+    static #instance = null;
 
     #model = null;
     #userModel = null;
@@ -85,7 +85,7 @@ class UserController {
             view.json({user});
         }
         catch(error) {
-            console.log(error)
+            console.log(error);
             view.error(error);
         }
     }

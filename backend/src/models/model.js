@@ -1,4 +1,4 @@
-'use strict';
+
 
 import mysql from 'promise-mysql';
 

@@ -1,4 +1,4 @@
-'use strict';
+
 
 import assert from 'assert';
 import bcrypt from 'bcrypt';

@@ -1,4 +1,4 @@
-'use strict';
+
 
 import assert from 'assert';
 
@@ -174,7 +174,7 @@ class AuthRoutes {
                     const user = await authModel.getUserProfileByEmail(email);
                     if (user === null)
                         throw new Error('User not found'); // FIXME silently ignore error ?
-                    userId = user.id
+                    userId = user.id;
                 }
 
                 const code = request.body.code;
@@ -214,7 +214,7 @@ class AuthRoutes {
                     const user = await authModel.getUserProfileByEmail(email);
                     if (user === null)
                         throw new Error('User not found'); // FIXME silently ignore error ?
-                    userId = user.id
+                    userId = user.id;
                 }
                 await authController.resendCode(userId, options, view);
             }
@@ -329,7 +329,7 @@ class AuthRoutes {
             const sendCodeByEmail = (request.body.sendCodeByEmail !== undefined) ?  request.body.sendCodeByEmail : true;
             const options = {
                 sendCodeByEmail
-            }
+            };
             try {
                 let email = request.body.email;
                 if (email === undefined)

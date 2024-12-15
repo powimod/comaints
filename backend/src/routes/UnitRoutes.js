@@ -1,4 +1,4 @@
-'use strict';
+
 import assert from 'assert';
 
 import UnitController from '../controllers/UnitController.js';
@@ -29,7 +29,7 @@ class UnitRoutes {
             const view = request.view;
 
             // for non admin users, add a filter on user company
-            const filters = {}
+            const filters = {};
             if (request.companyId !== null)
                 filters.companyId = request.companyId;
 
@@ -71,7 +71,7 @@ class UnitRoutes {
 
                 // for non admin users, force user company ID
                 if (request.companyId !== null)
-                    unit.companyId = request.companyId
+                    unit.companyId = request.companyId;
 
                 await unitController.createUnit(unit, view);
             }

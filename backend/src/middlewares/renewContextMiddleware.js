@@ -24,4 +24,4 @@ const renewContextMiddleware = async (request, user) => {
     });
 };
 
-export default renewContextMiddleware 
+export default renewContextMiddleware; 

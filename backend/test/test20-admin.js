@@ -1,4 +1,4 @@
-'use strict';
+
 import { expect } from 'chai';
 
 import { loadConfig, jsonGet, jsonPost, connectDb, disconnectDb } from './util.js';

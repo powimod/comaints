@@ -1,4 +1,4 @@
-'use strict';
+
 
 import ModelSingleton from '../models/model.js';
 import View from '../view.js';
@@ -15,7 +15,7 @@ import GlobalController  from './GlobalController.js';
 const API_VERSION = 'v1';
 
 class ControllerManager {
-    static #instance = null
+    static #instance = null;
 
 	#authController = null;
 	#accountController = null;
